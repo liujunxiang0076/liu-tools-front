@@ -3,10 +3,13 @@ export interface Tool {
   id: number
   name: string
   description: string
-  category: string
   icon: string
+  category: string
   tags: string[]
-  path?: string // 工具路径，用于路由跳转
+  path?: string
+  difficulty?: 'easy' | 'medium' | 'hard'
+  isPro?: boolean
+  isNew?: boolean
 }
 
 // 分类接口定义
@@ -14,12 +17,15 @@ export interface Category {
   id: string
   name: string
   icon: string
-  color: string
+  color?: string
   count?: number
 }
 
 // 视图类型
 export type ViewType = 'grid' | 'list'
+
+// 重新导出布局相关类型
+export * from './layout'
 
 // 收藏工具接口
 export interface FavoriteTool {

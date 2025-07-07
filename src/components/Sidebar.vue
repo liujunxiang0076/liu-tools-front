@@ -322,7 +322,7 @@ const handleClearFavorites = () => {
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
-  truncate: ellipsis;
+  text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
 }
