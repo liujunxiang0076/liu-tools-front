@@ -47,4 +47,9 @@ build/
 
 # 其他常见忽略
 coverage/
-.idea/ 
+.idea/
+
+# Auto Import 生成的文件
+auto-imports.d.ts
+components.d.ts
+.eslintrc-auto-import.json 
