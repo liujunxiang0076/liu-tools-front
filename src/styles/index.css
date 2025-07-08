@@ -8,16 +8,28 @@ html {
   scroll-behavior: smooth;
 }
 
+/* 全局样式重置 */
 body {
-  font-family: 'Inter', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-  line-height: 1.6;
   margin: 0;
   padding: 0;
+  font-family: 'Inter', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  /* 添加微妙的背景纹理效果 */
+  background: linear-gradient(135deg, hsl(var(--b2)) 0%, hsl(var(--b2)/0.8) 100%);
 }
 
 #app {
-  height: 100vh;
-  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  /* 确保应用填满整个视口 */
+  background: linear-gradient(
+    135deg, 
+    hsl(var(--b2)) 0%, 
+    hsl(var(--b2)/0.95) 25%,
+    hsl(var(--b2)/0.9) 50%,
+    hsl(var(--b2)/0.95) 75%,
+    hsl(var(--b2)) 100%
+  );
 }
 
 /* 品牌Logo渐变 */
@@ -30,15 +42,19 @@ body {
 
 /* 顶部导航栏 */
 .toolbar {
-  background-color: hsl(var(--b1));
-  border-bottom: 1px solid hsl(var(--b3));
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  background: linear-gradient(180deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.98) 100%);
+  border-bottom: 1px solid hsl(var(--b3) / 0.6);
+  box-shadow: 
+    0 1px 3px hsl(var(--bc) / 0.04),
+    0 1px 2px hsl(var(--bc) / 0.02);
   height: 64px;
   display: flex;
   align-items: center;
   padding: 0 1.5rem;
   position: relative;
   z-index: 10;
+  /* 添加微妙的毛玻璃效果 */
+  backdrop-filter: blur(10px);
 }
 
 .logo-container {
@@ -132,13 +148,17 @@ body {
 
 /* 侧边栏样式 */
 .sidebar {
-  background-color: hsl(var(--b1));
-  border-right: 1px solid hsl(var(--b3));
+  background: linear-gradient(180deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.98) 100%);
+  border-right: 1px solid hsl(var(--b3) / 0.6);
   width: 264px;
   height: 100%;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  /* 添加微妙的阴影 */
+  box-shadow: 
+    1px 0 3px hsl(var(--bc) / 0.03),
+    1px 0 2px hsl(var(--bc) / 0.02);
 }
 
 .sidebar-header {
@@ -290,21 +310,31 @@ body {
 
 /* 工具卡片样式 */
 .tool-card {
-  background-color: hsl(var(--b1));
-  border: 1px solid hsl(var(--b3));
-  border-radius: 16px;
+  background: hsl(var(--b1));
+  border: 1px solid hsl(var(--b3) / 0.6);
+  border-radius: 1rem;
   padding: 1.5rem;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  /* 添加微妙的渐变背景 */
+  background: linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.98) 100%);
+  /* 添加微妙的阴影 */
+  box-shadow: 
+    0 1px 3px hsl(var(--bc) / 0.05),
+    0 1px 2px hsl(var(--bc) / 0.03);
 }
 
 .tool-card:hover {
-  transform: translateY(-2px);
-  border-color: hsl(var(--p));
-  box-shadow: 0 4px 12px hsl(var(--p) / 0.15);
+  transform: translateY(-2px) scale(1.02);
+  border-color: hsl(var(--p) / 0.3);
+  box-shadow: 
+    0 8px 25px hsl(var(--bc) / 0.08),
+    0 3px 12px hsl(var(--p) / 0.1),
+    inset 0 1px 0 hsl(var(--b1));
+  /* 添加微妙的光泽效果 */
+  background: linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.95) 100%);
 }
 
 .tool-icon {
@@ -500,18 +530,24 @@ body {
 
 /* 收藏工具卡片 */
 .favorite-tool-card {
-  background-color: hsl(var(--b1));
-  border: 1px solid hsl(var(--b3));
+  background: linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.98) 100%);
+  border: 1px solid hsl(var(--b3) / 0.6);
   border-radius: 0.75rem;
   padding: 0.75rem;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  box-shadow: 
+    0 1px 3px hsl(var(--bc) / 0.05),
+    0 1px 2px hsl(var(--bc) / 0.03);
 }
 
 .favorite-tool-card:hover {
-  border-color: hsl(var(--p));
-  background-color: hsl(var(--p) / 0.02);
-  transform: scale(1.01);
+  border-color: hsl(var(--p) / 0.3);
+  background: linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.95) 100%);
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 
+    0 4px 12px hsl(var(--bc) / 0.06),
+    0 2px 6px hsl(var(--p) / 0.08);
 }
 
 /* 动画类 */

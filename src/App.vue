@@ -53,12 +53,12 @@ const initializeTheme = () => {
   // 检测系统偏好
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
   
-  // 确定要使用的主题 - 默认使用标准的light主题以获得最佳背景搭配
-  let initialTheme = 'light'
+  // 确定要使用的主题 - 默认使用优化的tropical主题以获得更好的背景搭配
+  let initialTheme = 'tropical'
   if (savedTheme) {
     initialTheme = savedTheme
   } else if (prefersDark) {
-    initialTheme = 'dark'
+    initialTheme = 'tropical-dark'
   }
   
   theme.value = initialTheme
@@ -67,7 +67,7 @@ const initializeTheme = () => {
   // 监听系统主题变化
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
     if (!localStorage.getItem('theme')) {
-      const newTheme = e.matches ? 'dark' : 'light'
+      const newTheme = e.matches ? 'tropical-dark' : 'tropical'
       theme.value = newTheme
       document.documentElement.setAttribute('data-theme', newTheme)
     }

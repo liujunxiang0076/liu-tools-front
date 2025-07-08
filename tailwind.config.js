@@ -78,8 +78,8 @@ export default {
           "accent": "#ff6b6b",           // 珊瑚红
           "neutral": "#3d4451",          // 中性灰
           "base-100": "#ffffff",         // 卡片背景纯白色
-          "base-200": "#f8fafc",         // 页面主背景浅灰
-          "base-300": "#f1f5f9",         // 更浅的分割线和边框
+          "base-200": "#fafbfc",         // 页面主背景，极浅的蓝灰色
+          "base-300": "#e4e7eb",         // 分割线和边框，温和的灰色
           "base-content": "#1f2937",     // 主文字颜色
           "info": "#4dabf7",             // 信息蓝
           "success": "#51cf66",          // 成功绿
