@@ -13,23 +13,29 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Inter', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-  /* 添加微妙的背景纹理效果 */
-  background: linear-gradient(135deg, hsl(var(--b2)) 0%, hsl(var(--b2)/0.8) 100%);
+  /* 添加现代化的背景效果 */
+  background: 
+    radial-gradient(circle at 20% 80%, hsl(var(--p) / 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, hsl(var(--s) / 0.03) 0%, transparent 50%),
+    linear-gradient(135deg, hsl(var(--b2)) 0%, hsl(var(--b2)/0.95) 100%);
 }
 
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-  /* 确保应用填满整个视口 */
-  background: linear-gradient(
-    135deg, 
-    hsl(var(--b2)) 0%, 
-    hsl(var(--b2)/0.95) 25%,
-    hsl(var(--b2)/0.9) 50%,
-    hsl(var(--b2)/0.95) 75%,
-    hsl(var(--b2)) 100%
-  );
+  /* 创造更丰富的背景层次 */
+  background: 
+    radial-gradient(circle at 25% 25%, hsl(var(--p) / 0.025) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, hsl(var(--s) / 0.025) 0%, transparent 50%),
+    linear-gradient(
+      135deg, 
+      hsl(var(--b2)) 0%, 
+      hsl(var(--b2)/0.98) 25%,
+      hsl(var(--b2)/0.95) 50%,
+      hsl(var(--b2)/0.98) 75%,
+      hsl(var(--b2)) 100%
+    );
 }
 
 /* 品牌Logo渐变 */
@@ -42,19 +48,22 @@ body {
 
 /* 顶部导航栏 */
 .toolbar {
-  background: linear-gradient(180deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.98) 100%);
-  border-bottom: 1px solid hsl(var(--b3) / 0.6);
+  background: 
+    linear-gradient(180deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.97) 100%),
+    radial-gradient(circle at 50% 0%, hsl(var(--p) / 0.02) 0%, transparent 70%);
+  border-bottom: 1px solid hsl(var(--b3) / 0.8);
   box-shadow: 
+    0 2px 8px hsl(var(--bc) / 0.06),
     0 1px 3px hsl(var(--bc) / 0.04),
-    0 1px 2px hsl(var(--bc) / 0.02);
+    inset 0 1px 0 hsl(var(--b1) / 0.8);
   height: 64px;
   display: flex;
   align-items: center;
   padding: 0 1.5rem;
   position: relative;
   z-index: 10;
-  /* 添加微妙的毛玻璃效果 */
-  backdrop-filter: blur(10px);
+  /* 增强毛玻璃效果 */
+  backdrop-filter: blur(12px) saturate(1.2);
 }
 
 .logo-container {
@@ -148,17 +157,20 @@ body {
 
 /* 侧边栏样式 */
 .sidebar {
-  background: linear-gradient(180deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.98) 100%);
-  border-right: 1px solid hsl(var(--b3) / 0.6);
+  background: 
+    linear-gradient(180deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.97) 100%),
+    radial-gradient(circle at 0% 50%, hsl(var(--s) / 0.02) 0%, transparent 70%);
+  border-right: 1px solid hsl(var(--b3) / 0.8);
   width: 264px;
   height: 100%;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  /* 添加微妙的阴影 */
+  /* 增强阴影效果 */
   box-shadow: 
+    2px 0 8px hsl(var(--bc) / 0.05),
     1px 0 3px hsl(var(--bc) / 0.03),
-    1px 0 2px hsl(var(--bc) / 0.02);
+    inset -1px 0 0 hsl(var(--b1) / 0.5);
 }
 
 .sidebar-header {
@@ -311,30 +323,36 @@ body {
 /* 工具卡片样式 */
 .tool-card {
   background: hsl(var(--b1));
-  border: 1px solid hsl(var(--b3) / 0.6);
+  border: 1px solid hsl(var(--b3) / 0.8);
   border-radius: 1rem;
   padding: 1.5rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  /* 添加微妙的渐变背景 */
-  background: linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.98) 100%);
-  /* 添加微妙的阴影 */
+  /* 增强背景渐变效果 */
+  background: 
+    linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.97) 100%),
+    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.02) 0%, transparent 50%);
+  /* 增强阴影效果 */
   box-shadow: 
+    0 2px 8px hsl(var(--bc) / 0.08),
     0 1px 3px hsl(var(--bc) / 0.05),
-    0 1px 2px hsl(var(--bc) / 0.03);
+    inset 0 1px 0 hsl(var(--b1) / 0.5);
 }
 
 .tool-card:hover {
-  transform: translateY(-2px) scale(1.02);
-  border-color: hsl(var(--p) / 0.3);
+  transform: translateY(-4px) scale(1.02);
+  border-color: hsl(var(--p) / 0.4);
   box-shadow: 
-    0 8px 25px hsl(var(--bc) / 0.08),
-    0 3px 12px hsl(var(--p) / 0.1),
-    inset 0 1px 0 hsl(var(--b1));
-  /* 添加微妙的光泽效果 */
-  background: linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.95) 100%);
+    0 12px 35px hsl(var(--bc) / 0.12),
+    0 5px 15px hsl(var(--p) / 0.15),
+    inset 0 1px 0 hsl(var(--b1)),
+    0 0 0 1px hsl(var(--p) / 0.1);
+  /* 增强光泽效果 */
+  background: 
+    linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.95) 100%),
+    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.04) 0%, transparent 50%);
 }
 
 .tool-icon {
@@ -530,24 +548,31 @@ body {
 
 /* 收藏工具卡片 */
 .favorite-tool-card {
-  background: linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.98) 100%);
-  border: 1px solid hsl(var(--b3) / 0.6);
+  background: 
+    linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.97) 100%),
+    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.02) 0%, transparent 50%);
+  border: 1px solid hsl(var(--b3) / 0.8);
   border-radius: 0.75rem;
   padding: 0.75rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   box-shadow: 
-    0 1px 3px hsl(var(--bc) / 0.05),
-    0 1px 2px hsl(var(--bc) / 0.03);
+    0 2px 6px hsl(var(--bc) / 0.06),
+    0 1px 2px hsl(var(--bc) / 0.04),
+    inset 0 1px 0 hsl(var(--b1) / 0.5);
 }
 
 .favorite-tool-card:hover {
-  border-color: hsl(var(--p) / 0.3);
-  background: linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.95) 100%);
-  transform: translateY(-1px) scale(1.01);
+  border-color: hsl(var(--p) / 0.4);
+  background: 
+    linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.95) 100%),
+    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.04) 0%, transparent 50%);
+  transform: translateY(-2px) scale(1.01);
   box-shadow: 
-    0 4px 12px hsl(var(--bc) / 0.06),
-    0 2px 6px hsl(var(--p) / 0.08);
+    0 8px 20px hsl(var(--bc) / 0.08),
+    0 3px 8px hsl(var(--p) / 0.12),
+    inset 0 1px 0 hsl(var(--b1)),
+    0 0 0 1px hsl(var(--p) / 0.08);
 }
 
 /* 动画类 */
