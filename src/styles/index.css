@@ -83,8 +83,8 @@ body {
 }
 
 .logo-icon {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2rem;  /* 32px */
+  height: 2rem; /* 32px */
   border-radius: 0.75rem;
   background: linear-gradient(135deg, hsl(var(--p)), hsl(var(--s)));
   display: flex;
@@ -97,7 +97,7 @@ body {
 }
 
 .logo-text {
-  font-size: 1.25rem;
+  font-size: 1.25rem; /* 20px */
   font-weight: 700;
   color: hsl(var(--bc));
 }
@@ -108,10 +108,10 @@ body {
   font-weight: 500;
 }
 
-/* 搜索框样式 */
+/* 搜索框样式 - 最大宽度512px */
 .search-input {
   width: 100%;
-  max-width: 480px;
+  max-width: 512px;
   padding: 0.75rem 1rem 0.75rem 2.5rem;
   border: 1px solid hsl(var(--b3));
   border-radius: 0.75rem;
@@ -165,13 +165,13 @@ body {
   color: hsl(var(--bc));
 }
 
-/* 侧边栏样式 */
+/* 侧边栏样式 - 固定宽度256px */
 .sidebar {
   background: 
     linear-gradient(180deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.97) 100%),
     radial-gradient(circle at 0% 50%, hsl(var(--s) / 0.02) 0%, transparent 70%);
   border-right: 1px solid hsl(var(--b3) / 0.8);
-  width: 264px;
+  width: 256px; /* 固定256像素宽度 */
   height: 100%;
   flex-shrink: 0;
   display: flex;
@@ -184,15 +184,15 @@ body {
 }
 
 .sidebar-header {
-  padding: 1.5rem;
+  padding: 1.5rem; /* 保持24px内边距 */
   border-bottom: 1px solid hsl(var(--b3));
 }
 
 .sidebar-title {
-  font-size: 1.125rem;
-  font-weight: 700;
+  font-size: 1.125rem; /* 18像素 */
+  font-weight: 600; /* 半粗体 */
   color: hsl(var(--bc));
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 1rem 0; /* 底部间距16像素 */
 }
 
 .tools-count-badge {
@@ -207,27 +207,30 @@ body {
   border: 1px solid hsl(var(--b3));
 }
 
-/* 分类菜单项 */
+/* 分类菜单项样式 */
 .category-menu-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
-  transition: all 0.2s ease;
+  border-radius: 0.5rem;
   cursor: pointer;
-  margin-bottom: 0.25rem;
-  color: hsl(var(--bc));
+  transition: all 0.2s ease;
+  color: hsl(var(--bc) / 0.8);
+  font-size: 0.875rem;
+  border: 1px solid transparent;
 }
 
 .category-menu-item:hover {
-  background-color: hsl(var(--p) / 0.05);
-  color: hsl(var(--p));
+  background-color: hsl(var(--b2));
+  color: hsl(var(--bc));
+  border-color: hsl(var(--b3));
 }
 
 .category-menu-item.active {
-  background-color: hsl(var(--p) / 0.1);
-  color: hsl(var(--p));
+  background-color: hsl(var(--p));
+  color: hsl(var(--pc));
+  border-color: hsl(var(--p));
   font-weight: 600;
 }
 
@@ -256,37 +259,27 @@ body {
   border-color: hsl(var(--pc) / 0.3);
 }
 
-/* 新的图标容器样式 */
+/* 分类图标容器 */
 .category-icon-wrapper {
-  width: 1.5rem;
-  height: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 1rem; /* 16px */
+  height: 1rem; /* 16px */
+  margin-right: 0.75rem; /* 12px间距 */
   flex-shrink: 0;
-  margin-right: 0.75rem;
-  color: hsl(var(--bc) / 0.6);
-  transition: color 0.2s ease;
-  position: relative;
-}
-
-.category-menu-item:hover .category-icon-wrapper {
-  color: hsl(var(--p));
-}
-
-.category-menu-item.active .category-icon-wrapper {
-  color: hsl(var(--p));
 }
 
 /* SVG图标样式 */
 .category-icon-svg {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1rem; /* 16px */
+  height: 1rem; /* 16px */
 }
 
 /* emoji图标样式 */
 .category-icon-emoji {
-  font-size: 1.125rem;
+  font-size: 1rem; /* 16px */
+  line-height: 1;
 }
 
 /* 移除旧的分类图标样式，保留为后备 */
@@ -304,24 +297,22 @@ body {
   margin-right: 0.75rem;
 }
 
+/* 工具数量徽章 */
 .category-count-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.5rem;
-  background-color: hsl(var(--b2));
-  color: hsl(var(--bc) / 0.6);
-  border-radius: 0.5rem;
+  background-color: hsl(var(--b3));
+  color: hsl(var(--bc) / 0.7);
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
   font-size: 0.75rem;
-  font-weight: 600;
-  border: 1px solid hsl(var(--b3));
+  font-weight: 500;
   min-width: 1.5rem;
-  justify-content: center;
+  text-align: center;
+  transition: all 0.2s ease;
 }
 
 .category-menu-item.active .category-count-badge {
-  background-color: hsl(var(--p) / 0.2);
-  color: hsl(var(--p));
-  border-color: hsl(var(--p));
+  background-color: hsl(var(--pc) / 0.2);
+  color: hsl(var(--pc));
 }
 
 .category-menu-item.all-tools .category-count-badge {
@@ -466,7 +457,7 @@ body {
   border-color: hsl(var(--n) / 0.2);
 }
 
-/* 收藏按钮 */
+/* 收藏按钮 - 默认透明不可见，悬停时显示 */
 .favorite-btn {
   position: absolute;
   top: 1rem;
@@ -484,17 +475,32 @@ body {
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* 默认状态：透明不可见 */
+  opacity: 0;
+  transform: scale(0.8);
 }
 
+/* 卡片悬停时显示收藏按钮 */
+.tool-card:hover .favorite-btn,
+.tool-list-item:hover .favorite-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 收藏按钮悬停效果 */
 .favorite-btn:hover {
-  color: hsl(var(--ac));
-  background: hsl(var(--ac) / 0.1);
+  color: hsl(var(--er)); /* 红色 */
+  background: hsl(var(--er) / 0.1);
   transform: scale(1.1);
 }
 
+/* 已收藏状态 */
 .favorite-btn.favorited {
-  color: hsl(var(--ac));
-  background: hsl(var(--ac) / 0.1);
+  color: hsl(var(--er)); /* 红色 */
+  background: hsl(var(--er) / 0.1);
+  /* 已收藏时始终显示 */
+  opacity: 1;
+  transform: scale(1);
 }
 
 /* 操作按钮 */
