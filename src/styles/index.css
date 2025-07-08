@@ -222,15 +222,29 @@ body {
   font-weight: 600;
 }
 
-/* 全部工具特殊样式 */
+/* 全部工具特殊样式 - 使用蓝紫渐变背景 */
 .category-menu-item.all-tools {
-  background-color: var(--text-color);
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   color: white;
   font-weight: 600;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.category-menu-item.all-tools:hover {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+  color: white;
 }
 
 .category-menu-item.all-tools .category-icon-wrapper {
   color: white;
+}
+
+.category-menu-item.all-tools .category-count-badge {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 /* 新的图标容器样式 */

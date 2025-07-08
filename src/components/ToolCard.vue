@@ -132,10 +132,7 @@ export default {
 </script>
 
 <style scoped>
-/* 工具卡片特定样式 */
-.tool-card {
-  /* 已在全局样式中定义 */
-}
+
 
 /* 网格视图下的响应式调整 */
 @media (max-width: 640px) {

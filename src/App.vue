@@ -5,6 +5,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, reactive, onMounted, onErrorCaptured } from 'vue'
 import { MainLayout } from '@/layouts'
 
 // 主布局组件引用
@@ -114,39 +115,74 @@ body {
 
 /* 全局加载状态样式 */
 .app-loading {
-  @apply fixed inset-0 bg-white flex items-center justify-center z-50;
+  position: fixed;
+  inset: 0;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
 }
 
 .loading-content {
-  @apply text-center;
+  text-align: center;
 }
 
 .loading-spinner {
-  @apply w-10 h-10 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin mx-auto mb-4;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 4px solid #d1d5db;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-text {
-  @apply text-sm text-gray-600;
+  font-size: 0.875rem;
+  color: #6b7280;
 }
 
 /* 全局错误状态样式 */
 .app-error {
-  @apply fixed inset-0 bg-white flex items-center justify-center text-center p-5;
+  position: fixed;
+  inset: 0;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.25rem;
 }
 
 .error-content {
-  @apply max-w-md;
+  max-width: 28rem;
 }
 
 .error-icon {
-  @apply w-16 h-16 text-red-500 mx-auto mb-4;
+  width: 4rem;
+  height: 4rem;
+  color: #ef4444;
+  margin: 0 auto 1rem auto;
 }
 
 .error-title {
-  @apply text-xl font-semibold text-gray-900 mb-2;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.5rem;
 }
 
 .error-message {
-  @apply text-sm text-gray-600 mb-5 leading-relaxed;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1.25rem;
+  line-height: 1.625;
 }
 </style> 
