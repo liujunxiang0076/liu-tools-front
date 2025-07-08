@@ -152,7 +152,7 @@ body {
 .app-loading {
   position: fixed;
   inset: 0;
-  background-color: white;
+  background-color: hsl(var(--b1));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -166,8 +166,8 @@ body {
 .loading-spinner {
   width: 2.5rem;
   height: 2.5rem;
-  border: 4px solid #d1d5db;
-  border-top-color: #3b82f6;
+  border: 4px solid hsl(var(--b3));
+  border-top-color: hsl(var(--p));
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem auto;
@@ -181,14 +181,14 @@ body {
 
 .loading-text {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: hsl(var(--bc) / 0.6);
 }
 
 /* 全局错误状态样式 */
 .app-error {
   position: fixed;
   inset: 0;
-  background-color: white;
+  background-color: hsl(var(--b1));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -203,20 +203,20 @@ body {
 .error-icon {
   width: 4rem;
   height: 4rem;
-  color: #ef4444;
+  color: hsl(var(--er));
   margin: 0 auto 1rem auto;
 }
 
 .error-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #111827;
+  color: hsl(var(--bc));
   margin-bottom: 0.5rem;
 }
 
 .error-message {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: hsl(var(--bc) / 0.6);
   margin-bottom: 1.25rem;
   line-height: 1.625;
 }
