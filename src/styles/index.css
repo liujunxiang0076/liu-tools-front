@@ -320,6 +320,37 @@ body {
   border-color: hsl(var(--pc) / 0.3);
 }
 
+/* 工具列表项样式（列表视图） */
+.tool-list-item {
+  background: 
+    linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.97) 100%),
+    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.02) 0%, transparent 50%);
+  border: 1px solid hsl(var(--b3) / 0.8);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  /* 增强阴影效果 */
+  box-shadow: 
+    0 2px 8px hsl(var(--bc) / 0.08),
+    0 1px 3px hsl(var(--bc) / 0.05),
+    inset 0 1px 0 hsl(var(--b1) / 0.5);
+}
+
+.tool-list-item:hover {
+  border-color: hsl(var(--p) / 0.4);
+  box-shadow: 
+    0 12px 35px hsl(var(--bc) / 0.12),
+    0 5px 15px hsl(var(--p) / 0.15),
+    inset 0 1px 0 hsl(var(--b1)),
+    0 0 0 1px hsl(var(--p) / 0.1);
+  /* 增强光泽效果 */
+  background: 
+    linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.95) 100%),
+    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.04) 0%, transparent 50%);
+  transform: translateY(-2px);
+}
+
 /* 工具卡片样式 */
 .tool-card {
   background: hsl(var(--b1));

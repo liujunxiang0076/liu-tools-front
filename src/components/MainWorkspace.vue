@@ -51,7 +51,7 @@
           <div 
             v-for="tool in getSortedTools()"
             :key="tool.id"
-            class="bg-base-100 border border-base-300 rounded-xl p-4 hover:border-primary hover:shadow-md transition-all duration-200 cursor-pointer"
+            class="tool-list-item"
             @click="handleToolClick(tool)"
           >
             <div class="flex items-center gap-4">
