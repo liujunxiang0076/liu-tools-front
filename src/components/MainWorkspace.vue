@@ -1,7 +1,7 @@
 <template>
-  <div class="flex-1 flex flex-col bg-base-secondary min-h-0">
+  <div class="flex-1 flex flex-col bg-base-200 min-h-0">
     <!-- 工作区头部 -->
-    <div class="bg-base-100 border-b border-base-200 px-6 py-4">
+    <div class="bg-base-100 border-b border-base-300 px-6 py-4">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-xl font-bold text-base-content">
@@ -51,7 +51,7 @@
           <div 
             v-for="tool in getSortedTools()"
             :key="tool.id"
-            class="bg-base-100 border border-base-200 rounded-xl p-4 hover:border-primary hover:shadow-md transition-all duration-200 cursor-pointer"
+            class="bg-base-100 border border-base-300 rounded-xl p-4 hover:border-primary hover:shadow-md transition-all duration-200 cursor-pointer"
             @click="handleToolClick(tool)"
           >
             <div class="flex items-center gap-4">

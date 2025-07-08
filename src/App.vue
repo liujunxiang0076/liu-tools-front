@@ -53,7 +53,7 @@ const initializeTheme = () => {
   // 检测系统偏好
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
   
-  // 确定要使用的主题
+  // 确定要使用的主题 - 默认使用标准的light主题以获得最佳背景搭配
   let initialTheme = 'light'
   if (savedTheme) {
     initialTheme = savedTheme

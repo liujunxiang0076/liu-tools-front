@@ -77,9 +77,9 @@ export default {
           "secondary": "#4ecdc4",        // 天空蓝
           "accent": "#ff6b6b",           // 珊瑚红
           "neutral": "#3d4451",          // 中性灰
-          "base-100": "#ffffff",         // 背景白色
-          "base-200": "#f8fafc",         // 浅灰背景
-          "base-300": "#e2e8f0",         // 中等灰色
+          "base-100": "#ffffff",         // 卡片背景纯白色
+          "base-200": "#f8fafc",         // 页面主背景浅灰
+          "base-300": "#f1f5f9",         // 更浅的分割线和边框
           "base-content": "#1f2937",     // 主文字颜色
           "info": "#4dabf7",             // 信息蓝
           "success": "#51cf66",          // 成功绿
