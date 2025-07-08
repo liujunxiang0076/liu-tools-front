@@ -1,75 +1,126 @@
 <template>
-  <aside class="sidebar">
-    <div class="sidebar-content">
-      <!-- 分类导航 -->
-      <div class="category-section">
-        <h3 class="section-title">工具分类</h3>
-        <nav class="category-nav">
-          <div
-            v-for="category in categoriesWithCount"
-            :key="category.id"
-            class="category-item"
-            :class="{ active: selectedCategory === category.id }"
-            @click="handleCategorySelect(category.id)"
-          >
-            <div class="category-main">
-              <component
-                :is="getCategoryIcon(category.icon)"
-                class="category-icon"
-                :style="{ color: category.color }"
-              />
-              <span class="category-name">{{ category.name }}</span>
-            </div>
-            <el-badge
-              :value="category.count"
-              class="category-badge"
-              :type="selectedCategory === category.id ? 'primary' : 'info'"
-            />
-          </div>
-        </nav>
+  <aside :class="['sidebar scale-in', { 'open': isOpen }]">
+    <!-- 侧边栏头部 -->
+    <div class="sidebar-header">
+      <h2 class="sidebar-title">工具分类</h2>
+      <div class="tools-count-badge">
+        共 {{ totalTools }} 个工具
       </div>
+    </div>
 
-      <!-- 我的收藏 -->
-      <div class="favorites-section">
-        <div class="section-header">
-          <h3 class="section-title">我的收藏</h3>
-          <el-button
-            v-if="favoriteTools.length > 0"
-            text
-            type="danger"
-            size="small"
-            @click="handleClearFavorites"
-          >
-            清空
-          </el-button>
-        </div>
-        
-        <div v-if="favoriteTools.length === 0" class="empty-favorites">
-          <Heart class="empty-icon" />
-          <p class="empty-text">暂无收藏工具</p>
-          <p class="empty-hint">点击工具卡片上的心形图标收藏工具</p>
-        </div>
-        
-        <div v-else class="favorites-list">
-          <div
-            v-for="tool in favoriteTools"
-            :key="tool.id"
-            class="favorite-item"
-            @click="handleToolSelect(tool)"
-          >
-            <span class="tool-icon">{{ tool.icon }}</span>
-            <div class="tool-info">
-              <div class="tool-name">{{ tool.name }}</div>
-              <div class="tool-category">{{ getCategoryName(tool.category) }}</div>
+    <!-- 分类菜单 -->
+    <div class="flex-1 overflow-y-auto p-4">
+      <nav class="space-y-1">
+        <div 
+          v-for="category in categories"
+          :key="category.id"
+          @click="emit('category-select', category.id)"
+          :class="[
+            'category-menu-item', 
+            { 
+              'active': selectedCategoryId === category.id,
+              'all-tools': category.id === 'all' && selectedCategoryId === category.id
+            }
+          ]"
+        >
+          <div class="flex items-center">
+            <!-- 分类图标 -->
+            <div class="category-icon-wrapper">
+              <svg v-if="category.id === 'all'" class="category-icon-svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+              </svg>
+              
+              <svg v-else-if="category.id === 'design'" class="category-icon-svg" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clip-rule="evenodd"/>
+              </svg>
+              
+              <svg v-else-if="category.id === 'development'" class="category-icon-svg" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+              </svg>
+              
+              <svg v-else-if="category.id === 'efficiency'" class="category-icon-svg" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+              </svg>
+              
+              <svg v-else-if="category.id === 'calculation'" class="category-icon-svg" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 011 1v3a1 1 0 11-2 0v-3a1 1 0 011-1zm-3 3a1 1 0 100 2h.01a1 1 0 100-2H10zm-4 1a1 1 0 011-1h.01a1 1 0 110 2H7a1 1 0 01-1-1zm1-4a1 1 0 100 2h.01a1 1 0 100-2H7zm2 1a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1zm4-4a1 1 0 100 2h.01a1 1 0 100-2H13zM9 9a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1zM7 8a1 1 0 000 2h.01a1 1 0 000-2H7z" clip-rule="evenodd"/>
+              </svg>
+              
+              <svg v-else-if="category.id === 'text'" class="category-icon-svg" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0v12h8V4H6z" clip-rule="evenodd"/>
+                <path fill-rule="evenodd" d="M8 6a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1zm0 3a1 1 0 011-1h4a1 1 0 110 2H9a1 1 0 01-1-1zm0 3a1 1 0 011-1h4a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"/>
+              </svg>
+              
+              <svg v-else-if="category.id === 'image'" class="category-icon-svg" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+              </svg>
+              
+              <svg v-else-if="category.id === 'network'" class="category-icon-svg" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16 8 8 0 000-16zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.56-.5-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0115.917 9h-1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.56.5.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.498-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.029 11H4.083a6.004 6.004 0 002.783 4.118z" clip-rule="evenodd"/>
+              </svg>
+              
+              <span v-else class="category-icon-emoji">{{ getCategoryEmoji(category.id) }}</span>
             </div>
-            <el-button
-              text
-              type="danger"
-              size="small"
-              :icon="X"
-              @click.stop="handleRemoveFromFavorites(tool.id)"
-            />
+            
+            <!-- 分类名称 -->
+            <span class="font-medium">{{ category.name }}</span>
           </div>
+          
+          <!-- 工具数量徽章 -->
+          <div class="category-count-badge">
+            {{ getCategoryCount(category.id) }}
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <!-- 收藏工具快速访问 -->
+    <div v-if="favoriteTools.length > 0" class="border-t border-base-200 p-4">
+      <h3 class="text-sm font-semibold text-base-content/70 mb-3">我的收藏</h3>
+      <div class="space-y-2">
+        <div 
+          v-for="tool in favoriteTools.slice(0, 5)"
+          :key="tool.id"
+          @click="emit('tool-select', tool)"
+          class="favorite-tool-card"
+        >
+          <div class="flex items-center gap-3">
+            <!-- 工具图标 -->
+            <span class="text-lg">{{ tool.icon }}</span>
+            
+            <!-- 工具信息 -->
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-base-content truncate">
+                {{ tool.name }}
+              </div>
+              <div class="text-xs text-base-content/60 truncate">
+                {{ getCategoryName(tool.category) }}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 显示更多收藏 -->
+        <div v-if="favoriteTools.length > 5" class="text-center pt-2">
+          <button 
+            @click="emit('show-all-favorites')"
+            class="text-xs text-primary hover:text-primary/80 font-medium"
+          >
+            查看全部 {{ favoriteTools.length }} 个收藏
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 空收藏状态 -->
+    <div v-else class="border-t border-base-200 p-4">
+      <div class="text-center py-4">
+        <div class="text-2xl mb-2">❤️</div>
+        <div class="text-sm text-base-content/60">
+          还没有收藏的工具
+        </div>
+        <div class="text-xs text-base-content/40 mt-1">
+          点击工具卡片的爱心图标收藏
         </div>
       </div>
     </div>
@@ -77,439 +128,83 @@
 </template>
 
 <script setup lang="ts">
-// Vue APIs 现在自动导入，无需手动导入
-import {
-  Grid,
-  Palette,
-  Code,
-  Zap,
-  FileText,
-  Globe,
-  Calculator,
-  Image,
-  Heart,
-  X
-} from 'lucide-vue-next'
-import { Category, Tool } from '@/types'
+import { computed } from 'vue'
+import type { Category, Tool } from '@/types'
+import { getCategoryCount } from '@/store/data'
 
-// 定义组件名称
-defineOptions({
-  name: 'Sidebar'
-})
-
-interface Props {
-  categoriesWithCount: Category[]
-  selectedCategory: string
+// Props
+const props = defineProps<{
+  categories: Category[]
+  selectedCategoryId: string
   favoriteTools: Tool[]
-}
+  totalTools: number
+  isOpen?: boolean
+}>()
 
-interface Emits {
-  (e: 'category-select', categoryId: string): void
-  (e: 'tool-select', tool: Tool): void
-  (e: 'remove-favorite', toolId: number): void
-  (e: 'clear-favorites'): void
-}
+// Emits
+const emit = defineEmits<{
+  'category-select': [categoryId: string]
+  'tool-select': [tool: Tool]
+  'show-all-favorites': []
+}>()
 
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
-
-// 图标映射
-const iconMap = {
-  Grid,
-  Palette,
-  Code,
-  Zap,
-  FileText,
-  Globe,
-  Calculator,
-  Image
-}
-
-// 获取分类图标组件
-const getCategoryIcon = (iconName: string) => {
-  return iconMap[iconName as keyof typeof iconMap] || Grid
+// 获取分类对应的emoji图标
+const getCategoryEmoji = (categoryId: string): string => {
+  const emojiMap: Record<string, string> = {
+    'all': '📦',
+    'design': '🎨',
+    'dev': '💻', 
+    'development': '💻',
+    'efficiency': '⚡',
+    'calc': '🧮',
+    'calculation': '🧮',
+    'text': '📝',
+    'image': '🖼️',
+    'network': '🌐'
+  }
+  return emojiMap[categoryId] || '🔧'
 }
 
 // 获取分类名称
-const getCategoryName = (categoryId: string) => {
-  const category = props.categoriesWithCount.find(cat => cat.id === categoryId)
-  return category?.name || '未知分类'
+const getCategoryName = (categoryId: string): string => {
+  const category = props.categories.find(c => c.id === categoryId)
+  return category?.name || '其他'
 }
 
-// 处理分类选择
-const handleCategorySelect = (categoryId: string) => {
-  emit('category-select', categoryId)
+// 获取图标组件（预留给图标库）
+const getIconComponent = (iconName: string) => {
+  // 这里可以根据需要导入和返回对应的图标组件
+  // 目前使用emoji代替
+  return null
 }
+</script>
 
-// 处理工具选择
-const handleToolSelect = (tool: Tool) => {
-  emit('tool-select', tool)
-}
-
-// 处理从收藏中移除工具
-const handleRemoveFromFavorites = (toolId: number) => {
-  emit('remove-favorite', toolId)
-}
-
-// 处理清空收藏
-const handleClearFavorites = () => {
-  emit('clear-favorites')
+<script lang="ts">
+export default {
+  name: 'Sidebar'
 }
 </script>
 
 <style scoped>
+/* 组件特定样式 */
 .sidebar {
-  width: 264px;
-  height: 100vh;
-  background: var(--card-bg);
-  border-right: 1px solid var(--border-color);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s ease;
 }
 
-.sidebar-content {
-  height: 100%;
-  overflow-y: auto;
-  padding: 24px 0;
-}
-
-.section-title {
-  font-size: var(--text-base);
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 16px;
-  padding: 0 24px;
-  letter-spacing: -0.025em;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-  margin-bottom: 16px;
-}
-
-.section-header .section-title {
-  margin-bottom: 0;
-  padding: 0;
-}
-
-/* 分类导航样式 - 增强版 */
-.category-section {
-  margin-bottom: 32px;
-}
-
-.category-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.category-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 24px;
-  cursor: pointer;
-  transition: var(--transition);
-  border-left: 3px solid transparent;
-  margin: 0 8px;
-  border-radius: var(--radius-lg);
-  position: relative;
-}
-
-.category-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--primary-light);
-  opacity: 0;
-  transition: var(--transition);
-  border-radius: var(--radius-lg);
-}
-
-.category-item:hover::before {
-  opacity: 0.5;
-}
-
-.category-item.active::before {
-  opacity: 1;
-}
-
-.category-item:hover {
-  transform: translateX(4px);
-}
-
-.category-item.active {
-  border-left-color: var(--primary-color);
-  background: var(--primary-light);
-}
-
-.category-main {
-  display: flex;
-  align-items: center;
-  flex: 1;
-  position: relative;
-  z-index: 1;
-}
-
-.category-icon {
-  width: 22px;
-  height: 22px;
-  margin-right: 12px;
-  flex-shrink: 0;
-  color: var(--text-secondary);
-  transition: var(--transition);
-}
-
-.category-item:hover .category-icon,
-.category-item.active .category-icon {
-  color: var(--primary-color);
-  transform: scale(1.1);
-}
-
-.category-name {
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--text-primary);
-  transition: var(--transition);
-}
-
-.category-item.active .category-name {
-  color: var(--primary-color);
-  font-weight: 600;
-}
-
-.category-badge {
-  margin-left: 8px;
-  position: relative;
-  z-index: 1;
-}
-
-.category-badge :deep(.el-badge__content) {
-  font-size: 10px;
-  min-width: 18px;
-  height: 18px;
-  line-height: 16px;
-  padding: 0 5px;
-  background: var(--primary-color);
-  border: none;
-  border-radius: var(--radius-full);
-  font-weight: 600;
-}
-
-/* 收藏区域样式 - 增强版 */
-.favorites-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid var(--border-light);
-  margin-top: 8px;
-  padding-top: 24px;
-}
-
-.empty-favorites {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 24px;
-  text-align: center;
-}
-
-.empty-icon {
-  width: 56px;
-  height: 56px;
-  color: var(--text-muted);
-  margin-bottom: 16px;
-  opacity: 0.6;
-}
-
-.empty-text {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-  font-weight: 500;
-}
-
-.empty-hint {
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-  line-height: 1.5;
-  max-width: 200px;
-}
-
-.favorites-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0 8px;
-}
-
-.favorite-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  cursor: pointer;
-  transition: var(--transition);
-  border-radius: var(--radius-lg);
-  margin-bottom: 4px;
-  position: relative;
-}
-
-.favorite-item:hover {
-  background: var(--bg-secondary);
-  transform: translateX(4px);
-}
-
-.tool-icon {
-  font-size: 18px;
-  margin-right: 12px;
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-md);
-  transition: var(--transition);
-}
-
-.favorite-item:hover .tool-icon {
-  background: var(--primary-light);
-  transform: scale(1.1);
-}
-
-.tool-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.tool-name {
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--text-primary);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  line-height: 1.3;
-}
-
-.tool-category {
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-
-.favorite-item .el-button {
-  opacity: 0;
-  transition: var(--transition);
-  margin-left: 8px;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-}
-
-.favorite-item:hover .el-button {
-  opacity: 1;
-  color: var(--error-color);
-}
-
-.favorite-item .el-button:hover {
-  background: var(--category-design-bg);
-  color: var(--error-color);
-  transform: scale(1.1);
-}
-
-/* 清空按钮样式 */
-.section-header .el-button {
-  font-size: var(--text-xs);
-  height: 28px;
-  padding: 0 12px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  transition: var(--transition);
-}
-
-.section-header .el-button:hover {
-  background: var(--category-design-bg);
-  border-color: var(--category-design-color);
-  color: var(--category-design-color);
-}
-
-/* 滚动条样式 - 增强版 */
-.sidebar-content::-webkit-scrollbar {
-  width: 4px;
-}
-
-.sidebar-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.sidebar-content::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 2px;
-  transition: var(--transition);
-}
-
-.sidebar-content::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-color);
-}
-
-.favorites-list::-webkit-scrollbar {
-  width: 3px;
-}
-
-.favorites-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.favorites-list::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 2px;
-}
-
-.favorites-list::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
-}
-
-/* 响应式设计 */
 @media (max-width: 768px) {
   .sidebar {
     position: fixed;
+    top: 0;
     left: 0;
-    top: 64px;
-    height: calc(100vh - 64px);
-    z-index: 1000;
+    z-index: 40;
+    width: 16rem;
     transform: translateX(-100%);
-    transition: transform var(--transition-slow);
-    box-shadow: var(--shadow-xl);
+    height: 100vh;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   }
   
   .sidebar.open {
     transform: translateX(0);
-  }
-  
-  .sidebar::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 264px;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: -1;
-    backdrop-filter: blur(2px);
   }
 }
 </style> 
