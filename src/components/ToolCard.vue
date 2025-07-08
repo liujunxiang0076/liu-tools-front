@@ -110,36 +110,62 @@ const handleDetailClick = () => {
 </script>
 
 <style scoped>
+/* 基础卡片样式 */
 .tool-card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
   transition: var(--transition);
   cursor: pointer;
-  overflow: hidden;
   position: relative;
+  overflow: hidden;
+}
+
+.tool-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--brand-gradient);
+  opacity: 0;
+  transition: var(--transition);
+  z-index: 0;
 }
 
 .tool-card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-4px);
   border-color: var(--primary-color);
+}
+
+.tool-card:hover::before {
+  opacity: 0.02;
 }
 
 .tool-card.is-favorite {
   border-color: var(--error-color);
+  background: linear-gradient(135deg, var(--card-bg) 0%, var(--category-design-bg) 100%);
+}
+
+.tool-card.is-favorite::before {
+  background: var(--category-design-color);
+  opacity: 0.03;
 }
 
 /* 网格视图样式 */
 .tool-card--grid {
-  padding: 20px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  height: 280px;
+  height: 300px;
+  position: relative;
 }
 
 .tool-card--grid .tool-icon-wrapper {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   align-self: center;
 }
 
@@ -147,6 +173,8 @@ const handleDetailClick = () => {
   flex: 1;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
 .tool-card--grid .tool-footer {
@@ -154,7 +182,7 @@ const handleDetailClick = () => {
 }
 
 .tool-card--grid .tool-tags {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .tool-card--grid .tool-actions {
@@ -164,11 +192,12 @@ const handleDetailClick = () => {
 
 /* 列表视图样式 */
 .tool-card--list {
-  padding: 16px 20px;
+  padding: 20px 24px;
   display: flex;
   align-items: flex-start;
-  gap: 16px;
-  min-height: 100px;
+  gap: 20px;
+  min-height: 120px;
+  position: relative;
 }
 
 .tool-card--list .tool-icon-wrapper {
@@ -179,21 +208,23 @@ const handleDetailClick = () => {
 .tool-card--list .tool-content {
   flex: 1;
   min-width: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .tool-card--list .tool-header {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .tool-card--list .tool-description {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .tool-card--list .tool-footer {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 16px;
+  gap: 20px;
 }
 
 .tool-card--list .tool-tags {
@@ -205,24 +236,37 @@ const handleDetailClick = () => {
   gap: 8px;
 }
 
-/* 工具图标 */
+/* 工具图标 - 增强版 */
 .tool-icon-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  background: linear-gradient(135deg, var(--primary-light), var(--secondary-color)opacity(0.1));
-  border-radius: var(--radius-xl);
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--primary-light) 100%);
+  border-radius: var(--radius-2xl);
   position: relative;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.tool-card:hover .tool-icon-wrapper {
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--category-efficiency-bg) 100%);
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
 }
 
 .tool-icon {
-  font-size: 32px;
+  font-size: 36px;
   line-height: 1;
+  transition: var(--transition);
 }
 
-/* 工具头部 */
+.tool-card:hover .tool-icon {
+  transform: scale(1.1);
+}
+
+/* 工具头部 - 增强版 */
 .tool-header {
   display: flex;
   align-items: flex-start;
@@ -232,33 +276,63 @@ const handleDetailClick = () => {
 }
 
 .tool-name {
-  font-size: 18px;
+  font-size: var(--text-lg);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
   line-height: 1.3;
   flex: 1;
+  transition: var(--transition);
+  letter-spacing: -0.025em;
+}
+
+.tool-card:hover .tool-name {
+  color: var(--primary-color);
 }
 
 .favorite-btn {
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: var(--transition);
   flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  transform: scale(0.8);
 }
 
 .tool-card:hover .favorite-btn {
   opacity: 1;
+  transform: scale(1);
 }
 
 .tool-card.is-favorite .favorite-btn {
   opacity: 1;
+  background: var(--category-design-bg);
+  border-color: var(--category-design-color);
+  color: var(--category-design-color);
+  transform: scale(1);
 }
 
-/* 工具描述 */
+.favorite-btn:hover {
+  background: var(--category-design-bg);
+  border-color: var(--category-design-color);
+  color: var(--category-design-color);
+  transform: scale(1.1);
+  box-shadow: var(--shadow-md);
+}
+
+/* 工具描述 - 增强版 */
 .tool-description {
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.6;
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -278,10 +352,10 @@ const handleDetailClick = () => {
 .tool-card--grid .tool-footer {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
-/* 标签区域 */
+/* 标签区域 - 增强版 */
 .tool-tags {
   display: flex;
   flex-wrap: wrap;
@@ -290,62 +364,131 @@ const handleDetailClick = () => {
 }
 
 .tool-tags .el-tag {
-  font-size: 11px;
-  height: 20px;
-  line-height: 18px;
-  padding: 0 6px;
-  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  height: 22px;
+  line-height: 20px;
+  padding: 0 8px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.tool-tags .el-tag:hover {
+  background: var(--primary-light);
+  color: var(--primary-color);
+  transform: scale(1.05);
+}
+
+.tool-tags .el-tag:nth-child(odd) {
+  background: var(--category-efficiency-bg);
+  color: var(--category-efficiency-color);
+}
+
+.tool-tags .el-tag:nth-child(even) {
+  background: var(--category-development-bg);
+  color: var(--category-development-color);
 }
 
 .more-tags {
-  font-size: 11px;
+  font-size: var(--text-xs);
   color: var(--text-muted);
   padding: 0 4px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
 }
 
-/* 操作按钮 */
+/* 操作按钮 - 增强版 */
 .tool-actions {
   display: flex;
   align-items: center;
 }
 
 .tool-actions .el-button {
-  font-size: 12px;
-  height: 28px;
-  padding: 0 12px;
+  font-size: var(--text-xs);
+  height: 32px;
+  padding: 0 16px;
+  border-radius: var(--radius-lg);
+  font-weight: 500;
+  transition: var(--transition);
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+}
+
+.tool-actions .el-button--primary {
+  background: var(--brand-gradient);
+  border: none;
+  color: white;
+}
+
+.tool-actions .el-button--primary:hover {
+  background: var(--brand-gradient-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.tool-actions .el-button:not(.el-button--primary) {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.tool-actions .el-button:not(.el-button--primary):hover {
+  background: var(--primary-light);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transform: translateY(-1px);
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
   .tool-card--grid {
-    height: auto;
-    min-height: 240px;
+    padding: 20px;
+    height: 280px;
+  }
+  
+  .tool-card--list {
+    padding: 16px 20px;
+    gap: 16px;
+    min-height: 100px;
+  }
+  
+  .tool-icon-wrapper {
+    width: 56px;
+    height: 56px;
+  }
+  
+  .tool-icon {
+    font-size: 32px;
+  }
+  
+  .tool-name {
+    font-size: var(--text-base);
+  }
+  
+  .favorite-btn {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .tool-actions .el-button {
+    font-size: var(--text-xs);
+    height: 28px;
+    padding: 0 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tool-card--grid {
     padding: 16px;
+    height: 260px;
   }
   
   .tool-card--list {
     padding: 12px 16px;
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .tool-card--list .tool-icon-wrapper {
-    align-self: flex-start;
-    margin-bottom: 12px;
-  }
-  
-  .tool-card--list .tool-footer {
-    flex-direction: column;
-    align-items: stretch;
     gap: 12px;
-  }
-  
-  .tool-card--list .tool-actions {
-    justify-content: center;
-  }
-  
-  .tool-name {
-    font-size: 16px;
   }
   
   .tool-icon-wrapper {
@@ -355,6 +498,14 @@ const handleDetailClick = () => {
   
   .tool-icon {
     font-size: 28px;
+  }
+  
+  .tool-footer {
+    margin-top: 12px;
+  }
+  
+  .tool-card--grid .tool-footer {
+    gap: 12px;
   }
 }
 
@@ -387,3 +538,4 @@ const handleDetailClick = () => {
   }
 }
 </style> 
+ 

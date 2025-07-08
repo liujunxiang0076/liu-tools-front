@@ -166,6 +166,7 @@ const handleDetailClick = (tool: Tool) => {
 </script>
 
 <style scoped>
+/* 主工作区 - 增强版 */
 .main-workspace {
   flex: 1;
   height: 100vh;
@@ -175,12 +176,13 @@ const handleDetailClick = (tool: Tool) => {
   background: var(--bg-color);
 }
 
-/* 标题区域 */
+/* 标题区域 - 增强版 */
 .workspace-header {
   background: var(--card-bg);
   border-bottom: 1px solid var(--border-color);
-  padding: 20px 32px;
+  padding: 24px 32px;
   flex-shrink: 0;
+  box-shadow: var(--shadow-xs);
 }
 
 .header-content {
@@ -189,30 +191,46 @@ const handleDetailClick = (tool: Tool) => {
 }
 
 .section-title {
-  font-size: 24px;
+  font-size: var(--text-2xl);
   font-weight: 700;
   color: var(--text-primary);
   margin: 0 0 12px 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  letter-spacing: -0.025em;
+}
+
+.section-title::before {
+  content: '';
+  width: 4px;
+  height: 24px;
+  background: var(--brand-gradient);
+  border-radius: var(--radius-sm);
 }
 
 .tool-count {
-  font-size: 18px;
+  font-size: var(--text-lg);
   font-weight: 500;
   color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
 }
 
 .search-info {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 10px 16px;
   background: var(--primary-light);
-  border-radius: var(--radius-md);
-  font-size: 14px;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
   color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  margin-top: 8px;
+  font-weight: 500;
 }
 
 .search-icon {
@@ -227,7 +245,7 @@ const handleDetailClick = (tool: Tool) => {
   position: relative;
 }
 
-/* 空状态 */
+/* 空状态 - 增强版 */
 .empty-state {
   display: flex;
   align-items: center;
@@ -240,125 +258,189 @@ const handleDetailClick = (tool: Tool) => {
 .empty-content {
   text-align: center;
   max-width: 400px;
+  background: var(--card-bg);
+  border-radius: var(--radius-2xl);
+  padding: 48px 32px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
 }
 
 .empty-icon {
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
   color: var(--text-muted);
   margin: 0 auto 24px;
+  opacity: 0.6;
 }
 
 .empty-title {
-  font-size: 20px;
+  font-size: var(--text-xl);
   font-weight: 600;
   color: var(--text-secondary);
   margin: 0 0 12px 0;
+  letter-spacing: -0.025em;
 }
 
 .empty-description {
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--text-muted);
   line-height: 1.6;
-  margin: 0 0 24px 0;
+  margin: 0 0 32px 0;
 }
 
-/* 工具容器 */
+.empty-content .el-button {
+  background: var(--brand-gradient);
+  border: none;
+  color: white;
+  font-weight: 500;
+  padding: 12px 24px;
+  border-radius: var(--radius-lg);
+  transition: var(--transition);
+}
+
+.empty-content .el-button:hover {
+  background: var(--brand-gradient-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 工具容器 - 增强版 */
 .tools-container {
-  padding: 24px 32px;
+  padding: 32px;
   max-width: 1400px;
   margin: 0 auto;
 }
 
-/* 网格布局 */
+/* 网格布局 - 增强版 */
 .tools-container--grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 28px;
 }
 
-/* 列表布局 */
+/* 列表布局 - 增强版 */
 .tools-container--list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
-/* 加载更多 */
+/* 加载更多 - 增强版 */
 .load-more {
   display: flex;
   justify-content: center;
-  padding: 32px;
+  padding: 48px 32px;
 }
 
-/* 响应式设计 */
+.load-more .el-button {
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  color: var(--text-secondary);
+  font-weight: 500;
+  padding: 12px 32px;
+  border-radius: var(--radius-xl);
+  transition: var(--transition);
+  font-size: var(--text-sm);
+}
+
+.load-more .el-button:hover {
+  background: var(--primary-light);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 响应式设计 - 增强版 */
 @media (max-width: 1200px) {
   .tools-container--grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
   }
 }
 
 @media (max-width: 768px) {
   .workspace-header {
-    padding: 16px 20px;
+    padding: 20px 24px;
   }
   
   .section-title {
-    font-size: 20px;
+    font-size: var(--text-xl);
   }
   
   .tool-count {
-    font-size: 16px;
+    font-size: var(--text-base);
+    padding: 3px 10px;
   }
   
   .tools-container {
-    padding: 20px;
+    padding: 24px 20px;
   }
   
   .tools-container--grid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 20px;
   }
   
   .tools-container--list {
-    gap: 12px;
+    gap: 16px;
   }
   
-  .empty-state {
-    min-height: 300px;
-    padding: 20px;
+  .empty-content {
+    padding: 32px 24px;
+    margin: 0 16px;
   }
   
   .empty-icon {
-    width: 48px;
-    height: 48px;
-    margin-bottom: 16px;
+    width: 64px;
+    height: 64px;
   }
   
   .empty-title {
-    font-size: 18px;
+    font-size: var(--text-lg);
+  }
+  
+  .load-more {
+    padding: 32px 20px;
   }
 }
 
 @media (max-width: 480px) {
   .workspace-header {
-    padding: 12px 16px;
+    padding: 16px 20px;
   }
   
   .section-title {
-    font-size: 18px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+    font-size: var(--text-lg);
+    gap: 8px;
+  }
+  
+  .section-title::before {
+    width: 3px;
+    height: 20px;
+  }
+  
+  .tool-count {
+    font-size: var(--text-sm);
   }
   
   .tools-container {
-    padding: 16px;
+    padding: 20px 16px;
+  }
+  
+  .empty-content {
+    padding: 24px 20px;
+    margin: 0 12px;
+  }
+  
+  .empty-icon {
+    width: 56px;
+    height: 56px;
   }
   
   .search-info {
-    flex-wrap: wrap;
+    padding: 8px 12px;
+    font-size: var(--text-xs);
   }
 }
 
@@ -410,3 +492,4 @@ const handleDetailClick = (tool: Tool) => {
 .tool-card:nth-child(5) { animation-delay: 0.5s; }
 .tool-card:nth-child(6) { animation-delay: 0.6s; }
 </style> 
+ 
