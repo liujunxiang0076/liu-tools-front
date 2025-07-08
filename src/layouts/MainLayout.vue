@@ -1,258 +1,197 @@
 <template>
-  <div class="main-layout">
+  <div class="h-screen flex flex-col overflow-hidden">
     <!-- 顶部导航栏 -->
     <TopNavBar
-      :view-type="store.state.viewType"
-      :search-keyword="store.state.searchKeyword"
-      @view-change="handleViewChange"
-      @search="handleSearch"
+      :search-query="searchQuery"
+      :view-mode="viewMode"
+      :sidebar-open="sidebarOpen"
+      @update:search-query="searchQuery = $event"
+      @update:view-mode="viewMode = $event"
+      @toggle-sidebar="toggleSidebar"
     />
 
-    <div class="layout-content">
+    <!-- 主体内容区域 -->
+    <div class="flex flex-1 min-h-0">
       <!-- 侧边栏 -->
       <Sidebar
-        :categories-with-count="store.getters.categoriesWithCount.value"
-        :selected-category="store.state.selectedCategory"
-        :favorite-tools="store.getters.favoriteTools.value"
+        :categories="categories"
+        :selected-category-id="selectedCategory"
+        :favorite-tools="favoriteTools"
+        :total-tools="totalTools"
+        :is-open="sidebarOpen"
         @category-select="handleCategorySelect"
         @tool-select="handleToolSelect"
-        @remove-favorite="handleRemoveFromFavorites"
-        @clear-favorites="handleClearFavorites"
+        @show-all-favorites="handleShowAllFavorites"
       />
+
+      <!-- 移动端侧边栏遮罩 -->
+      <div 
+        v-if="sidebarOpen" 
+        class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+        @click="sidebarOpen = false"
+      ></div>
 
       <!-- 主工作区 -->
       <MainWorkspace
-        :filtered-tools="store.getters.filteredTools.value"
-        :categories="store.state.categories"
-        :selected-category="store.state.selectedCategory"
-        :search-keyword="store.state.searchKeyword"
-        :view-type="store.state.viewType"
-        :is-favorite="store.getters.isFavorite"
-        @tool-click="handleToolClick"
-        @favorite-click="handleFavoriteClick"
-        @use-click="handleUseClick"
-        @detail-click="handleDetailClick"
-        @clear-search="handleClearSearch"
+        :selected-category="selectedCategory"
+        :search-query="searchQuery"
+        :view-mode="viewMode"
+        :favorite-ids="favoriteIds"
+        @update:favorite-ids="favoriteIds = $event"
+        @update:search-query="searchQuery = $event"
+        @tool-select="handleToolSelect"
       />
     </div>
-
-    <!-- 移动端遮罩层 -->
-    <div
-      v-if="mobileState.showOverlay"
-      class="mobile-overlay"
-      @click="closeMobileSidebar"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-// 定义组件名称
-defineOptions({
-  name: 'MainLayout'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import TopNavBar from '@/components/TopNavBar.vue'
+import Sidebar from '@/components/Sidebar.vue'
+import MainWorkspace from '@/components/MainWorkspace.vue'
+import { categories, tools, getToolsByCategory } from '@/store/data'
+import type { Tool } from '@/types'
+import { Message } from '@/utils/message'
+
+// 响应式状态
+const searchQuery = ref('')
+const selectedCategory = ref('all')
+const viewMode = ref<'grid' | 'list'>('grid')
+const favoriteIds = ref<number[]>([])
+const sidebarOpen = ref(false)
+
+// 计算属性
+const totalTools = computed(() => tools.length)
+
+const favoriteTools = computed(() => {
+  return tools.filter(tool => favoriteIds.value.includes(tool.id))
 })
 
-import { useStore } from '@/store'
-import { Tool, ViewType } from '@/types'
-import { MobileLayoutState } from '@/types/layout'
-
-// 使用状态管理
-const store = useStore()
-
-// 移动端布局状态
-const mobileState = reactive<MobileLayoutState>({
-  showOverlay: false,
-  sidebarExpanded: false
-})
-
-// 处理视图切换
-const handleViewChange = (viewType: ViewType) => {
-  store.actions.setViewType(viewType)
-}
-
-// 处理搜索
-const handleSearch = (keyword: string) => {
-  store.actions.setSearchKeyword(keyword)
-}
-
-// 处理分类选择
+// 事件处理函数
 const handleCategorySelect = (categoryId: string) => {
-  store.actions.setSelectedCategory(categoryId)
-  // 移动端自动关闭侧边栏
-  if (window.innerWidth <= 768) {
-    closeMobileSidebar()
+  selectedCategory.value = categoryId
+  // 移动端选择分类后关闭侧边栏
+  if (window.innerWidth < 1024) {
+    sidebarOpen.value = false
   }
 }
 
-// 处理工具选择（从侧边栏收藏列表）
 const handleToolSelect = (tool: Tool) => {
-  store.actions.showToolDetail(tool)
-}
-
-// 处理工具点击
-const handleToolClick = (tool: Tool) => {
-  // 可以在这里添加工具点击的通用逻辑
-  console.log('工具点击:', tool.name)
-}
-
-// 处理收藏点击
-const handleFavoriteClick = (tool: Tool) => {
-  store.actions.toggleFavorite(tool.id)
+  // 模拟工具页面跳转
+  console.log('Selected tool:', tool)
   
-  // 显示提示消息
-  const isFavorite = store.getters.isFavorite(tool.id)
-  ElMessage({
-    message: isFavorite ? `已收藏 ${tool.name}` : `已取消收藏 ${tool.name}`,
-    type: isFavorite ? 'success' : 'info',
-    duration: 2000
-  })
-}
-
-// 处理使用工具
-const handleUseClick = (tool: Tool) => {
-  // 这里可以实现路由跳转到具体工具页面
-  console.log('使用工具:', tool.name)
-  ElMessage({
-    message: `即将打开 ${tool.name}`,
-    type: 'info'
-  })
-  
-  // 示例：如果有路由，可以这样跳转
-  // router.push(tool.path || `/tool/${tool.id}`)
-}
-
-// 处理工具详情
-const handleDetailClick = (tool: Tool) => {
-  store.actions.showToolDetail(tool)
-  ElMessage({
-    message: `查看 ${tool.name} 详情`,
-    type: 'info'
-  })
-}
-
-// 处理从收藏中移除
-const handleRemoveFromFavorites = (toolId: number) => {
-  const tool = store.actions.getToolById(toolId)
-  store.actions.removeFromFavorites(toolId)
-  
-  if (tool) {
-    ElMessage({
-      message: `已从收藏中移除 ${tool.name}`,
-      type: 'info'
-    })
+  // 这里可以实现真正的路由跳转
+  if (tool.path) {
+    // 示例：window.open(tool.path, '_blank')
+    Message.success(`正在打开 ${tool.name}...`)
+    
+    // 简单的页面跳转模拟
+    setTimeout(() => {
+      Message.info(`${tool.name} 工具页面还在开发中，敬请期待！`)
+    }, 500)
+  } else {
+    Message.warning(`${tool.name} 暂未配置页面路径`)
   }
 }
 
-// 处理清空收藏
-const handleClearFavorites = () => {
-  ElMessageBox.confirm(
-    '确定要清空所有收藏吗？',
-    '确认操作',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning',
-    }
-  ).then(() => {
-    store.actions.clearFavorites()
-    ElMessage({
-      message: '已清空所有收藏',
-      type: 'success'
-    })
-  }).catch(() => {
-    // 用户取消操作
-  })
+const handleShowAllFavorites = () => {
+  selectedCategory.value = 'favorites'
+  Message.info('显示所有收藏的工具')
 }
 
-// 处理清除搜索
-const handleClearSearch = () => {
-  store.actions.setSearchKeyword('')
-  store.actions.setSelectedCategory('all')
-}
-
-// 关闭移动端侧边栏
-const closeMobileSidebar = () => {
-  mobileState.showOverlay = false
-  mobileState.sidebarExpanded = false
-}
-
-// 处理移动端侧边栏切换
-const toggleMobileSidebar = () => {
-  mobileState.showOverlay = !mobileState.showOverlay
-  mobileState.sidebarExpanded = !mobileState.sidebarExpanded
+// 切换侧边栏（移动端）
+const toggleSidebar = () => {
+  sidebarOpen.value = !sidebarOpen.value
 }
 
 // 监听窗口大小变化
 const handleResize = () => {
-  if (window.innerWidth > 768) {
-    mobileState.showOverlay = false
-    mobileState.sidebarExpanded = false
+  if (window.innerWidth >= 1024) {
+    sidebarOpen.value = false
   }
 }
 
-// 暴露方法给父组件
-defineExpose({
-  toggleMobileSidebar,
-  closeMobileSidebar
-})
-
-// 组件挂载时的初始化
+// 生命周期钩子
 onMounted(() => {
-  // 添加窗口大小变化监听
+  // 从localStorage恢复用户偏好
+  const savedFavorites = localStorage.getItem('favoriteTools')
+  if (savedFavorites) {
+    try {
+      favoriteIds.value = JSON.parse(savedFavorites)
+    } catch (error) {
+      console.error('Failed to parse favorite tools from localStorage:', error)
+    }
+  }
+
+  const savedViewMode = localStorage.getItem('viewMode')
+  if (savedViewMode && (savedViewMode === 'grid' || savedViewMode === 'list')) {
+    viewMode.value = savedViewMode as 'grid' | 'list'
+  }
+
+  const savedCategory = localStorage.getItem('selectedCategory')
+  if (savedCategory) {
+    selectedCategory.value = savedCategory
+  }
+
+  // 监听窗口大小变化
   window.addEventListener('resize', handleResize)
 })
 
-// 组件卸载时清理
+// 监听favoriteIds变化，同步到localStorage
+watch(favoriteIds, (newFavorites) => {
+  localStorage.setItem('favoriteTools', JSON.stringify(newFavorites))
+}, { deep: true })
+
+// 监听viewMode变化，同步到localStorage
+watch(viewMode, (newViewMode) => {
+  localStorage.setItem('viewMode', newViewMode)
+})
+
+// 监听selectedCategory变化，同步到localStorage
+watch(selectedCategory, (newCategory) => {
+  localStorage.setItem('selectedCategory', newCategory)
+})
+
+// 监听搜索查询变化，重置分类选择
+watch(searchQuery, (newQuery) => {
+  if (newQuery.trim() && selectedCategory.value !== 'all') {
+    selectedCategory.value = 'all'
+  }
+})
+
+// 清理函数
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 })
 </script>
 
+<script lang="ts">
+export default {
+  name: 'MainLayout'
+}
+</script>
+
 <style scoped>
-.main-layout {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.layout-content {
-  flex: 1;
-  display: flex;
-  height: calc(100vh - 64px);
-  overflow: hidden;
-}
-
-/* 移动端遮罩层 */
-.mobile-overlay {
-  position: fixed;
-  top: 64px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  backdrop-filter: blur(2px);
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .layout-content {
-    height: calc(100vh - 64px);
+/* 确保移动端侧边栏正确显示 */
+@media (max-width: 1024px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 40;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
   }
 }
 
-/* Element Plus 组件样式调整 */
-:deep(.el-message) {
-  z-index: 3000;
-}
-
-:deep(.el-button--primary) {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-:deep(.el-button--primary:hover) {
-  background-color: var(--primary-dark);
-  border-color: var(--primary-dark);
+/* 防止背景滚动 */
+.overflow-hidden {
+  overflow: hidden;
 }
 </style> 
