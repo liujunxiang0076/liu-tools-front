@@ -120,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 // Props
 const props = defineProps<{
@@ -139,14 +139,49 @@ const emit = defineEmits<{
 // 深色模式状态
 const isDark = ref(false)
 
+// 初始化主题状态
+const initializeTheme = () => {
+  const savedTheme = localStorage.getItem('theme')
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  
+  let currentTheme = 'light'
+  if (savedTheme) {
+    currentTheme = savedTheme
+  } else if (prefersDark) {
+    currentTheme = 'dark'
+  }
+  
+  isDark.value = currentTheme === 'dark'
+  
+  // 监听主题变化
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+        const theme = document.documentElement.getAttribute('data-theme')
+        isDark.value = theme === 'dark'
+      }
+    })
+  })
+  
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme']
+  })
+  
+  // 监听系统主题变化
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem('theme')) {
+      isDark.value = e.matches
+    }
+  })
+}
+
 // 切换深色模式
 const toggleDarkMode = () => {
+  const newTheme = isDark.value ? 'light' : 'dark'
   isDark.value = !isDark.value
-  const theme = isDark.value ? 'dark' : 'light'
-  document.documentElement.setAttribute('data-theme', theme)
-  
-  // 保存用户偏好到localStorage
-  localStorage.setItem('theme', theme)
+  document.documentElement.setAttribute('data-theme', newTheme)
+  localStorage.setItem('theme', newTheme)
 }
 
 // 处理搜索输入
@@ -162,11 +197,7 @@ const handleMobileMenuToggle = () => {
 
 // 组件挂载时恢复主题设置
 onMounted(() => {
-  const savedTheme = localStorage.getItem('theme')
-  if (savedTheme) {
-    isDark.value = savedTheme === 'dark'
-    document.documentElement.setAttribute('data-theme', savedTheme)
-  }
+  initializeTheme()
 })
 </script>
 

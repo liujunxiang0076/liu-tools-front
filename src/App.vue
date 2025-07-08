@@ -1,5 +1,5 @@
 <template>
-  <div id="app" data-theme="tropical" class="min-h-screen bg-base-200">
+  <div id="app" class="min-h-screen bg-base-200">
     <MainLayout />
   </div>
 </template>
@@ -10,6 +10,9 @@ import { MainLayout } from '@/layouts'
 
 // 主布局组件引用
 const mainLayoutRef = ref<InstanceType<typeof MainLayout>>()
+
+// 主题状态
+const theme = ref('light')
 
 // 消息状态
 const message = reactive({
@@ -42,8 +45,40 @@ const getAlertClass = () => {
   }
 }
 
+// 初始化主题
+const initializeTheme = () => {
+  // 从localStorage获取保存的主题
+  const savedTheme = localStorage.getItem('theme')
+  
+  // 检测系统偏好
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  
+  // 确定要使用的主题
+  let initialTheme = 'light'
+  if (savedTheme) {
+    initialTheme = savedTheme
+  } else if (prefersDark) {
+    initialTheme = 'dark'
+  }
+  
+  theme.value = initialTheme
+  document.documentElement.setAttribute('data-theme', initialTheme)
+  
+  // 监听系统主题变化
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem('theme')) {
+      const newTheme = e.matches ? 'dark' : 'light'
+      theme.value = newTheme
+      document.documentElement.setAttribute('data-theme', newTheme)
+    }
+  })
+}
+
 // 应用级别的初始化逻辑
 const initializeApp = () => {
+  // 初始化主题
+  initializeTheme()
+  
   // 显示欢迎消息
   showMessage('欢迎使用在线工具箱！', 'success', 3000)
 

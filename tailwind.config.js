@@ -69,6 +69,8 @@ export default {
   plugins: [require("daisyui")],
   daisyui: {
     themes: [
+      "light",  // DaisyUI默认浅色主题
+      "dark",   // DaisyUI默认深色主题
       {
         tropical: {
           "primary": "#00d4aa",          // 薄荷绿
@@ -84,15 +86,15 @@ export default {
           "warning": "#ffe66d",          // 警告黄
           "error": "#ff6b6b",            // 错误红
         },
-        dark: {
+        "tropical-dark": {
           "primary": "#00d4aa",
           "secondary": "#4ecdc4", 
           "accent": "#ff6b6b",
           "neutral": "#191D24",
-          "base-100": "#2A303C",
-          "base-200": "#242933",
-          "base-300": "#20252E",
-          "base-content": "#A6ADBB",
+          "base-100": "#1f2937",         // 深色背景
+          "base-200": "#111827",         // 更深背景
+          "base-300": "#0f172a",         // 最深背景
+          "base-content": "#f9fafb",     // 浅色文字
           "info": "#4dabf7",
           "success": "#51cf66",
           "warning": "#ffe66d",
