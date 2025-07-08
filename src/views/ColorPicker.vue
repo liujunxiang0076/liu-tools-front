@@ -471,6 +471,7 @@ export default {
 <style scoped>
 /* 颜色选择器样式优化 */
 input[type="color"] {
+  appearance: none;
   -webkit-appearance: none;
   border: none;
   cursor: pointer;
