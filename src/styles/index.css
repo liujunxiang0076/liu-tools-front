@@ -3,6 +3,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 深色模式颜色过渡 */
+* {
+  transition: 
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
 /* 全局基础样式 */
 html {
   scroll-behavior: smooth;
@@ -13,7 +22,8 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Inter', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-  /* 添加现代化的背景效果 */
+  /* 浅色模式：浅灰色背景 + 精美渐变 */
+  /* 深色模式：深灰色背景 + 精美渐变 */
   background: 
     radial-gradient(circle at 20% 80%, hsl(var(--p) / 0.03) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, hsl(var(--s) / 0.03) 0%, transparent 50%),
@@ -24,7 +34,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-  /* 创造更丰富的背景层次 */
+  /* 更丰富的背景层次，自动适配深浅色模式 */
   background: 
     radial-gradient(circle at 25% 25%, hsl(var(--p) / 0.025) 0%, transparent 50%),
     radial-gradient(circle at 75% 75%, hsl(var(--s) / 0.025) 0%, transparent 50%),
@@ -320,70 +330,51 @@ body {
   border-color: hsl(var(--pc) / 0.3);
 }
 
-/* 工具列表项样式（列表视图） */
+/* 工具卡片统一样式（网格和列表通用） */
+.tool-card,
 .tool-list-item {
   background: 
     linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.97) 100%),
     radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.02) 0%, transparent 50%);
   border: 1px solid hsl(var(--b3) / 0.8);
   border-radius: 0.75rem;
-  padding: 1rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  /* 增强阴影效果 */
-  box-shadow: 
-    0 2px 8px hsl(var(--bc) / 0.08),
-    0 1px 3px hsl(var(--bc) / 0.05),
-    inset 0 1px 0 hsl(var(--b1) / 0.5);
-}
-
-.tool-list-item:hover {
-  border-color: hsl(var(--p) / 0.4);
-  box-shadow: 
-    0 12px 35px hsl(var(--bc) / 0.12),
-    0 5px 15px hsl(var(--p) / 0.15),
-    inset 0 1px 0 hsl(var(--b1)),
-    0 0 0 1px hsl(var(--p) / 0.1);
-  /* 增强光泽效果 */
-  background: 
-    linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.95) 100%),
-    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.04) 0%, transparent 50%);
-  transform: translateY(-2px);
-}
-
-/* 工具卡片样式 */
-.tool-card {
-  background: hsl(var(--b1));
-  border: 1px solid hsl(var(--b3) / 0.8);
-  border-radius: 1rem;
-  padding: 1.5rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
-  overflow: hidden;
-  /* 增强背景渐变效果 */
-  background: 
-    linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.97) 100%),
-    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.02) 0%, transparent 50%);
-  /* 增强阴影效果 */
+  /* 统一阴影效果 */
   box-shadow: 
     0 2px 8px hsl(var(--bc) / 0.08),
     0 1px 3px hsl(var(--bc) / 0.05),
     inset 0 1px 0 hsl(var(--b1) / 0.5);
 }
 
-.tool-card:hover {
-  transform: translateY(-4px) scale(1.02);
+/* 网格卡片特定样式 */
+.tool-card {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+/* 列表项特定样式 */
+.tool-list-item {
+  padding: 1rem;
+}
+
+/* 统一悬停效果（温和的现代化效果） */
+.tool-card:hover,
+.tool-list-item:hover {
   border-color: hsl(var(--p) / 0.4);
   box-shadow: 
-    0 12px 35px hsl(var(--bc) / 0.12),
-    0 5px 15px hsl(var(--p) / 0.15),
+    0 8px 25px hsl(var(--bc) / 0.12),
+    0 4px 12px hsl(var(--p) / 0.15),
     inset 0 1px 0 hsl(var(--b1)),
     0 0 0 1px hsl(var(--p) / 0.1);
-  /* 增强光泽效果 */
+  /* 温和的光泽效果 */
   background: 
     linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.95) 100%),
     radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.04) 0%, transparent 50%);
+  /* 统一使用温和的位移效果 */
+  transform: translateY(-2px);
 }
 
 .tool-icon {
@@ -395,23 +386,26 @@ body {
 .tool-title {
   font-size: 1.125rem;
   font-weight: 600;
+  /* 浅色模式：深灰色主文字，深色模式：白色主文字 */
   color: hsl(var(--bc));
   margin-bottom: 0.5rem;
   transition: color 0.2s ease;
 }
 
-.tool-card:hover .tool-title {
+.tool-card:hover .tool-title,
+.tool-list-item:hover .tool-title {
   color: hsl(var(--p));
 }
 
 .tool-description {
+  /* 浅色模式：中灰色辅助文字，深色模式：浅灰色辅助文字 */
   color: hsl(var(--bc) / 0.6);
   font-size: 0.875rem;
   line-height: 1.5;
   margin-bottom: 1rem;
 }
 
-/* 分类标签样式 */
+/* 分类标签样式 - 增强深浅色模式适配 */
 .category-tag {
   display: inline-flex;
   align-items: center;
@@ -420,46 +414,56 @@ body {
   font-size: 0.75rem;
   font-weight: 500;
   margin-bottom: 1rem;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
 .category-tag.design {
-  background-color: hsl(var(--ac) / 0.1);
+  background-color: hsl(var(--ac) / 0.12);
   color: hsl(var(--ac));
+  border-color: hsl(var(--ac) / 0.2);
 }
 
 .category-tag.development {
-  background-color: hsl(var(--su) / 0.1);
+  background-color: hsl(var(--su) / 0.12);
   color: hsl(var(--su));
+  border-color: hsl(var(--su) / 0.2);
 }
 
 .category-tag.efficiency {
-  background-color: hsl(var(--wa) / 0.1);
+  background-color: hsl(var(--wa) / 0.12);
   color: hsl(var(--wa));
+  border-color: hsl(var(--wa) / 0.2);
 }
 
 .category-tag.calculation {
-  background-color: hsl(var(--er) / 0.1);
+  background-color: hsl(var(--er) / 0.12);
   color: hsl(var(--er));
+  border-color: hsl(var(--er) / 0.2);
 }
 
 .category-tag.text {
-  background-color: hsl(var(--s) / 0.1);
+  background-color: hsl(var(--s) / 0.12);
   color: hsl(var(--s));
+  border-color: hsl(var(--s) / 0.2);
 }
 
 .category-tag.image {
-  background-color: hsl(var(--in) / 0.1);
+  background-color: hsl(var(--in) / 0.12);
   color: hsl(var(--in));
+  border-color: hsl(var(--in) / 0.2);
 }
 
 .category-tag.network {
-  background-color: hsl(var(--p) / 0.1);
+  background-color: hsl(var(--p) / 0.12);
   color: hsl(var(--p));
+  border-color: hsl(var(--p) / 0.2);
 }
 
 .category-tag.other {
-  background-color: hsl(var(--n) / 0.1);
+  background-color: hsl(var(--n) / 0.12);
   color: hsl(var(--nc));
+  border-color: hsl(var(--n) / 0.2);
 }
 
 /* 收藏按钮 */
@@ -577,7 +581,7 @@ body {
   gap: 1rem;
 }
 
-/* 收藏工具卡片 */
+/* 收藏工具卡片 - 统一使用温和效果 */
 .favorite-tool-card {
   background: 
     linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.97) 100%),
@@ -598,7 +602,8 @@ body {
   background: 
     linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.95) 100%),
     radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.04) 0%, transparent 50%);
-  transform: translateY(-2px) scale(1.01);
+  /* 统一使用温和的位移效果 */
+  transform: translateY(-2px);
   box-shadow: 
     0 8px 20px hsl(var(--bc) / 0.08),
     0 3px 8px hsl(var(--p) / 0.12),
