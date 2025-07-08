@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-1 flex flex-col bg-base-200 min-h-0">
+  <div class="flex-1 flex flex-col bg-base-200 min-h-0 relative">
     <!-- 工作区头部 -->
     <div class="bg-base-100 border-b border-base-300 px-6 py-4">
       <div class="flex items-center justify-between">
@@ -8,7 +8,8 @@
             {{ getCurrentCategoryName() }}
           </h1>
           <p class="text-sm text-base-content/60 mt-1">
-            {{ getFilteredTools().length }} 个工具可用
+            找到 {{ getFilteredTools().length }} 个工具
+            {{ searchQuery ? `· 搜索 '${searchQuery}'` : '' }}
           </p>
         </div>
         
@@ -42,7 +43,7 @@
             @favorite-toggle="handleFavoriteToggle"
             @tool-use="handleToolUse"
             @tool-details="handleToolDetails"
-            @tool-click="handleToolClick"
+            @tool-click="handleToolDetails"
           />
         </div>
 
@@ -52,8 +53,29 @@
             v-for="tool in getSortedTools()"
             :key="tool.id"
             class="tool-list-item"
-            @click="handleToolClick(tool)"
+            @click="handleToolDetails(tool)"
           >
+            <!-- 收藏按钮 -->
+            <button 
+              @click.stop="handleFavoriteToggle(tool)"
+              :class="['favorite-btn', { 'favorited': isFavorite(tool.id) }]"
+              :title="isFavorite(tool.id) ? '取消收藏' : '添加收藏'"
+            >
+              <svg 
+                class="w-4 h-4" 
+                :fill="isFavorite(tool.id) ? 'currentColor' : 'none'" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  stroke-width="2" 
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+            </button>
+
             <div class="flex items-center gap-4">
               <!-- 工具图标 -->
               <div class="flex-shrink-0">
@@ -97,27 +119,6 @@
               
               <!-- 操作按钮 -->
               <div class="flex items-center gap-2 flex-shrink-0">
-                <!-- 收藏按钮 -->
-                <button 
-                  @click.stop="handleFavoriteToggle(tool)"
-                  :class="['btn btn-ghost btn-circle btn-sm', { 'text-accent': isFavorite(tool.id) }]"
-                  :title="isFavorite(tool.id) ? '取消收藏' : '添加收藏'"
-                >
-                  <svg 
-                    class="w-4 h-4" 
-                    :fill="isFavorite(tool.id) ? 'currentColor' : 'none'" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path 
-                      stroke-linecap="round" 
-                      stroke-linejoin="round" 
-                      stroke-width="2" 
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                    />
-                  </svg>
-                </button>
-                
                 <!-- 使用按钮 -->
                 <button 
                   @click.stop="handleToolUse(tool)"
@@ -157,6 +158,16 @@
         </div>
       </div>
     </div>
+
+    <!-- 工具详情面板 -->
+    <ToolDetailPanel
+      :tool="selectedTool"
+      :is-open="showDetailPanel"
+      :is-favorite="selectedTool ? isFavorite(selectedTool.id) : false"
+      @close="handleDetailPanelClose"
+      @tool-use="handleToolUse"
+      @favorite-toggle="handleFavoriteToggle"
+    />
   </div>
 </template>
 
@@ -164,6 +175,7 @@
 import { ref, computed } from 'vue'
 import type { Tool } from '@/types'
 import ToolCard from './ToolCard.vue'
+import ToolDetailPanel from './ToolDetailPanel.vue'
 import { categories, tools, getToolsByCategory, searchTools } from '@/store/data'
 import { Message } from '@/utils/message'
 
@@ -182,10 +194,12 @@ const emit = defineEmits<{
   'tool-select': [tool: Tool]
 }>()
 
-// 排序方式
+// 响应式状态
 const sortBy = ref<'default' | 'name' | 'category' | 'updated'>('default')
+const selectedTool = ref<Tool | null>(null)
+const showDetailPanel = ref(false)
 
-// 获取当前分类名称
+// 排序方式
 const getCurrentCategoryName = (): string => {
   if (props.selectedCategory === 'all') {
     return '全部工具'
@@ -263,8 +277,8 @@ const handleToolUse = (tool: Tool) => {
 
 // 处理工具详情
 const handleToolDetails = (tool: Tool) => {
-  // 显示工具详情面板或弹窗
-  Message.info(`查看 ${tool.name} 详细信息`)
+  selectedTool.value = tool
+  showDetailPanel.value = true
 }
 
 // 处理工具点击
@@ -275,6 +289,12 @@ const handleToolClick = (tool: Tool) => {
 // 清除搜索
 const handleClearSearch = () => {
   emit('update:searchQuery', '')
+}
+
+// 处理详情面板关闭
+const handleDetailPanelClose = () => {
+  showDetailPanel.value = false
+  selectedTool.value = null
 }
 </script>
 
