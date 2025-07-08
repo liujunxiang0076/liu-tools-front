@@ -1,495 +1,313 @@
 <template>
-  <main class="main-workspace">
-    <!-- 标题区域 -->
-    <header class="workspace-header">
-      <div class="header-content">
-        <h2 class="section-title">
-          {{ getCurrentCategoryName() }}
-          <span class="tool-count">({{ filteredTools.length }})</span>
-        </h2>
+  <div class="flex-1 flex flex-col bg-base-secondary min-h-0">
+    <!-- 工作区头部 -->
+    <div class="bg-base-100 border-b border-base-200 px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-bold text-base-content">
+            {{ getCurrentCategoryName() }}
+          </h1>
+          <p class="text-sm text-base-content/60 mt-1">
+            {{ getFilteredTools().length }} 个工具可用
+          </p>
+        </div>
         
-        <!-- 搜索结果提示 -->
-        <div v-if="searchKeyword" class="search-info">
-          <Search class="search-icon" />
-          <span>搜索"{{ searchKeyword }}"的结果</span>
-          <el-button text type="primary" @click="clearSearch">
-            清除搜索
-          </el-button>
-        </div>
-      </div>
-    </header>
-
-    <!-- 工具展示区 -->
-    <div class="workspace-content">
-      <!-- 空状态 -->
-      <div v-if="filteredTools.length === 0" class="empty-state">
-        <div class="empty-content">
-          <component :is="getEmptyIcon()" class="empty-icon" />
-          <h3 class="empty-title">{{ getEmptyTitle() }}</h3>
-          <p class="empty-description">{{ getEmptyDescription() }}</p>
-          <el-button
-            v-if="searchKeyword"
-            type="primary"
-            @click="clearSearch"
+        <!-- 排序选择 -->
+        <div class="flex items-center gap-3">
+          <label class="text-sm text-base-content/70 font-medium">排序:</label>
+          <select 
+            v-model="sortBy" 
+            class="select select-sm select-bordered bg-base-100"
           >
-            清除搜索条件
-          </el-button>
+            <option value="default">默认排序</option>
+            <option value="name">按名称</option>
+            <option value="category">按分类</option>
+            <option value="updated">最近更新</option>
+          </select>
         </div>
-      </div>
-
-      <!-- 工具列表 -->
-      <div
-        v-else
-        class="tools-container"
-        :class="`tools-container--${viewType}`"
-      >
-        <ToolCard
-          v-for="tool in filteredTools"
-          :key="tool.id"
-          :tool="tool"
-          :view-type="viewType"
-          :is-favorite="isFavorite(tool.id)"
-          @tool-click="handleToolClick"
-          @favorite-click="handleFavoriteClick"
-          @use-click="handleUseClick"
-          @detail-click="handleDetailClick"
-        />
-      </div>
-
-      <!-- 加载更多按钮（预留分页功能） -->
-      <div v-if="false" class="load-more">
-        <el-button type="primary" plain size="large">
-          加载更多工具
-        </el-button>
       </div>
     </div>
-  </main>
+
+    <!-- 工具展示区域 -->
+    <div class="flex-1 overflow-y-auto p-6">
+      <!-- 有工具时显示 -->
+      <div v-if="getFilteredTools().length > 0">
+        <!-- 网格视图 -->
+        <div v-if="viewMode === 'grid'" class="tools-grid">
+          <ToolCard
+            v-for="tool in getSortedTools()"
+            :key="tool.id"
+            :tool="tool"
+            :is-favorite="isFavorite(tool.id)"
+            @favorite-toggle="handleFavoriteToggle"
+            @tool-use="handleToolUse"
+            @tool-details="handleToolDetails"
+            @tool-click="handleToolClick"
+          />
+        </div>
+
+        <!-- 列表视图 -->
+        <div v-else class="tools-list">
+          <div 
+            v-for="tool in getSortedTools()"
+            :key="tool.id"
+            class="bg-base-100 border border-base-200 rounded-xl p-4 hover:border-primary hover:shadow-md transition-all duration-200 cursor-pointer"
+            @click="handleToolClick(tool)"
+          >
+            <div class="flex items-center gap-4">
+              <!-- 工具图标 -->
+              <div class="flex-shrink-0">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl">
+                  {{ tool.icon }}
+                </div>
+              </div>
+              
+              <!-- 工具信息 -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 mb-2">
+                  <h3 class="text-lg font-semibold text-base-content truncate">
+                    {{ tool.name }}
+                  </h3>
+                  <div :class="['category-tag', tool.category, 'flex-shrink-0']">
+                    {{ getCategoryName(tool.category) }}
+                  </div>
+                </div>
+                
+                <p class="text-sm text-base-content/70 line-clamp-2 mb-2">
+                  {{ tool.description }}
+                </p>
+                
+                <!-- 标签 -->
+                <div class="flex flex-wrap gap-1">
+                  <span 
+                    v-for="tag in tool.tags.slice(0, 4)" 
+                    :key="tag"
+                    class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-base-200 text-base-content/60"
+                  >
+                    {{ tag }}
+                  </span>
+                  <span 
+                    v-if="tool.tags.length > 4"
+                    class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-base-200 text-base-content/40"
+                  >
+                    +{{ tool.tags.length - 4 }}
+                  </span>
+                </div>
+              </div>
+              
+              <!-- 操作按钮 -->
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <!-- 收藏按钮 -->
+                <button 
+                  @click.stop="handleFavoriteToggle(tool)"
+                  :class="['btn btn-ghost btn-circle btn-sm', { 'text-accent': isFavorite(tool.id) }]"
+                  :title="isFavorite(tool.id) ? '取消收藏' : '添加收藏'"
+                >
+                  <svg 
+                    class="w-4 h-4" 
+                    :fill="isFavorite(tool.id) ? 'currentColor' : 'none'" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path 
+                      stroke-linecap="round" 
+                      stroke-linejoin="round" 
+                      stroke-width="2" 
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </button>
+                
+                <!-- 使用按钮 -->
+                <button 
+                  @click.stop="handleToolUse(tool)"
+                  class="action-btn primary"
+                >
+                  立即使用
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 空状态显示 -->
+      <div v-else class="empty-state">
+        <div class="empty-icon">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+        <h3 class="empty-title">
+          {{ searchQuery ? '没有找到匹配的工具' : '该分类暂无工具' }}
+        </h3>
+        <p class="empty-description">
+          {{ searchQuery 
+            ? `尝试使用其他关键词搜索，或浏览其他分类的工具` 
+            : '请选择其他分类查看可用工具，或尝试搜索功能'
+          }}
+        </p>
+        <div v-if="searchQuery" class="mt-4">
+          <button 
+            @click="handleClearSearch"
+            class="action-btn secondary"
+          >
+            清除搜索
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-// Vue APIs 现在自动导入，无需手动导入
-import { Search, Package, AlertCircle, Inbox } from 'lucide-vue-next'
-// ToolCard 组件现在自动导入，无需手动导入
-import { Tool, Category, ViewType } from '@/types'
+import { ref, computed } from 'vue'
+import type { Tool } from '@/types'
+import ToolCard from './ToolCard.vue'
+import { categories, tools, getToolsByCategory, searchTools } from '@/store/data'
+import { Message } from '@/utils/message'
 
-// 定义组件名称
-defineOptions({
-  name: 'MainWorkspace'
-})
-
-interface Props {
-  filteredTools: Tool[]
-  categories: Category[]
+// Props
+const props = defineProps<{
   selectedCategory: string
-  searchKeyword: string
-  viewType: ViewType
-  isFavorite: (toolId: number) => boolean
-}
+  searchQuery: string
+  viewMode: 'grid' | 'list'
+  favoriteIds: number[]
+}>()
 
-interface Emits {
-  (e: 'tool-click', tool: Tool): void
-  (e: 'favorite-click', tool: Tool): void
-  (e: 'use-click', tool: Tool): void
-  (e: 'detail-click', tool: Tool): void
-  (e: 'clear-search'): void
-}
+// Emits
+const emit = defineEmits<{
+  'update:favoriteIds': [ids: number[]]
+  'update:searchQuery': [query: string]
+  'tool-select': [tool: Tool]
+}>()
 
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+// 排序方式
+const sortBy = ref<'default' | 'name' | 'category' | 'updated'>('default')
 
 // 获取当前分类名称
-const getCurrentCategoryName = () => {
+const getCurrentCategoryName = (): string => {
   if (props.selectedCategory === 'all') {
     return '全部工具'
   }
-  const category = props.categories.find(cat => cat.id === props.selectedCategory)
+  const category = categories.find(c => c.id === props.selectedCategory)
   return category?.name || '未知分类'
 }
 
-// 获取空状态图标
-const getEmptyIcon = () => {
-  if (props.searchKeyword) {
-    return Search
-  }
-  if (props.selectedCategory === 'all') {
-    return Package
-  }
-  return Inbox
+// 获取分类名称
+const getCategoryName = (categoryId: string): string => {
+  const category = categories.find(c => c.id === categoryId)
+  return category?.name || '其他'
 }
 
-// 获取空状态标题
-const getEmptyTitle = () => {
-  if (props.searchKeyword) {
-    return '未找到相关工具'
+// 获取筛选后的工具
+const getFilteredTools = (): Tool[] => {
+  let filteredTools: Tool[] = []
+  
+  if (props.searchQuery.trim()) {
+    // 如果有搜索关键词，搜索所有工具
+    filteredTools = searchTools(props.searchQuery)
+  } else {
+    // 否则按分类筛选
+    filteredTools = getToolsByCategory(props.selectedCategory)
   }
-  if (props.selectedCategory === 'all') {
-    return '暂无工具'
-  }
-  return `暂无${getCurrentCategoryName()}`
+  
+  return filteredTools
 }
 
-// 获取空状态描述
-const getEmptyDescription = () => {
-  if (props.searchKeyword) {
-    return '尝试使用其他关键词搜索，或者浏览其他分类的工具'
+// 获取排序后的工具
+const getSortedTools = (): Tool[] => {
+  const filtered = getFilteredTools()
+  
+  switch (sortBy.value) {
+    case 'name':
+      return [...filtered].sort((a, b) => a.name.localeCompare(b.name))
+    case 'category':
+      return [...filtered].sort((a, b) => a.category.localeCompare(b.category))
+    case 'updated':
+      return [...filtered].sort((a, b) => b.id - a.id) // 简单按ID倒序，实际应该按更新时间
+    default:
+      return filtered
   }
-  if (props.selectedCategory === 'all') {
-    return '系统中还没有添加任何工具'
-  }
-  return `当前分类下暂时没有可用的工具，请尝试其他分类`
 }
 
-// 清除搜索
-const clearSearch = () => {
-  emit('clear-search')
+// 检查工具是否已收藏
+const isFavorite = (toolId: number): boolean => {
+  return props.favoriteIds.includes(toolId)
+}
+
+// 处理收藏切换
+const handleFavoriteToggle = (tool: Tool) => {
+  const currentFavorites = [...props.favoriteIds]
+  const index = currentFavorites.indexOf(tool.id)
+  
+  if (index > -1) {
+    // 取消收藏
+    currentFavorites.splice(index, 1)
+    Message.success(`已取消收藏 ${tool.name}`)
+  } else {
+    // 添加收藏
+    currentFavorites.push(tool.id)
+    Message.success(`已收藏 ${tool.name}`)
+  }
+  
+  emit('update:favoriteIds', currentFavorites)
+}
+
+// 处理工具使用
+const handleToolUse = (tool: Tool) => {
+  // 这里可以添加使用统计等逻辑
+  emit('tool-select', tool)
+  Message.info(`正在打开 ${tool.name}...`)
+}
+
+// 处理工具详情
+const handleToolDetails = (tool: Tool) => {
+  // 显示工具详情面板或弹窗
+  Message.info(`查看 ${tool.name} 详细信息`)
 }
 
 // 处理工具点击
 const handleToolClick = (tool: Tool) => {
-  emit('tool-click', tool)
+  emit('tool-select', tool)
 }
 
-// 处理收藏点击
-const handleFavoriteClick = (tool: Tool) => {
-  emit('favorite-click', tool)
+// 清除搜索
+const handleClearSearch = () => {
+  emit('update:searchQuery', '')
 }
+</script>
 
-// 处理使用点击
-const handleUseClick = (tool: Tool) => {
-  emit('use-click', tool)
-}
-
-// 处理详情点击
-const handleDetailClick = (tool: Tool) => {
-  emit('detail-click', tool)
+<script lang="ts">
+export default {
+  name: 'MainWorkspace'
 }
 </script>
 
 <style scoped>
-/* 主工作区 - 增强版 */
-.main-workspace {
-  flex: 1;
-  height: 100vh;
+/* 列表视图的行裁剪 */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  background: var(--bg-color);
 }
 
-/* 标题区域 - 增强版 */
-.workspace-header {
-  background: var(--card-bg);
-  border-bottom: 1px solid var(--border-color);
-  padding: 24px 32px;
-  flex-shrink: 0;
-  box-shadow: var(--shadow-xs);
-}
-
-.header-content {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.section-title {
-  font-size: var(--text-2xl);
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0 0 12px 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  letter-spacing: -0.025em;
-}
-
-.section-title::before {
-  content: '';
-  width: 4px;
-  height: 24px;
-  background: var(--brand-gradient);
-  border-radius: var(--radius-sm);
-}
-
-.tool-count {
-  font-size: var(--text-lg);
-  font-weight: 500;
-  color: var(--text-muted);
-  background: var(--bg-secondary);
-  padding: 4px 12px;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border-color);
-}
-
-.search-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: var(--primary-light);
-  border-radius: var(--radius-lg);
-  font-size: var(--text-sm);
-  color: var(--primary-color);
-  border: 1px solid var(--primary-color);
-  margin-top: 8px;
-  font-weight: 500;
-}
-
-.search-icon {
-  width: 16px;
-  height: 16px;
-}
-
-/* 工作区内容 */
-.workspace-content {
-  flex: 1;
-  overflow-y: auto;
-  position: relative;
-}
-
-/* 空状态 - 增强版 */
-.empty-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  min-height: 400px;
-  padding: 40px;
-}
-
-.empty-content {
-  text-align: center;
-  max-width: 400px;
-  background: var(--card-bg);
-  border-radius: var(--radius-2xl);
-  padding: 48px 32px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-light);
-}
-
-.empty-icon {
-  width: 80px;
-  height: 80px;
-  color: var(--text-muted);
-  margin: 0 auto 24px;
-  opacity: 0.6;
-}
-
-.empty-title {
-  font-size: var(--text-xl);
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin: 0 0 12px 0;
-  letter-spacing: -0.025em;
-}
-
-.empty-description {
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-  line-height: 1.6;
-  margin: 0 0 32px 0;
-}
-
-.empty-content .el-button {
-  background: var(--brand-gradient);
-  border: none;
-  color: white;
-  font-weight: 500;
-  padding: 12px 24px;
-  border-radius: var(--radius-lg);
-  transition: var(--transition);
-}
-
-.empty-content .el-button:hover {
-  background: var(--brand-gradient-hover);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-/* 工具容器 - 增强版 */
-.tools-container {
-  padding: 32px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-/* 网格布局 - 增强版 */
-.tools-container--grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 28px;
-}
-
-/* 列表布局 - 增强版 */
-.tools-container--list {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-/* 加载更多 - 增强版 */
-.load-more {
-  display: flex;
-  justify-content: center;
-  padding: 48px 32px;
-}
-
-.load-more .el-button {
-  background: var(--card-bg);
-  border: 2px solid var(--border-color);
-  color: var(--text-secondary);
-  font-weight: 500;
-  padding: 12px 32px;
-  border-radius: var(--radius-xl);
-  transition: var(--transition);
-  font-size: var(--text-sm);
-}
-
-.load-more .el-button:hover {
-  background: var(--primary-light);
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-/* 响应式设计 - 增强版 */
-@media (max-width: 1200px) {
-  .tools-container--grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
-  }
-}
-
+/* 响应式优化 */
 @media (max-width: 768px) {
-  .workspace-header {
-    padding: 20px 24px;
-  }
-  
-  .section-title {
-    font-size: var(--text-xl);
-  }
-  
-  .tool-count {
-    font-size: var(--text-base);
-    padding: 3px 10px;
-  }
-  
-  .tools-container {
-    padding: 24px 20px;
-  }
-  
-  .tools-container--grid {
+  .tools-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .tools-container--list {
-    gap: 16px;
-  }
-  
-  .empty-content {
-    padding: 32px 24px;
-    margin: 0 16px;
-  }
-  
-  .empty-icon {
-    width: 64px;
-    height: 64px;
-  }
-  
-  .empty-title {
-    font-size: var(--text-lg);
-  }
-  
-  .load-more {
-    padding: 32px 20px;
   }
 }
 
-@media (max-width: 480px) {
-  .workspace-header {
-    padding: 16px 20px;
+@media (max-width: 640px) {
+  .flex-1 {
+    padding: 1rem;
   }
   
-  .section-title {
-    font-size: var(--text-lg);
-    gap: 8px;
-  }
-  
-  .section-title::before {
-    width: 3px;
-    height: 20px;
-  }
-  
-  .tool-count {
-    font-size: var(--text-sm);
-  }
-  
-  .tools-container {
-    padding: 20px 16px;
-  }
-  
-  .empty-content {
-    padding: 24px 20px;
-    margin: 0 12px;
-  }
-  
-  .empty-icon {
-    width: 56px;
-    height: 56px;
-  }
-  
-  .search-info {
-    padding: 8px 12px;
-    font-size: var(--text-xs);
+  .tools-grid {
+    gap: 1rem;
   }
 }
-
-/* 滚动条样式 */
-.workspace-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.workspace-content::-webkit-scrollbar-track {
-  background: var(--bg-color);
-}
-
-.workspace-content::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
-}
-
-.workspace-content::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
-}
-
-/* 平滑滚动 */
-.workspace-content {
-  scroll-behavior: smooth;
-}
-
-/* 工具卡片进入动画 */
-.tools-container--grid .tool-card,
-.tools-container--list .tool-card {
-  animation: fadeInUp 0.4s ease forwards;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 为不同的卡片添加延迟动画 */
-.tool-card:nth-child(1) { animation-delay: 0.1s; }
-.tool-card:nth-child(2) { animation-delay: 0.2s; }
-.tool-card:nth-child(3) { animation-delay: 0.3s; }
-.tool-card:nth-child(4) { animation-delay: 0.4s; }
-.tool-card:nth-child(5) { animation-delay: 0.5s; }
-.tool-card:nth-child(6) { animation-delay: 0.6s; }
 </style> 
  
