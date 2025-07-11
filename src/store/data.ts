@@ -9,6 +9,12 @@ export const categories: Category[] = [
     color: '#6366f1'
   },
   {
+    id: 'favorites',
+    name: '我的收藏',
+    icon: 'Heart',
+    color: '#ef4444'
+  },
+  {
     id: 'design',
     name: '设计工具',
     icon: 'Palette',

@@ -22,6 +22,7 @@
         @category-select="handleCategorySelect"
         @tool-select="handleToolSelect"
         @show-all-favorites="handleShowAllFavorites"
+        @remove-favorite="handleRemoveFavorite"
       />
 
       <!-- 移动端侧边栏遮罩 -->
@@ -42,6 +43,17 @@
         @tool-select="handleToolSelect"
       />
     </div>
+
+    <!-- 收藏管理弹窗 -->
+    <FavoritesModal
+      :is-open="showFavoritesModal"
+      :favorite-tools="favoriteTools"
+      @close="showFavoritesModal = false"
+      @tool-select="handleToolSelect"
+      @tool-use="handleToolSelect"
+      @remove-favorite="handleRemoveFavorite"
+      @clear-all="handleClearAllFavorites"
+    />
   </div>
 </template>
 
@@ -50,6 +62,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import TopNavBar from '@/components/TopNavBar.vue'
 import Sidebar from '@/components/Sidebar.vue'
 import MainWorkspace from '@/components/MainWorkspace.vue'
+import FavoritesModal from '@/components/FavoritesModal.vue'
 import { categories, tools, getToolsByCategory } from '@/store/data'
 import type { Tool } from '@/types'
 import { Message } from '@/utils/message'
@@ -60,6 +73,7 @@ const selectedCategory = ref('all')
 const viewMode = ref<'grid' | 'list'>('grid')
 const favoriteIds = ref<number[]>([])
 const sidebarOpen = ref(false)
+const showFavoritesModal = ref(false)
 
 // 计算属性
 const totalTools = computed(() => tools.length)
@@ -96,8 +110,23 @@ const handleToolSelect = (tool: Tool) => {
 }
 
 const handleShowAllFavorites = () => {
-  selectedCategory.value = 'favorites'
-  Message.info('显示所有收藏的工具')
+  showFavoritesModal.value = true
+}
+
+const handleRemoveFavorite = (tool: Tool) => {
+  const currentFavorites = [...favoriteIds.value]
+  const index = currentFavorites.indexOf(tool.id)
+  
+  if (index > -1) {
+    currentFavorites.splice(index, 1)
+    favoriteIds.value = currentFavorites
+    Message.success(`已取消收藏 ${tool.name}`)
+  }
+}
+
+const handleClearAllFavorites = () => {
+  favoriteIds.value = []
+  Message.success('已清空所有收藏')
 }
 
 // 切换侧边栏（移动端）

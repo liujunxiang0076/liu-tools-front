@@ -204,6 +204,9 @@ const getCurrentCategoryName = (): string => {
   if (props.selectedCategory === 'all') {
     return '全部工具'
   }
+  if (props.selectedCategory === 'favorites') {
+    return '我的收藏'
+  }
   const category = categories.find(c => c.id === props.selectedCategory)
   return category?.name || '未知分类'
 }
@@ -221,6 +224,9 @@ const getFilteredTools = (): Tool[] => {
   if (props.searchQuery.trim()) {
     // 如果有搜索关键词，搜索所有工具
     filteredTools = searchTools(props.searchQuery)
+  } else if (props.selectedCategory === 'favorites') {
+    // 如果选择的是收藏分类，显示收藏的工具
+    filteredTools = tools.filter(tool => props.favoriteIds.includes(tool.id))
   } else {
     // 否则按分类筛选
     filteredTools = getToolsByCategory(props.selectedCategory)
