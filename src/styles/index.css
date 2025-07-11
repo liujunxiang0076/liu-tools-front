@@ -363,16 +363,67 @@ body {
     0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
-/* 网格卡片特定样式 */
+/* 网格卡片特定样式 - 统一尺寸 */
 .tool-card {
-  padding: 1.5rem;
+  padding: 1.5rem; /* 保持标准尺寸 24px */
   border-radius: 1rem;
   overflow: hidden;
+  /* 确保所有网格卡片高度一致 */
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 列表项特定样式 */
 .tool-list-item {
   padding: 1rem;
+}
+
+/* 工具卡片内容区域优化 */
+.tool-card .tool-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  display: block;
+  text-align: center;
+}
+
+.tool-card .tool-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: hsl(var(--bc));
+  margin-bottom: 0.5rem;
+  text-align: center;
+  transition: color 0.2s ease;
+}
+
+.tool-card .tool-description {
+  color: hsl(var(--bc) / 0.6);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  flex-grow: 1; /* 让描述区域自动扩展填充空间 */
+  text-align: center;
+}
+
+.tool-card .category-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin: 0 auto 1rem auto; /* 居中显示 */
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+/* 工具卡片底部操作区域 */
+.tool-card .action-buttons {
+  margin-top: auto; /* 推到底部 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
 /* 优化的悬停效果 */
@@ -399,20 +450,6 @@ body {
     0 0 0 1px rgba(37, 99, 235, 0.25); /* blue-600/25 */
 }
 
-.tool-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  display: block;
-}
-
-.tool-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: hsl(var(--bc));
-  margin-bottom: 0.5rem;
-  transition: color 0.2s ease; /* 确保动画时长为200毫秒 */
-}
-
 /* 标题悬停变色 */
 .tool-card:hover .tool-title,
 .tool-list-item:hover .tool-title {
@@ -422,14 +459,6 @@ body {
 [data-theme="dark"] .tool-card:hover .tool-title,
 [data-theme="dark"] .tool-list-item:hover .tool-title {
   color: #60a5fa; /* blue-400 深色模式 */
-}
-
-.tool-description {
-  /* 浅色模式：中灰色辅助文字，深色模式：浅灰色辅助文字 */
-  color: hsl(var(--bc) / 0.6);
-  font-size: 0.875rem;
-  line-height: 1.5;
-  margin-bottom: 1rem;
 }
 
 /* 分类标签样式 - 新配色规范 */
