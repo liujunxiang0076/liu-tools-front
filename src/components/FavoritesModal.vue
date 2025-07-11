@@ -164,7 +164,7 @@
                 <button 
                   v-for="page in visiblePages"
                   :key="page"
-                  @click="currentPage = page"
+                  @click="currentPage = Number(page)"
                   :class="[
                     'join-item btn btn-sm',
                     { 'btn-active': currentPage === page }
@@ -326,7 +326,7 @@ const paginatedFavorites = computed(() => {
 
 // 计算可见页码
 const visiblePages = computed(() => {
-  const pages = []
+  const pages: (number | string)[] = []
   const total = totalPages.value
   const current = currentPage.value
   
