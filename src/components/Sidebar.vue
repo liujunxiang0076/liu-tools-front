@@ -3,8 +3,8 @@
     <!-- 侧边栏头部 -->
     <div class="sidebar-header">
       <h2 class="sidebar-title">工具分类</h2>
-      <div class="tools-count-badge">
-        共 {{ totalTools }} 个工具
+      <div class="badge badge-outline badge-sm">
+        共 {{ totalTools }} 个
       </div>
     </div>
 
@@ -29,12 +29,12 @@
               {{ getCategoryEmoji(category.id) }}
             </span>
             
-            <!-- 分类名称和数量 -->
+            <!-- 分类名称和数量徽章 -->
             <div class="flex-1 flex items-center justify-between">
               <span class="category-name">{{ category.name }}</span>
-              <span class="category-count">
+              <div :class="['badge badge-sm', getCategoryBadgeClass(category.id)]">
                 {{ getCategoryToolCount(category.id) }}
-              </span>
+              </div>
             </div>
           </div>
         </div>
@@ -45,11 +45,9 @@
     <div v-if="favoriteTools.length > 0" class="border-t border-base-200 p-4">
       <div class="flex items-center justify-between mb-3">
         <h3 class="text-sm font-semibold text-base-content/70">我的收藏</h3>
-        <!-- 收藏数量徽章 -->
-        <div class="flex items-center gap-2">
-          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-            {{ favoriteTools.length }}
-          </span>
+        <!-- 收藏数量徽章 - 使用更专业的徽章样式 -->
+        <div class="badge badge-primary badge-sm">
+          {{ favoriteTools.length }}
         </div>
       </div>
       
@@ -70,8 +68,11 @@
               <div class="text-sm font-medium text-base-content truncate">
                 {{ tool.name }}
               </div>
-              <div class="text-xs text-base-content/60 truncate">
-                {{ getCategoryName(tool.category) }}
+              <div class="flex items-center gap-2 mt-1">
+                <!-- 添加分类徽章 -->
+                <div :class="['badge badge-xs badge-outline', getCategoryBadgeClass(tool.category)]">
+                  {{ getCategoryName(tool.category) }}
+                </div>
               </div>
             </div>
             
@@ -95,12 +96,15 @@
           <button 
             v-if="favoriteTools.length > 5"
             @click="toggleShowAll"
-            class="text-xs font-medium px-3 py-2 rounded-lg transition-colors hover:bg-base-200"
+            class="text-xs font-medium px-3 py-2 rounded-lg transition-colors hover:bg-base-200 flex items-center gap-2"
             :class="showAllFavorites ? 'text-primary bg-primary/10' : 'text-base-content/70'"
           >
-            {{ showAllFavorites ? '收起' : `查看全部 ${favoriteTools.length} 个` }}
+            {{ showAllFavorites ? '收起' : '查看全部' }}
+            <div class="badge badge-xs badge-ghost">
+              {{ favoriteTools.length }}
+            </div>
             <svg 
-              class="w-3 h-3 ml-1 inline-block transition-transform"
+              class="w-3 h-3 transition-transform"
               :class="{ 'rotate-180': showAllFavorites }"
               fill="none" 
               stroke="currentColor" 
@@ -114,9 +118,12 @@
           <button 
             v-if="favoriteTools.length > 3"
             @click="emit('show-all-favorites')"
-            class="text-xs text-primary hover:text-primary/80 font-medium px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors ml-2"
+            class="text-xs text-primary hover:text-primary/80 font-medium px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors ml-2 flex items-center gap-1"
           >
             管理收藏
+            <div class="badge badge-xs badge-primary badge-outline">
+              {{ favoriteTools.length }}
+            </div>
           </button>
         </div>
       </div>
@@ -129,9 +136,9 @@
         <div class="text-sm text-base-content/60 mb-1">
           还没有收藏的工具
         </div>
-        <div class="text-xs text-base-content/40">
+        <div class="text-xs text-base-content/40 flex items-center justify-center gap-1">
           点击工具卡片的 
-          <svg class="w-3 h-3 inline-block mx-1 text-error" fill="currentColor" viewBox="0 0 24 24">
+          <svg class="w-3 h-3 text-error" fill="currentColor" viewBox="0 0 24 24">
             <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
           </svg>
           图标收藏
@@ -191,9 +198,26 @@ const getCategoryEmoji = (categoryId: string): string => {
     'calculation': '🧮',
     'text': '📝',
     'image': '🖼️',
-    'network': '🌐'
+    'network': '🌐',
+    'favorites': '❤️'
   }
   return emojiMap[categoryId] || '🔧'
+}
+
+// 获取分类徽章样式类
+const getCategoryBadgeClass = (categoryId: string): string => {
+  const badgeClassMap: Record<string, string> = {
+    'all': 'badge-neutral',
+    'favorites': 'badge-error',
+    'design': 'badge-secondary', 
+    'development': 'badge-info',
+    'efficiency': 'badge-success',
+    'calculation': 'badge-accent',
+    'text': 'badge-warning',
+    'image': 'badge-error',
+    'network': 'badge-info'
+  }
+  return badgeClassMap[categoryId] || 'badge-neutral'
 }
 
 // 获取分类名称
