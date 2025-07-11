@@ -701,55 +701,41 @@ body {
 
 /* 收藏工具卡片 - 新配色规范 */
 .favorite-tool-card {
-  background: 
-    linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.97) 100%),
-    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.02) 0%, transparent 50%);
+  background: #ffffff; /* 纯白色背景 */
   border: 1px solid hsl(var(--b3) / 0.8);
   border-radius: 0.75rem;
   padding: 0.75rem;
   transition: all 0.2s ease;
   cursor: pointer;
   box-shadow: 
-    0 2px 6px rgba(0, 0, 0, 0.06),
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 hsl(var(--b1) / 0.5);
+    0 2px 6px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-/* 深色模式收藏工具卡片 */
+/* 深色模式收藏工具卡片 - 暗灰色背景 */
 [data-theme="dark"] .favorite-tool-card {
-  background: 
-    linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.87) 100%),
-    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.03) 0%, transparent 50%);
-  border: 1px solid rgba(71, 85, 105, 0.5);
+  background: #1e293b; /* slate-800 暗灰色背景 */
+  border: 1px solid rgba(71, 85, 105, 0.6);
   box-shadow: 
-    0 2px 6px rgba(0, 0, 0, 0.2),
-    0 1px 2px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(30, 41, 59, 0.8);
+    0 2px 6px rgba(0, 0, 0, 0.25),
+    0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .favorite-tool-card:hover {
-  border-color: #93c5fd; /* blue-300 浅色模式 */
-  background: 
-    linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.95) 100%),
-    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.04) 0%, transparent 50%);
+  border-color: #3b82f6; /* blue-500 */
+  background: #ffffff; /* 保持白色背景 */
   transform: translateY(-2px);
   box-shadow: 
-    0 8px 20px rgba(0, 0, 0, 0.1),
-    0 3px 8px rgba(59, 130, 246, 0.15),
-    inset 0 1px 0 hsl(var(--b1)),
-    0 0 0 1px rgba(147, 197, 253, 0.15);
+    0 8px 20px rgba(0, 0, 0, 0.12),
+    0 3px 8px rgba(59, 130, 246, 0.2);
 }
 
 [data-theme="dark"] .favorite-tool-card:hover {
-  border-color: #2563eb; /* blue-600 深色模式 */
-  background: 
-    linear-gradient(145deg, rgba(30, 41, 59, 0.95) 0%, rgba(30, 41, 59, 0.92) 100%),
-    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.05) 0%, transparent 50%);
+  border-color: #60a5fa; /* blue-400 深色模式 */
+  background: #334155; /* slate-700 悬停时稍亮 */
   box-shadow: 
-    0 8px 20px rgba(0, 0, 0, 0.3),
-    0 3px 8px rgba(37, 99, 235, 0.25),
-    inset 0 1px 0 rgba(30, 41, 59, 0.9),
-    0 0 0 1px rgba(37, 99, 235, 0.2);
+    0 8px 20px rgba(0, 0, 0, 0.35),
+    0 3px 8px rgba(96, 165, 250, 0.25);
 }
 
 /* 动画类 */
