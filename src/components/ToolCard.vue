@@ -45,7 +45,7 @@
     </p>
 
     <!-- 标签列表 -->
-    <div class="flex flex-wrap gap-1 mb-4">
+    <div class="flex flex-wrap gap-1 mb-4 justify-center">
       <span 
         v-for="tag in tool.tags.slice(0, 3)" 
         :key="tag"
@@ -62,10 +62,10 @@
     </div>
 
     <!-- 操作按钮 -->
-    <div class="flex items-center justify-between">
+    <div class="action-buttons">
       <button 
         @click.stop="handleUseClick"
-        class="action-btn primary"
+        class="action-btn primary flex-1"
       >
         立即使用
       </button>
@@ -74,7 +74,7 @@
         @click.stop="handleDetailsClick"
         class="action-btn secondary"
       >
-        详细信息
+        详情
       </button>
     </div>
   </div>
