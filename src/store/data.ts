@@ -75,7 +75,7 @@ export const tools: Tool[] = [
   {
     id: 2,
     name: '图片压缩',
-    description: '在线图片压缩和优化工具，支持JPG、PNG等多种格式，保持画质同时减小文件大小',
+    description: '在线图片压缩和优化工具，支持JPG、PNG等多种格式',
     category: 'image',
     icon: '🖼️',
     tags: ['图片', '压缩', '优化', 'JPG', 'PNG', '文件大小'],

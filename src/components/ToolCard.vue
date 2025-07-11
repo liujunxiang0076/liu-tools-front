@@ -152,6 +152,9 @@ export default {
   .tool-description {
     font-size: 0.8rem;
     margin-bottom: 0.75rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
 }
 </style> 
