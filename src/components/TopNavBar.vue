@@ -35,13 +35,13 @@
     <div class="navbar-center flex-1 max-w-[512px] mx-8">
       <div class="form-control w-full">
         <div class="relative">
-          <!-- 搜索图标在左侧内部，距离左边12像素 -->
-          <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/40">
-            <svg v-if="!isSearching" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <!-- 搜索图标在左侧内部，距离左边16像素 -->
+          <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-base-content/40 pointer-events-none">
+            <svg v-if="!isSearching" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
             <!-- 搜索加载动画 -->
-            <div v-else class="w-4 h-4 animate-spin">
+            <div v-else class="w-5 h-5 animate-spin">
               <svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
               </svg>
@@ -63,14 +63,14 @@
             spellcheck="false"
           />
           
-          <!-- 清空按钮 -->
+          <!-- 清空按钮 - 增大点击区域 -->
           <button 
             v-if="searchQuery.trim()"
             @click="handleClearSearch"
-            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-base-content/40 hover:text-base-content/80 transition-colors duration-150"
+            class="search-clear-button"
             title="清空搜索"
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
@@ -79,18 +79,18 @@
         <!-- 搜索建议下拉框 -->
         <div 
           v-if="showSuggestions && searchSuggestions.length > 0"
-          class="absolute top-full left-0 right-0 mt-1 bg-base-100 border border-base-300 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto"
+          class="search-suggestions-dropdown"
         >
           <div 
             v-for="(suggestion, index) in searchSuggestions"
             :key="index"
             @click="handleSuggestionClick(suggestion)"
-            class="px-4 py-2 hover:bg-base-200 cursor-pointer transition-colors duration-150 flex items-center gap-3"
+            class="search-suggestion-item"
           >
-            <svg class="w-4 h-4 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-base-content/40 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
-            <span class="text-sm text-base-content">{{ suggestion }}</span>
+            <span class="text-base text-base-content font-medium">{{ suggestion }}</span>
           </div>
         </div>
       </div>

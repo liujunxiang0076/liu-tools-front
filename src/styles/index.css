@@ -110,69 +110,136 @@ body {
   font-weight: 500;
 }
 
-/* 搜索框样式 - 优化深色模式透明度 */
+/* 搜索框样式 - 现代化设计优化 */
 .search-input {
   width: 100%;
   max-width: 512px;
-  padding: 0.75rem 2.5rem 0.75rem 2.5rem; /* 左右都预留空间 */
-  border: 1px solid hsl(var(--b3));
-  border-radius: 0.75rem;
+  height: 48px; /* 增大高度到48px，符合现代设计标准 */
+  padding: 0 3.5rem 0 3rem; /* 左侧56px，右侧56px，为图标和按钮预留空间 */
+  border: 1.5px solid hsl(var(--b3)); /* 增加边框宽度 */
+  border-radius: 1rem; /* 增大圆角到16px */
   background-color: hsl(var(--b1));
-  transition: all 0.15s ease;
-  font-size: 0.875rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); /* 使用更平滑的缓动函数 */
+  font-size: 1rem; /* 增大字体到16px */
+  font-weight: 500; /* 增加字体粗细 */
   color: hsl(var(--bc));
   position: relative;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.04),
+    0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 [data-theme="dark"] .search-input {
-  background-color: rgba(51, 65, 85, 0.5); /* slate-700/50 */
+  background-color: rgba(51, 65, 85, 0.6); /* slate-700/60 提高透明度 */
+  border-color: rgba(71, 85, 105, 0.8); /* 增强边框可见度 */
 }
 
 .search-input:focus {
   outline: none;
   border-color: #3b82f6; /* blue-500 聚焦边框 */
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* blue-500/50 聚焦环 */
+  box-shadow: 
+    0 0 0 4px rgba(59, 130, 246, 0.12), /* 增大聚焦环 */
+    0 4px 12px rgba(59, 130, 246, 0.15),
+    0 2px 4px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px); /* 轻微上浮效果 */
 }
 
 .search-input::placeholder {
-  color: hsl(var(--bc) / 0.4);
+  color: hsl(var(--bc) / 0.5); /* 增强占位符可见度 */
+  font-weight: 400;
 }
 
-/* 搜索建议下拉框样式 */
-.search-suggestions {
+/* 搜索框清空按钮 - 增大点击区域 */
+.search-clear-button {
   position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  margin-top: 0.25rem;
-  background-color: hsl(var(--b1));
-  border: 1px solid hsl(var(--b3));
-  border-radius: 0.75rem;
-  box-shadow: 
-    0 10px 25px rgba(0, 0, 0, 0.1),
-    0 4px 6px rgba(0, 0, 0, 0.05);
-  z-index: 50;
-  max-height: 16rem;
-  overflow-y: auto;
+  right: 0.75rem; /* 12px from right */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2rem; /* 32px 点击区域 */
+  height: 2rem; /* 32px 点击区域 */
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 0.5rem; /* 8px 圆角 */
+  color: hsl(var(--bc) / 0.4);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 现代化悬停效果 */
   backdrop-filter: blur(8px);
 }
 
-[data-theme="dark"] .search-suggestions {
-  background-color: rgba(30, 41, 59, 0.95);
-  border-color: rgba(71, 85, 105, 0.5);
-  box-shadow: 
-    0 10px 25px rgba(0, 0, 0, 0.3),
-    0 4px 6px rgba(0, 0, 0, 0.2);
+.search-clear-button:hover {
+  color: hsl(var(--bc) / 0.8);
+  background-color: hsl(var(--er) / 0.1); /* 红色背景提示 */
+  transform: translateY(-50%) scale(1.05); /* 轻微放大 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.search-clear-button:active {
+  transform: translateY(-50%) scale(0.95);
+  background-color: hsl(var(--er) / 0.15);
+}
+
+/* 搜索建议下拉框 - 现代化设计 */
+.search-suggestions-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem); /* 8px 间距 */
+  left: 0;
+  right: 0;
+  background-color: hsl(var(--b1));
+  border: 1px solid hsl(var(--b3) / 0.8);
+  border-radius: 1rem; /* 与搜索框保持一致的圆角 */
+  box-shadow: 
+    0 20px 25px rgba(0, 0, 0, 0.1),
+    0 10px 10px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  z-index: 50;
+  max-height: 20rem; /* 增大最大高度 */
+  overflow-y: auto;
+  backdrop-filter: blur(12px) saturate(1.1);
+  /* 现代化滚动条 */
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--bc) / 0.2) transparent;
+}
+
+.search-suggestions-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.search-suggestions-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.search-suggestions-dropdown::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--bc) / 0.2);
+  border-radius: 3px;
+}
+
+.search-suggestions-dropdown::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--bc) / 0.3);
+}
+
+[data-theme="dark"] .search-suggestions-dropdown {
+  background-color: rgba(30, 41, 59, 0.95); /* slate-800/95 */
+  border-color: rgba(71, 85, 105, 0.6);
+  box-shadow: 
+    0 20px 25px rgba(0, 0, 0, 0.25),
+    0 10px 10px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* 搜索建议项 - 增大点击区域 */
 .search-suggestion-item {
-  padding: 0.75rem 1rem;
+  padding: 1rem 1.25rem; /* 增大内边距 16px 20px */
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  border-bottom: 1px solid hsl(var(--b3) / 0.5);
+  gap: 0.875rem; /* 14px 间距 */
+  border-bottom: 1px solid hsl(var(--b3) / 0.3);
+  min-height: 3.5rem; /* 56px 最小高度，确保足够的点击区域 */
 }
 
 .search-suggestion-item:last-child {
@@ -180,48 +247,31 @@ body {
 }
 
 .search-suggestion-item:hover {
-  background-color: hsl(var(--b2));
+  background-color: hsl(var(--p) / 0.08); /* 主色调背景 */
   color: hsl(var(--bc));
+  transform: translateX(4px); /* 轻微右移效果 */
+  border-left: 3px solid hsl(var(--p)); /* 左侧强调边框 */
+  padding-left: calc(1.25rem - 3px); /* 调整内边距补偿边框 */
 }
 
 .search-suggestion-item:first-child {
-  border-top-left-radius: 0.75rem;
-  border-top-right-radius: 0.75rem;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
 }
 
 .search-suggestion-item:last-child {
-  border-bottom-left-radius: 0.75rem;
-  border-bottom-right-radius: 0.75rem;
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
 }
 
-/* 搜索框清空按钮样式 */
-.search-clear-btn {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 0.375rem;
-  color: hsl(var(--bc) / 0.4);
-  transition: all 0.15s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* 搜索建议项文字样式 */
+.search-suggestion-item span {
+  font-size: 1rem; /* 16px */
+  line-height: 1.5;
+  font-weight: 500;
 }
 
-.search-clear-btn:hover {
-  color: hsl(var(--bc) / 0.8);
-  background-color: hsl(var(--b2));
-}
-
-.search-clear-btn:active {
-  transform: translateY(-50%) scale(0.95);
-}
-
-/* 搜索加载状态样式 */
+/* 搜索加载状态优化 */
 .search-loading {
   animation: spin 1s linear infinite;
 }
@@ -1054,17 +1104,74 @@ body {
 /* 搜索框响应式优化 */
 @media (max-width: 768px) {
   .search-input {
-    font-size: 0.875rem;
-    padding: 0.625rem 2rem 0.625rem 2.5rem;
+    height: 44px; /* 移动端稍微减小高度 */
+    font-size: 0.9375rem; /* 15px */
+    padding: 0 3rem 0 2.75rem; /* 调整内边距 */
+    border-radius: 0.875rem; /* 14px 圆角 */
   }
   
-  .search-suggestions {
-    margin-top: 0.125rem;
-    border-radius: 0.5rem;
+  .search-suggestions-dropdown {
+    border-radius: 0.875rem;
+    max-height: 16rem; /* 移动端减小最大高度 */
   }
   
   .search-suggestion-item {
-    padding: 0.625rem 0.875rem;
-    font-size: 0.875rem;
+    padding: 0.875rem 1rem; /* 14px 16px */
+    min-height: 3rem; /* 48px 最小高度 */
+    gap: 0.75rem; /* 12px 间距 */
+  }
+  
+  .search-suggestion-item span {
+    font-size: 0.9375rem; /* 15px */
+  }
+  
+  .search-clear-button {
+    width: 1.75rem; /* 28px */
+    height: 1.75rem; /* 28px */
+  }
+  
+  .search-clear-button svg {
+    width: 1.125rem; /* 18px */
+    height: 1.125rem; /* 18px */
+  }
+} 
+
+@media (max-width: 640px) {
+  .search-input {
+    height: 40px; /* 小屏幕进一步减小 */
+    font-size: 0.875rem; /* 14px */
+    padding: 0 2.75rem 0 2.5rem; /* 进一步调整内边距 */
+    border-radius: 0.75rem; /* 12px 圆角 */
+  }
+  
+  .search-suggestions-dropdown {
+    border-radius: 0.75rem;
+    max-height: 14rem; /* 进一步减小最大高度 */
+  }
+  
+  .search-suggestion-item {
+    padding: 0.75rem 0.875rem; /* 12px 14px */
+    min-height: 2.75rem; /* 44px 最小高度 */
+    gap: 0.625rem; /* 10px 间距 */
+  }
+  
+  .search-suggestion-item span {
+    font-size: 0.875rem; /* 14px */
+  }
+  
+  .search-clear-button {
+    width: 1.5rem; /* 24px */
+    height: 1.5rem; /* 24px */
+  }
+  
+  .search-clear-button svg {
+    width: 1rem; /* 16px */
+    height: 1rem; /* 16px */
+  }
+  
+  /* 搜索图标也要相应调整 */
+  .search-input + .absolute svg {
+    width: 1.125rem; /* 18px */
+    height: 1.125rem; /* 18px */
   }
 } 
