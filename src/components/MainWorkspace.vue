@@ -1,24 +1,24 @@
 <template>
   <div class="flex-1 flex flex-col bg-base-200 min-h-0 relative">
     <!-- 工作区头部 -->
-    <div class="bg-base-100 border-b border-base-300 px-6 py-4">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-xl font-bold text-base-content">
+    <div class="workspace-header">
+      <div class="workspace-header-content">
+        <div class="workspace-header-left">
+          <h1 class="workspace-header-title">
             {{ getCurrentCategoryName() }}
           </h1>
-          <p class="text-sm text-base-content/60 mt-1">
+          <p class="workspace-header-subtitle">
             找到 {{ getFilteredTools().length }} 个工具
             {{ searchQuery ? `· 搜索 '${searchQuery}'` : '' }}
           </p>
         </div>
         
         <!-- 排序选择 -->
-        <div class="flex items-center gap-3">
-          <label class="text-sm text-base-content/70 font-medium">排序:</label>
+        <div class="workspace-header-right">
+          <label class="workspace-sort-label">排序:</label>
           <select 
             v-model="sortBy" 
-            class="select select-sm select-bordered bg-base-100"
+            class="select select-sm select-bordered bg-base-100 workspace-sort-select"
           >
             <option value="default">默认排序</option>
             <option value="name">按名称</option>
