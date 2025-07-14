@@ -1,7 +1,9 @@
+/* stylelint-disable at-rule-no-unknown */
 /* Tailwind CSS 基础样式 */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* stylelint-enable at-rule-no-unknown */
 
 /* 深色模式颜色过渡 - 优化切换速度 */
 * {
@@ -1038,7 +1040,7 @@ body {
   
 }
 
-/* 像素化效果 - 创新的"像素画"滚动遮罩 */
+/* 像素化效果 - 创新的"像素画"滚动遮罩 - 透明毛玻璃版 */
 .workspace-header-scrolled::before {
   content: '';
   position: absolute;
@@ -1047,24 +1049,26 @@ body {
   right: 0;
   bottom: 0;
   z-index: 1;
+  pointer-events: none; /* 确保不阻挡鼠标事件 */
   
   /* 核心像素化效果：模糊 + 网格圆点背景 */
-  backdrop-filter: var(--pixel-blur, blur(8px)) !important;
-  -webkit-backdrop-filter: var(--pixel-blur, blur(8px)) !important;
+  backdrop-filter: var(--pixel-blur, blur(12px)) !important;
+  -webkit-backdrop-filter: var(--pixel-blur, blur(12px)) !important;
   
-  /* 创建网格圆点背景 - 像素化的关键 */
+  /* 创建网格圆点背景 - 像素化的关键 - 透明背景版 */
   background-image: 
     radial-gradient(circle at center, 
-      rgba(255, 255, 255, var(--pixel-opacity, 0.6)) 30%, 
-      transparent 35%
+      rgba(255, 255, 255, var(--pixel-opacity, 0.7)) 15%, 
+      rgba(255, 255, 255, calc(var(--pixel-opacity, 0.7) * 0.3)) 30%,
+      transparent 40%
     );
   
   /* 控制像素密度 - 可动态调整 */
-  background-size: var(--pixel-size, 12px) var(--pixel-size, 12px);
+  background-size: var(--pixel-size, 16px) var(--pixel-size, 16px);
   background-repeat: repeat;
   
   /* 添加轻微的透明度渐变 */
-  opacity: var(--pixel-intensity, 0.7);
+  opacity: var(--pixel-intensity, 1.0);
   
   /* 平滑过渡动画 */
   transition: 
@@ -1073,13 +1077,14 @@ body {
     opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* 深色模式的像素化效果 */
+/* 深色模式的像素化效果 - 透明版 */
 [data-theme="dark"] .workspace-header-scrolled::before {
-  /* 深色模式使用更深的圆点 */
+  /* 深色模式使用更深的圆点 - 透明背景 */
   background-image: 
     radial-gradient(circle at center, 
-      rgba(30, 41, 59, var(--pixel-opacity, 0.8)) 30%, 
-      transparent 35%
+      rgba(30, 41, 59, var(--pixel-opacity, 0.8)) 15%, 
+      rgba(30, 41, 59, calc(var(--pixel-opacity, 0.8) * 0.3)) 30%,
+      transparent 40%
     );
 }
 
@@ -1160,10 +1165,13 @@ body {
     .workspace-header-scrolled::before {
       /* Safari 专用优化 */
       -webkit-transform: translateZ(0);
+      transform: translateZ(0);
       -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
       
       /* 降低 Safari 中的模糊强度 */
       -webkit-backdrop-filter: var(--pixel-blur, blur(6px)) !important;
+      backdrop-filter: var(--pixel-blur, blur(6px)) !important;
     }
   }
 }
