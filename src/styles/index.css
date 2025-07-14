@@ -67,7 +67,8 @@ body {
 }
 
 /* 顶部导航栏 - 优化深色模式毛玻璃效果 */
-.toolbar {
+.toolbar,
+.navbar.toolbar {
   background: 
     linear-gradient(180deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.97) 100%),
     radial-gradient(circle at 50% 0%, hsl(var(--p) / 0.02) 0%, transparent 70%);
@@ -86,7 +87,8 @@ body {
   backdrop-filter: blur(12px) saturate(1.2);
 }
 
-[data-theme="dark"] .toolbar {
+[data-theme="dark"] .toolbar,
+[data-theme="dark"] .navbar.toolbar {
   background: 
     linear-gradient(180deg, rgba(30, 41, 59, 0.95) 0%, rgba(30, 41, 59, 0.92) 100%),
     radial-gradient(circle at 50% 0%, hsl(var(--p) / 0.03) 0%, transparent 70%);
@@ -960,17 +962,11 @@ body {
   .sidebar {
     width: 240px;
   }
-  
-  /* 中等屏幕搜索框优化 */
-  .navbar-center {
-    max-width: 28rem; /* 448px */
-    margin-left: 1rem;
-    margin-right: 1rem;
-  }
 }
 
 @media (max-width: 768px) {
-  .toolbar {
+  .toolbar,
+  .navbar.toolbar {
     height: 56px;
     padding: 0 1rem;
   }
@@ -994,26 +990,12 @@ body {
   .sidebar.open {
     transform: translateX(0);
   }
-  
-  /* 平板端搜索框宽度 */
-  .navbar-center {
-    max-width: 24rem; /* 384px */
-    margin-left: 0.75rem;
-    margin-right: 0.75rem;
-  }
 }
 
 @media (max-width: 640px) {
   .tools-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
-  }
-  
-  /* 手机端搜索框充分利用空间 */
-  .navbar-center {
-    max-width: none; /* 移除最大宽度限制 */
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
   }
   
   .search-input {

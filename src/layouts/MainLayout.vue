@@ -59,10 +59,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import TopNavBar from '@/components/TopNavBar.vue'
-import Sidebar from '@/components/Sidebar.vue'
-import MainWorkspace from '@/components/MainWorkspace.vue'
-import FavoritesModal from '@/components/FavoritesModal.vue'
+
 import { categories, tools, getToolsByCategory } from '@/store/data'
 import type { Tool } from '@/types'
 import { Message } from '@/utils/message'
