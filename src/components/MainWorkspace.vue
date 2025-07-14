@@ -214,7 +214,7 @@ const scrollContainerRef = ref<HTMLElement | null>(null)
 const isScrolled = ref(false)
 const scrollProgress = ref(0) // 新增：滚动进度值
 
-// 滚动处理函数 - 渐进式模糊效果 + UI优化
+// 滚动处理函数 - 渐进式模糊效果 + UI优化 + 像素化效果
 const handleScroll = () => {
   if (scrollContainerRef.value) {
     const scrollTop = scrollContainerRef.value.scrollTop
@@ -233,19 +233,39 @@ const handleScroll = () => {
         // 添加滚动效果类
         headerRef.value.classList.add('workspace-header-scrolled')
         
-        // 更平滑的动态设置模糊强度
+        // 原有的模糊效果参数
         const blurStrength = 4 + (scrollProgress.value * 12) // 4px到16px，避免过度模糊
         const saturation = 1.1 + (scrollProgress.value * 0.6) // 1.1到1.7，避免过度饱和
         const opacity = 0.65 + (scrollProgress.value * 0.25) // 0.65到0.9，更自然的透明度
         
-        // 动态应用样式
+        // 🎨 新增：像素化效果参数 - 创造"像素画"效果
+        const pixelBlur = 4 + (scrollProgress.value * 8) // 4px到12px的像素模糊
+        const pixelSize = 16 - (scrollProgress.value * 6) // 16px到10px，密度逐渐增加
+        const pixelOpacity = 0.3 + (scrollProgress.value * 0.5) // 0.3到0.8的圆点透明度
+        const pixelIntensity = 0.5 + (scrollProgress.value * 0.4) // 0.5到0.9的整体强度
+        
+        // 动态应用原有样式
         headerRef.value.style.setProperty('--dynamic-blur', `blur(${blurStrength}px) saturate(${saturation})`)
         headerRef.value.style.setProperty('--dynamic-opacity', opacity.toString())
+        
+        // 🎨 动态应用像素化效果样式
+        headerRef.value.style.setProperty('--pixel-blur', `blur(${pixelBlur}px)`)
+        headerRef.value.style.setProperty('--pixel-size', `${pixelSize}px`)
+        headerRef.value.style.setProperty('--pixel-opacity', pixelOpacity.toString())
+        headerRef.value.style.setProperty('--pixel-intensity', pixelIntensity.toString())
       } else {
         // 移除滚动效果类
         headerRef.value.classList.remove('workspace-header-scrolled')
+        
+        // 清除原有样式
         headerRef.value.style.removeProperty('--dynamic-blur')
         headerRef.value.style.removeProperty('--dynamic-opacity')
+        
+        // 🎨 清除像素化样式
+        headerRef.value.style.removeProperty('--pixel-blur')
+        headerRef.value.style.removeProperty('--pixel-size')
+        headerRef.value.style.removeProperty('--pixel-opacity')
+        headerRef.value.style.removeProperty('--pixel-intensity')
       }
     }
   }

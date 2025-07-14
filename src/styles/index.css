@@ -1034,13 +1034,138 @@ body {
   -webkit-backdrop-filter: var(--dynamic-blur, blur(16px) saturate(1.7)) brightness(1.05) !important;
   backdrop-filter: var(--dynamic-blur, blur(16px) saturate(1.7)) brightness(1.05) !important;
   /* 更柔和的边框效果 */
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
-  /* 层次分明但不夸张的阴影 */
-  box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.08),
-    0 2px 8px rgba(0, 0, 0, 0.06),
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+  /* border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important; */
+  
+}
+
+/* 像素化效果 - 创新的"像素画"滚动遮罩 */
+.workspace-header-scrolled::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  
+  /* 核心像素化效果：模糊 + 网格圆点背景 */
+  backdrop-filter: var(--pixel-blur, blur(8px)) !important;
+  -webkit-backdrop-filter: var(--pixel-blur, blur(8px)) !important;
+  
+  /* 创建网格圆点背景 - 像素化的关键 */
+  background-image: 
+    radial-gradient(circle at center, 
+      rgba(255, 255, 255, var(--pixel-opacity, 0.6)) 30%, 
+      transparent 35%
+    );
+  
+  /* 控制像素密度 - 可动态调整 */
+  background-size: var(--pixel-size, 12px) var(--pixel-size, 12px);
+  background-repeat: repeat;
+  
+  /* 添加轻微的透明度渐变 */
+  opacity: var(--pixel-intensity, 0.7);
+  
+  /* 平滑过渡动画 */
+  transition: 
+    backdrop-filter 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    background-size 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* 深色模式的像素化效果 */
+[data-theme="dark"] .workspace-header-scrolled::before {
+  /* 深色模式使用更深的圆点 */
+  background-image: 
+    radial-gradient(circle at center, 
+      rgba(30, 41, 59, var(--pixel-opacity, 0.8)) 30%, 
+      transparent 35%
+    );
+}
+
+/* 确保内容在像素化遮罩之上 */
+.workspace-header-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* 🚀 像素化效果性能优化 - GPU硬件加速 */
+.workspace-header-scrolled::before {
+  /* 启用GPU硬件加速 */
+  transform: translateZ(0);
+  will-change: backdrop-filter, background-size, opacity;
+  
+  /* 优化渲染性能 */
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* 📱 像素化效果降级方案 - 不支持backdrop-filter的浏览器 */
+@supports not (backdrop-filter: blur(8px)) {
+  .workspace-header-scrolled::before {
+    /* 降级到纯网格背景 + 半透明遮罩 */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    
+    /* 增强网格效果补偿模糊缺失 */
+    background-image: 
+      radial-gradient(circle at center, 
+        rgba(255, 255, 255, 0.9) 25%, 
+        rgba(255, 255, 255, 0.3) 30%,
+        transparent 35%
+      );
+    
+    /* 添加额外的半透明背景 */
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+  
+  [data-theme="dark"] .workspace-header-scrolled::before {
+    background-image: 
+      radial-gradient(circle at center, 
+        rgba(30, 41, 59, 0.95) 25%, 
+        rgba(30, 41, 59, 0.4) 30%,
+        transparent 35%
+      );
+    background-color: rgba(30, 41, 59, 0.2);
+  }
+}
+
+/* 🎨 响应式像素化效果优化 */
+@media (max-width: 768px) {
+  .workspace-header-scrolled::before {
+    /* 移动端减少像素密度，提升性能 */
+    background-size: var(--pixel-size, 14px) var(--pixel-size, 14px);
+    
+    /* 降低像素模糊强度，减少计算负担 */
+    backdrop-filter: var(--pixel-blur, blur(6px)) !important;
+    -webkit-backdrop-filter: var(--pixel-blur, blur(6px)) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .workspace-header-scrolled::before {
+    /* 小屏幕进一步优化性能 */
+    background-size: var(--pixel-size, 16px) var(--pixel-size, 16px);
+    backdrop-filter: var(--pixel-blur, blur(4px)) !important;
+    -webkit-backdrop-filter: var(--pixel-blur, blur(4px)) !important;
+    
+    /* 减少透明度层叠 */
+    opacity: var(--pixel-intensity, 0.6);
+  }
+}
+
+/* 🌐 Safari 浏览器特殊优化 */
+@media not all and (min-resolution:.001dpcm) {
+  @supports (-webkit-appearance:none) {
+    .workspace-header-scrolled::before {
+      /* Safari 专用优化 */
+      -webkit-transform: translateZ(0);
+      -webkit-backface-visibility: hidden;
+      
+      /* 降低 Safari 中的模糊强度 */
+      -webkit-backdrop-filter: var(--pixel-blur, blur(6px)) !important;
+    }
+  }
 }
 
 /* 深色模式下的滚动效果 - 优雅版 */
