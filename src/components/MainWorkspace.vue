@@ -238,11 +238,11 @@ const handleScroll = () => {
         const saturation = 1.1 + (scrollProgress.value * 0.6) // 1.1到1.7，避免过度饱和
         const opacity = 0.65 + (scrollProgress.value * 0.25) // 0.65到0.9，更自然的透明度
         
-        // 🎨 新增：像素化效果参数 - 创造"像素画"效果
-        const pixelBlur = 4 + (scrollProgress.value * 8) // 4px到12px的像素模糊
-        const pixelSize = 16 - (scrollProgress.value * 6) // 16px到10px，密度逐渐增加
-        const pixelOpacity = 0.3 + (scrollProgress.value * 0.5) // 0.3到0.8的圆点透明度
-        const pixelIntensity = 0.5 + (scrollProgress.value * 0.4) // 0.5到0.9的整体强度
+        // 🎨 新增：像素化效果参数 - 创造"像素画"效果（毛玻璃优化版）
+        const pixelBlur = 6 + (scrollProgress.value * 8) // 6px到14px的像素模糊，更细腻
+        const pixelSize = 14 - (scrollProgress.value * 4) // 14px到10px，更细腻的网格
+        const pixelOpacity = 0.3 + (scrollProgress.value * 0.4) // 0.3到0.7的圆点透明度，更透明
+        const pixelIntensity = 0.6 + (scrollProgress.value * 0.3) // 0.6到0.9的整体强度，更自然
         
         // 动态应用原有样式
         headerRef.value.style.setProperty('--dynamic-blur', `blur(${blurStrength}px) saturate(${saturation})`)
@@ -428,6 +428,7 @@ export default {
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
