@@ -1,7 +1,13 @@
 <template>
   <div class="flex-1 flex flex-col bg-base-200 min-h-0 relative">
     <!-- 工作区头部 -->
-    <div class="workspace-header">
+    <div 
+      ref="headerRef"
+      :class="[
+        'workspace-header',
+        { 'workspace-header-scrolled': isScrolled }
+      ]"
+    >
       <div class="workspace-header-content">
         <div class="workspace-header-left">
           <h1 class="workspace-header-title">
@@ -30,7 +36,10 @@
     </div>
 
     <!-- 工具展示区域 -->
-    <div class="flex-1 overflow-y-auto p-6">
+    <div 
+      ref="scrollContainerRef"
+      class="flex-1 overflow-y-auto p-6"
+    >
       <!-- 有工具时显示 -->
       <div v-if="getFilteredTools().length > 0">
         <!-- 网格视图 -->
@@ -172,7 +181,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import type { Tool } from '@/types'
 import ToolCard from './ToolCard.vue'
 import ToolDetailPanel from './ToolDetailPanel.vue'
@@ -198,6 +207,58 @@ const emit = defineEmits<{
 const sortBy = ref<'default' | 'name' | 'category' | 'updated'>('default')
 const selectedTool = ref<Tool | null>(null)
 const showDetailPanel = ref(false)
+
+// 滚动状态
+const headerRef = ref<HTMLElement | null>(null)
+const scrollContainerRef = ref<HTMLElement | null>(null)
+const isScrolled = ref(false)
+
+// 滚动处理函数
+const handleScroll = () => {
+  if (scrollContainerRef.value) {
+    const scrollTop = scrollContainerRef.value.scrollTop
+    const threshold = 20 // 滚动阈值，超过20px开始显示效果
+    
+    isScrolled.value = scrollTop > threshold
+    
+    if (headerRef.value) {
+      if (scrollTop > threshold) {
+        // 添加滚动效果类
+        headerRef.value.classList.add('workspace-header-scrolled')
+      } else {
+        // 移除滚动效果类
+        headerRef.value.classList.remove('workspace-header-scrolled')
+      }
+    }
+  }
+}
+
+// 防抖优化
+let scrollTimeout: NodeJS.Timeout | null = null
+const debouncedHandleScroll = () => {
+  if (scrollTimeout) {
+    clearTimeout(scrollTimeout)
+  }
+  scrollTimeout = setTimeout(handleScroll, 10)
+}
+
+// 生命周期钩子
+onMounted(() => {
+  // 确保滚动容器存在后添加事件监听
+  if (scrollContainerRef.value) {
+    scrollContainerRef.value.addEventListener('scroll', debouncedHandleScroll, { passive: true })
+  }
+})
+
+onUnmounted(() => {
+  // 清理事件监听器
+  if (scrollContainerRef.value) {
+    scrollContainerRef.value.removeEventListener('scroll', debouncedHandleScroll)
+  }
+  if (scrollTimeout) {
+    clearTimeout(scrollTimeout)
+  }
+})
 
 // 排序方式
 const getCurrentCategoryName = (): string => {
