@@ -31,8 +31,8 @@
       </div>
     </div>
 
-    <!-- 中间搜索区域 - 使用flex-1占据剩余空间 -->
-    <div class="flex-1 mx-4 lg:mx-6 xl:mx-8 max-w-3xl">
+    <!-- 中间搜索区域 -->
+    <div class="flex-1 mx-4 lg:mx-6 xl:mx-8" style="max-width: 16rem;">
       <div class="form-control w-full">
         <div class="relative">
           <!-- 搜索图标在左侧内部，距离左边16像素 -->
