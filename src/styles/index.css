@@ -113,7 +113,7 @@ body {
 /* 搜索框样式 - 现代化设计优化 */
 .search-input {
   width: 100%;
-  max-width: 512px;
+  /* 移除固定最大宽度，使用容器的max-width控制 */
   height: 48px; /* 增大高度到48px，符合现代设计标准 */
   padding: 0 3.5rem 0 3rem; /* 左侧56px，右侧56px，为图标和按钮预留空间 */
   border: 1.5px solid hsl(var(--b3)); /* 增加边框宽度 */
@@ -960,6 +960,13 @@ body {
   .sidebar {
     width: 240px;
   }
+  
+  /* 中等屏幕搜索框优化 */
+  .navbar-center {
+    max-width: 28rem; /* 448px */
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
 }
 
 @media (max-width: 768px) {
@@ -987,6 +994,13 @@ body {
   .sidebar.open {
     transform: translateX(0);
   }
+  
+  /* 平板端搜索框宽度 */
+  .navbar-center {
+    max-width: 24rem; /* 384px */
+    margin-left: 0.75rem;
+    margin-right: 0.75rem;
+  }
 }
 
 @media (max-width: 640px) {
@@ -995,9 +1009,16 @@ body {
     gap: 1rem;
   }
   
+  /* 手机端搜索框充分利用空间 */
+  .navbar-center {
+    max-width: none; /* 移除最大宽度限制 */
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+  
   .search-input {
     font-size: 0.8125rem;
-    padding: 0.5rem 1.75rem 0.5rem 2.25rem;
+    padding: 0 1.75rem 0 2.25rem;
   }
   
   .search-suggestion-item {

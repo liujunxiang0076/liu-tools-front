@@ -409,12 +409,6 @@ watch(() => props.isOpen, (isOpen) => {
 })
 </script>
 
-<script lang="ts">
-export default {
-  name: 'FavoritesModal'
-}
-</script>
-
 <style scoped>
 /* 收藏项卡片样式 */
 .favorite-item-card {

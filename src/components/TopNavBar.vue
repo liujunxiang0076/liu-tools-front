@@ -31,8 +31,8 @@
       </div>
     </div>
 
-    <!-- 中间搜索区域 - 最大宽度512px -->
-    <div class="navbar-center flex-1 max-w-[512px] mx-8">
+    <!-- 中间搜索区域 - 优化宽度分配 -->
+    <div class="navbar-center flex-1 max-w-2xl mx-4 lg:mx-6 xl:mx-8">
       <div class="form-control w-full">
         <div class="relative">
           <!-- 搜索图标在左侧内部，距离左边16像素 -->
