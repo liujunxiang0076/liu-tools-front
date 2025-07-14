@@ -1009,7 +1009,7 @@ body {
   }
 } 
 
-/* 工作区头部样式优化 */
+/* 工作区头部样式优化 - 平滑过渡 */
 .workspace-header {
   background-color: hsl(var(--b1));
   border-bottom: 1px solid hsl(var(--b3));
@@ -1018,41 +1018,46 @@ body {
   position: sticky;
   top: 0;
   z-index: 20;
-  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  /* 更平滑的过渡动画 */
+  transition: 
+    background 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    backdrop-filter 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    border-color 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* 滚动时的模糊背景效果 - 增强版 + 动态模糊 */
+/* 滚动时的模糊背景效果 - 优雅版 */
 .workspace-header-scrolled {
-  /* 浅色模式：更强的模糊和饱和度 */
-  background: rgba(255, 255, 255, var(--dynamic-opacity, 0.75)) !important;
-  /* 增强模糊效果 - 支持动态调整 */
-  -webkit-backdrop-filter: var(--dynamic-blur, blur(20px) saturate(2.0)) brightness(1.1) !important;
-  backdrop-filter: var(--dynamic-blur, blur(20px) saturate(2.0)) brightness(1.1) !important;
-  /* 更精细的边框效果 */
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
-  /* 增强阴影层次 */
+  /* 浅色模式：更温和的模糊和饱和度 */
+  background: rgba(255, 255, 255, var(--dynamic-opacity, 0.65)) !important;
+  /* 更温和的模糊效果 - 支持动态调整 */
+  -webkit-backdrop-filter: var(--dynamic-blur, blur(16px) saturate(1.7)) brightness(1.05) !important;
+  backdrop-filter: var(--dynamic-blur, blur(16px) saturate(1.7)) brightness(1.05) !important;
+  /* 更柔和的边框效果 */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+  /* 层次分明但不夸张的阴影 */
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    0 4px 16px rgba(0, 0, 0, 0.08),
-    0 2px 8px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+    0 4px 20px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
 }
 
-/* 深色模式下的滚动效果 - 增强版 + 动态模糊 */
+/* 深色模式下的滚动效果 - 优雅版 */
 [data-theme="dark"] .workspace-header-scrolled {
-  /* 深色模式：更强的模糊和对比度 */
-  background: rgba(30, 41, 59, var(--dynamic-opacity, 0.75)) !important;
-  /* 增强模糊效果 - 支持动态调整 */
-  -webkit-backdrop-filter: var(--dynamic-blur, blur(20px) saturate(2.0)) brightness(0.9) !important;
-  backdrop-filter: var(--dynamic-blur, blur(20px) saturate(2.0)) brightness(0.9) !important;
-  /* 深色模式边框 */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-  /* 深色模式阴影层次 */
+  /* 深色模式：更温和的模糊和对比度 */
+  background: rgba(30, 41, 59, var(--dynamic-opacity, 0.65)) !important;
+  /* 更温和的模糊效果 - 支持动态调整 */
+  -webkit-backdrop-filter: var(--dynamic-blur, blur(16px) saturate(1.7)) brightness(0.95) !important;
+  backdrop-filter: var(--dynamic-blur, blur(16px) saturate(1.7)) brightness(0.95) !important;
+  /* 深色模式柔和边框 */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  /* 深色模式层次阴影 */
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    0 4px 16px rgba(0, 0, 0, 0.3),
-    0 2px 8px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.25),
+    0 1px 3px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
 }
 
 /* 降级方案：不支持backdrop-filter的浏览器 */

@@ -214,27 +214,29 @@ const scrollContainerRef = ref<HTMLElement | null>(null)
 const isScrolled = ref(false)
 const scrollProgress = ref(0) // 新增：滚动进度值
 
-// 滚动处理函数 - 渐进式模糊效果
+// 滚动处理函数 - 渐进式模糊效果 + UI优化
 const handleScroll = () => {
   if (scrollContainerRef.value) {
     const scrollTop = scrollContainerRef.value.scrollTop
-    const threshold = 10 // 降低滚动阈值到10px，让效果更敏感
-    const maxScroll = 50 // 最大滚动距离，达到此值时模糊效果完全激活
+    const threshold = 5 // 更敏感的触发阈值，让用户感知更自然
+    const maxScroll = 80 // 增加最大滚动距离，让过渡更缓慢优雅
     
     isScrolled.value = scrollTop > threshold
     
-    // 计算滚动进度 (0-1)
-    scrollProgress.value = Math.min(scrollTop / maxScroll, 1)
+    // 计算滚动进度 (0-1) 使用更平滑的曲线
+    const rawProgress = Math.min(scrollTop / maxScroll, 1)
+    // 使用easeOutQuart缓动函数让过渡更自然
+    scrollProgress.value = 1 - Math.pow(1 - rawProgress, 4)
     
     if (headerRef.value) {
       if (scrollTop > threshold) {
         // 添加滚动效果类
         headerRef.value.classList.add('workspace-header-scrolled')
         
-        // 动态设置模糊强度
-        const blurStrength = 8 + (scrollProgress.value * 12) // 8px到20px
-        const saturation = 1.2 + (scrollProgress.value * 0.8) // 1.2到2.0
-        const opacity = 0.75 + (scrollProgress.value * 0.15) // 0.75到0.9
+        // 更平滑的动态设置模糊强度
+        const blurStrength = 4 + (scrollProgress.value * 12) // 4px到16px，避免过度模糊
+        const saturation = 1.1 + (scrollProgress.value * 0.6) // 1.1到1.7，避免过度饱和
+        const opacity = 0.65 + (scrollProgress.value * 0.25) // 0.65到0.9，更自然的透明度
         
         // 动态应用样式
         headerRef.value.style.setProperty('--dynamic-blur', `blur(${blurStrength}px) saturate(${saturation})`)
@@ -249,13 +251,24 @@ const handleScroll = () => {
   }
 }
 
-// 防抖优化 - 减少防抖延迟提高响应性
+// 防抖优化 - 使用 requestAnimationFrame 提高平滑度
 let scrollTimeout: NodeJS.Timeout | null = null
+let animationFrameId: number | null = null
+
 const debouncedHandleScroll = () => {
-  if (scrollTimeout) {
-    clearTimeout(scrollTimeout)
+  // 取消之前的动画帧
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId)
   }
-  scrollTimeout = setTimeout(handleScroll, 5) // 减少防抖延迟到5ms
+  
+  // 使用 requestAnimationFrame 确保在下一次重绘前执行
+  animationFrameId = requestAnimationFrame(() => {
+    if (scrollTimeout) {
+      clearTimeout(scrollTimeout)
+    }
+    // 稍微延迟以避免过于频繁的更新
+    scrollTimeout = setTimeout(handleScroll, 8) // 8ms 提供良好的响应性和性能平衡
+  })
 }
 
 // 生命周期钩子
@@ -273,6 +286,9 @@ onUnmounted(() => {
   }
   if (scrollTimeout) {
     clearTimeout(scrollTimeout)
+  }
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId)
   }
 })
 
