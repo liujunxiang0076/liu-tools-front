@@ -212,34 +212,50 @@ const showDetailPanel = ref(false)
 const headerRef = ref<HTMLElement | null>(null)
 const scrollContainerRef = ref<HTMLElement | null>(null)
 const isScrolled = ref(false)
+const scrollProgress = ref(0) // 新增：滚动进度值
 
-// 滚动处理函数
+// 滚动处理函数 - 渐进式模糊效果
 const handleScroll = () => {
   if (scrollContainerRef.value) {
     const scrollTop = scrollContainerRef.value.scrollTop
-    const threshold = 20 // 滚动阈值，超过20px开始显示效果
+    const threshold = 10 // 降低滚动阈值到10px，让效果更敏感
+    const maxScroll = 50 // 最大滚动距离，达到此值时模糊效果完全激活
     
     isScrolled.value = scrollTop > threshold
+    
+    // 计算滚动进度 (0-1)
+    scrollProgress.value = Math.min(scrollTop / maxScroll, 1)
     
     if (headerRef.value) {
       if (scrollTop > threshold) {
         // 添加滚动效果类
         headerRef.value.classList.add('workspace-header-scrolled')
+        
+        // 动态设置模糊强度
+        const blurStrength = 8 + (scrollProgress.value * 12) // 8px到20px
+        const saturation = 1.2 + (scrollProgress.value * 0.8) // 1.2到2.0
+        const opacity = 0.75 + (scrollProgress.value * 0.15) // 0.75到0.9
+        
+        // 动态应用样式
+        headerRef.value.style.setProperty('--dynamic-blur', `blur(${blurStrength}px) saturate(${saturation})`)
+        headerRef.value.style.setProperty('--dynamic-opacity', opacity.toString())
       } else {
         // 移除滚动效果类
         headerRef.value.classList.remove('workspace-header-scrolled')
+        headerRef.value.style.removeProperty('--dynamic-blur')
+        headerRef.value.style.removeProperty('--dynamic-opacity')
       }
     }
   }
 }
 
-// 防抖优化
+// 防抖优化 - 减少防抖延迟提高响应性
 let scrollTimeout: NodeJS.Timeout | null = null
 const debouncedHandleScroll = () => {
   if (scrollTimeout) {
     clearTimeout(scrollTimeout)
   }
-  scrollTimeout = setTimeout(handleScroll, 10)
+  scrollTimeout = setTimeout(handleScroll, 5) // 减少防抖延迟到5ms
 }
 
 // 生命周期钩子
