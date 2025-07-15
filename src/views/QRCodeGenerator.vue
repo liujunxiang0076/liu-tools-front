@@ -99,7 +99,7 @@
                           @click="selectTag(tag)"
                           :title="`拖拽排序 • 双击编辑 • 单击选择生成二维码`"
                         >
-                          <span class="truncate flex-1 font-mono text-xs">{{ tag.content }}</span>
+                          <span class="truncate flex-1 text-xs" style="font-family: 'Microsoft YaHei', sans-serif;">{{ tag.content }}</span>
                           <button 
                             @click.stop="deleteTag(tag.id)"
                             class="delete-btn opacity-0 group-hover:opacity-100 transition-opacity ml-1"
@@ -120,10 +120,10 @@
                             @keyup.enter="saveTagEdit(tag)"
                             @keyup.escape="cancelTagEdit"
                             @blur="saveTagEdit(tag)"
-                            class="bg-transparent border-none outline-none font-mono text-xs flex-1 min-w-0 placeholder-current"
+                            class="bg-transparent border-none outline-none text-xs flex-1 min-w-0 placeholder-current"
                             :class="getTagTextColorClass(tag)"
                             ref="tagEditInput"
-                            :style="{ width: Math.max(60, editingContent.length * 7) + 'px' }"
+                            :style="{ width: Math.max(60, editingContent.length * 8) + 'px', fontFamily: 'Microsoft YaHei, sans-serif' }"
                           />
                         </div>
                       </div>
@@ -136,7 +136,8 @@
                         @keyup.enter="addNewTag"
                         @keyup.escape="cancelAddTag"
                         @blur="handleAddTagBlur"
-                        class="input input-bordered input-sm w-full font-mono text-sm"
+                        class="input input-bordered input-sm w-full text-sm"
+                        style="font-family: 'Microsoft YaHei', sans-serif;"
                         placeholder="输入文本内容，回车确认，ESC取消..."
                         ref="newTagInput"
                       />
@@ -160,7 +161,7 @@
                   
                   <!-- 操作提示 -->
                   <div class="text-xs text-base-content/60 mt-2">
-                    💡 拖拽标签排序，单击选择生成二维码，双击编辑内容（回车确认，ESC取消），悬停显示删除按钮
+                    💡 自动生成最新标签二维码，单击切换选择，拖拽排序，双击编辑内容（回车确认，ESC取消），悬停显示删除按钮
                   </div>
                 </div>
 
@@ -401,19 +402,18 @@
               <!-- 二维码显示区域 -->
               <div class="bg-white rounded-lg p-8 flex items-center justify-center min-h-80">
                 <div v-if="currentQRValue" class="qr-preview">
-                  <!-- 临时占位符，等待依赖安装完成后替换为真实的二维码组件 -->
-                  <div class="w-72 h-72 bg-base-300 rounded-lg flex flex-col items-center justify-center text-base-content/60">
-                    <div class="text-6xl mb-4">📱</div>
-                    <div class="text-center">
-                      <p class="font-bold mb-2">二维码预览</p>
-                      <p class="text-sm">{{ currentQRValue.substring(0, 50) }}{{ currentQRValue.length > 50 ? '...' : '' }}</p>
-                    </div>
-                  </div>
+                  <canvas 
+                    ref="qrCanvas"
+                    :width="qrSettings.size" 
+                    :height="qrSettings.size"
+                    class="border border-gray-200 rounded-lg"
+                  ></canvas>
                 </div>
                 <div v-else class="text-center text-base-content/50">
                   <div class="text-6xl mb-4">📱</div>
-                  <p class="text-lg">请选择内容生成二维码</p>
-                  <p class="text-sm mt-2" v-if="currentType === 'text' && textTags.length > 0">单击文本标签即可生成二维码</p>
+                  <p class="text-lg" v-if="currentType === 'text'">添加文本标签生成二维码</p>
+                  <p class="text-lg" v-else>请输入内容生成二维码</p>
+                  <p class="text-sm mt-2" v-if="currentType === 'text'">添加的第一个标签将自动生成二维码</p>
                 </div>
               </div>
 
@@ -453,8 +453,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, nextTick, watch, getCurrentInstance } from 'vue'
-// 临时注释掉，待依赖安装完成后启用
-// import QrcodeVue from 'qrcode.vue'
+import * as QRCode from 'qrcode'
 
 // 内容类型定义
 interface ContentType {
@@ -631,9 +630,13 @@ const dragState = reactive({
 const currentQRValue = computed(() => {
   switch (currentType.value) {
     case 'text':
-      // 对于文本类型，返回选中标签的内容
-      const selectedTag = textTags.value.find(tag => tag.id === selectedTagId.value)
-      return selectedTag ? selectedTag.content : ''
+      // 对于文本类型，优先返回选中标签的内容，如果没有选中则使用最后一个标签
+      let targetTag = textTags.value.find(tag => tag.id === selectedTagId.value)
+      if (!targetTag && textTags.value.length > 0) {
+        // 如果没有选中标签，使用最后一个（最新添加的）标签
+        targetTag = textTags.value[textTags.value.length - 1] // 数组最后一个是最新添加的
+      }
+      return targetTag ? targetTag.content : ''
     case 'url':
       return contentData.url
     case 'wifi':
@@ -681,9 +684,8 @@ const startAddingTag = () => {
   newTagContent.value = ''
   nextTick(() => {
     setTimeout(() => {
-      const input = document.querySelector('input[ref="newTagInput"]') as HTMLInputElement
-      if (input) {
-        input.focus()
+      if (newTagInput.value) {
+        newTagInput.value.focus()
       }
     }, 10)
   })
@@ -700,11 +702,11 @@ const addNewTag = () => {
     // 避免重复添加相同内容
     const existingIndex = textTags.value.findIndex(tag => tag.content === newTag.content)
     if (existingIndex === -1) {
-      textTags.value.unshift(newTag)
+      textTags.value.push(newTag) // 添加到末尾
       
-      // 限制标签数量
+      // 限制标签数量，如果超出则删除最老的标签
       if (textTags.value.length > 20) {
-        textTags.value = textTags.value.slice(0, 20)
+        textTags.value = textTags.value.slice(-20) // 保留最后20个
       }
       
       saveTagsToLocal()
@@ -751,7 +753,7 @@ const getTagColorClass = (tag: TextTag, isSelected: boolean, isEditing: boolean 
   if (isSelected) {
     return `${colorScheme.bg} ${colorScheme.border} text-white shadow-sm`
   } else {
-    return `bg-transparent ${colorScheme.border} border-opacity-40 ${colorScheme.text}`
+    return `bg-transparent ${colorScheme.border} ${colorScheme.text}`
   }
 }
 
@@ -768,12 +770,11 @@ const startEditingTag = (tag: TextTag) => {
   nextTick(() => {
     // 使用setTimeout确保ref已经正确设置
     setTimeout(() => {
-      const input = document.querySelector('input[ref="tagEditInput"]') as HTMLInputElement
-      if (input) {
-        input.focus()
+      if (tagEditInput.value) {
+        tagEditInput.value.focus()
         // 将光标定位到文本末尾
-        const length = input.value.length
-        input.setSelectionRange(length, length)
+        const length = tagEditInput.value.value.length
+        tagEditInput.value.setSelectionRange(length, length)
       }
     }, 10)
   })
@@ -798,9 +799,17 @@ const deleteTag = (tagId: string) => {
   if (index !== -1) {
     textTags.value.splice(index, 1)
     saveTagsToLocal()
-  }
-  if (selectedTagId.value === tagId) {
-    selectedTagId.value = ''
+    
+    // 如果删除的是当前选中的标签，自动选中下一个可用标签
+    if (selectedTagId.value === tagId) {
+      if (textTags.value.length > 0) {
+        // 优先选择同位置的标签，如果超出则选择最后一个
+        const nextIndex = Math.min(index, textTags.value.length - 1)
+        selectedTagId.value = textTags.value[nextIndex].id
+      } else {
+        selectedTagId.value = ''
+      }
+    }
   }
 }
 
@@ -830,14 +839,43 @@ const clearCurrentContent = () => {
   }
 }
 
-const downloadQRCode = () => {
-  // 下载功能实现
-  console.log('下载二维码')
+// 实现下载功能
+const downloadQRCode = async () => {
+  if (!currentQRValue.value) return
+  
+  try {
+    // 生成二维码数据URL
+    const dataUrl = await QRCode.toDataURL(currentQRValue.value, {
+      width: qrSettings.size,
+      margin: qrSettings.margin,
+      color: {
+        dark: qrSettings.foreground,
+        light: qrSettings.background
+      },
+      errorCorrectionLevel: qrSettings.level
+    })
+    
+    // 创建下载链接
+    const link = document.createElement('a')
+    link.download = `qrcode-${Date.now()}.png`
+    link.href = dataUrl
+    link.click()
+  } catch (error) {
+    console.error('下载失败:', error)
+  }
 }
 
-const copyQRCodeToClipboard = () => {
-  // 复制到剪贴板功能
-  console.log('复制到剪贴板')
+// 实现复制功能
+const copyQRCodeToClipboard = async () => {
+  if (!currentQRValue.value) return
+  
+  try {
+    await navigator.clipboard.writeText(currentQRValue.value)
+    // 这里可以添加一个提示消息
+    console.log('内容已复制到剪贴板')
+  } catch (error) {
+    console.error('复制失败:', error)
+  }
 }
 
 const saveTagsToLocal = () => {
@@ -848,7 +886,14 @@ const loadTagsFromLocal = () => {
   const saved = localStorage.getItem('qrcode-text-tags')
   if (saved) {
     try {
-      textTags.value = JSON.parse(saved)
+      const parsedTags = JSON.parse(saved)
+      // 为没有时间戳的旧标签补充时间戳
+      textTags.value = parsedTags.map((tag: any, index: number) => ({
+        ...tag,
+        timestamp: tag.timestamp || (Date.now() - (parsedTags.length - index) * 1000)
+      }))
+      // 按时间戳排序，确保标签按创建时间顺序排列
+      textTags.value.sort((a, b) => a.timestamp - b.timestamp)
     } catch (e) {
       console.error('加载文本标签失败:', e)
     }
@@ -905,9 +950,32 @@ const handleDrop = (event: DragEvent, index: number) => {
     const targetIndex = index
     
     if (draggedIndex !== -1 && targetIndex !== -1 && draggedIndex !== targetIndex) {
-      // 移动标签到新位置
-      const [movedTag] = textTags.value.splice(draggedIndex, 1)
-      textTags.value.splice(targetIndex, 0, movedTag)
+      // 重新计算时间戳来实现真正的顺序调整
+      const now = Date.now()
+      const draggedTag = textTags.value[draggedIndex]
+      
+      if (targetIndex > draggedIndex) {
+        // 向后拖拽：设置时间戳比目标位置的标签稍晚
+        const targetTag = textTags.value[targetIndex]
+        const nextTag = textTags.value[targetIndex + 1]
+        if (nextTag) {
+          draggedTag.timestamp = (targetTag.timestamp + nextTag.timestamp) / 2
+        } else {
+          draggedTag.timestamp = targetTag.timestamp + 1000
+        }
+      } else {
+        // 向前拖拽：设置时间戳比目标位置的标签稍早
+        const targetTag = textTags.value[targetIndex]
+        const prevTag = textTags.value[targetIndex - 1]
+        if (prevTag) {
+          draggedTag.timestamp = (prevTag.timestamp + targetTag.timestamp) / 2
+        } else {
+          draggedTag.timestamp = targetTag.timestamp - 1000
+        }
+      }
+      
+      // 重新排序标签数组（按时间戳排序）
+      textTags.value.sort((a, b) => a.timestamp - b.timestamp)
       saveTagsToLocal()
     }
   }
@@ -928,9 +996,58 @@ const handleDragEnd = () => {
   })
 }
 
+// 二维码Canvas引用
+const qrCanvas = ref<HTMLCanvasElement | null>(null)
+
+// 输入框引用
+const tagEditInput = ref<HTMLInputElement | null>(null)
+const newTagInput = ref<HTMLInputElement | null>(null)
+
+// 生成二维码
+const generateQRCode = async () => {
+  if (!currentQRValue.value || !qrCanvas.value) return
+  
+  try {
+    await QRCode.toCanvas(qrCanvas.value, currentQRValue.value, {
+      width: qrSettings.size,
+      margin: qrSettings.margin,
+      color: {
+        dark: qrSettings.foreground,
+        light: qrSettings.background
+      },
+      errorCorrectionLevel: qrSettings.level
+    })
+  } catch (error) {
+    console.error('二维码生成失败:', error)
+  }
+}
+
+// 监听二维码内容变化
+watch(currentQRValue, () => {
+  nextTick(() => {
+    generateQRCode()
+  })
+})
+
+// 监听设置变化
+watch(qrSettings, () => {
+  nextTick(() => {
+    generateQRCode()
+  })
+}, { deep: true })
+
 // 生命周期
 onMounted(() => {
   loadTagsFromLocal()
+  
+  // 如果没有选中标签但有标签存在，自动选中最新的标签
+  nextTick(() => {
+    if (!selectedTagId.value && textTags.value.length > 0) {
+      selectedTagId.value = textTags.value[textTags.value.length - 1].id // 选中最新添加的标签
+    }
+    // 初始生成二维码
+    generateQRCode()
+  })
 })
 
 // 返回主页方法
@@ -1000,7 +1117,7 @@ export default {
 
 .tag-item:not(.tag-selected):hover .tag-badge {
   background-color: rgba(0, 0, 0, 0.05) !important;
-  border-opacity: 0.6 !important;
+  border-color: rgba(0, 0, 0, 0.3) !important;
 }
 
 /* 删除按钮样式 */
