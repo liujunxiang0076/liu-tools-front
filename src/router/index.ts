@@ -5,6 +5,10 @@ import type { RouteRecordRaw } from 'vue-router'
 import MainLayout from '@/layouts/MainLayout.vue'
 import QRCodeGenerator from '@/views/QRCodeGenerator.vue'
 import ColorPicker from '@/views/ColorPicker.vue'
+import JsonFormatter from '@/views/JsonFormatter.vue'
+import Base64Tool from '@/views/Base64Tool.vue'
+import MD5Tool from '@/views/MD5Tool.vue'
+import TimestampTool from '@/views/TimestampTool.vue'
 
 // 定义路由
 const routes: RouteRecordRaw[] = [
@@ -37,6 +41,26 @@ const routes: RouteRecordRaw[] = [
         path: 'color-picker',
         name: 'ToolColorPicker',
         component: ColorPicker
+      },
+      {
+        path: 'json-formatter',
+        name: 'ToolJsonFormatter',
+        component: JsonFormatter
+      },
+      {
+        path: 'base64',
+        name: 'ToolBase64',
+        component: Base64Tool
+      },
+      {
+        path: 'md5',
+        name: 'ToolMD5',
+        component: MD5Tool
+      },
+      {
+        path: 'timestamp',
+        name: 'ToolTimestamp',
+        component: TimestampTool
       }
     ]
   },
