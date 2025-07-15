@@ -69,7 +69,7 @@
       </div>
       
       <div class="space-y-2">
-        <!-- 显示前5个收藏，添加展开状态管理 -->
+        <!-- 显示最多3个收藏工具，按最先收藏的顺序 -->
         <div 
           v-for="tool in visibleFavorites"
           :key="tool.id"
@@ -106,29 +106,6 @@
               </button>
             </div>
           </div>
-        </div>
-        
-        <!-- 展开/收起按钮 - 保持居中显示 -->
-        <div v-if="favoriteTools.length > 5" class="text-center pt-2">
-          <button 
-            @click="toggleShowAll"
-            class="text-xs font-medium px-3 py-2 rounded-lg transition-colors hover:bg-base-200 inline-flex items-center gap-2"
-            :class="showAllFavorites ? 'text-primary bg-primary/10' : 'text-base-content/70'"
-          >
-            {{ showAllFavorites ? '收起' : '查看全部' }}
-            <div class="badge badge-xs badge-ghost">
-              {{ favoriteTools.length }}
-            </div>
-            <svg 
-              class="w-3 h-3 transition-transform"
-              :class="{ 'rotate-180': showAllFavorites }"
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
-          </button>
         </div>
       </div>
     </div>
@@ -174,21 +151,11 @@ const emit = defineEmits<{
   'remove-favorite': [tool: Tool]
 }>()
 
-// 响应式状态
-const showAllFavorites = ref(false)
-
-// 可见的收藏工具
+// 可见的收藏工具 - 最多显示3个，按最先收藏的顺序
 const visibleFavorites = computed(() => {
-  if (showAllFavorites.value || props.favoriteTools.length <= 5) {
-    return props.favoriteTools
-  }
-  return props.favoriteTools.slice(0, 5)
+  // 最多显示前3个收藏工具
+  return props.favoriteTools.slice(0, 3)
 })
-
-// 切换显示所有收藏
-const toggleShowAll = () => {
-  showAllFavorites.value = !showAllFavorites.value
-}
 
 // 获取分类对应的emoji图标
 const getCategoryEmoji = (categoryId: string): string => {
