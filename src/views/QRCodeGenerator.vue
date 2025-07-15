@@ -62,13 +62,22 @@
                     <!-- 现有标签 -->
                     <div class="flex flex-wrap gap-2 mb-3" v-if="textTags.length > 0">
                       <div 
-                        v-for="tag in textTags" 
+                        v-for="(tag, index) in textTags" 
                         :key="tag.id"
                         class="tag-item group"
                         :class="{ 
                           'tag-editing': editingTagId === tag.id,
-                          'tag-selected': selectedTagId === tag.id 
+                          'tag-selected': selectedTagId === tag.id,
+                          'tag-dragging': dragState.draggedId === tag.id,
+                          'tag-drop-target': dragState.dropTargetIndex === index
                         }"
+                        :draggable="editingTagId !== tag.id"
+                        @dragstart="handleDragStart($event, tag, index)"
+                        @dragover="handleDragOver($event, index)"
+                        @dragenter="handleDragEnter($event, index)"
+                        @dragleave="handleDragLeave($event, index)"
+                        @drop="handleDrop($event, index)"
+                        @dragend="handleDragEnd"
                       >
                         <!-- 正常显示模式 -->
                         <div 
@@ -77,7 +86,7 @@
                           :class="getTagColorClass(tag, selectedTagId === tag.id)"
                           @dblclick="startEditingTag(tag)"
                           @click="selectTag(tag)"
-                          :title="`双击编辑 • 单击选择生成二维码`"
+                          :title="`拖拽排序 • 双击编辑 • 单击选择生成二维码`"
                         >
                           <span class="truncate flex-1 font-mono text-xs">{{ tag.content }}</span>
                           <button 
@@ -140,7 +149,7 @@
                   
                   <!-- 操作提示 -->
                   <div class="text-xs text-base-content/60 mt-2">
-                    💡 单击标签选择生成二维码，双击编辑内容（回车确认，ESC取消），悬停显示删除按钮
+                    💡 拖拽标签排序，单击选择生成二维码，双击编辑内容（回车确认，ESC取消），悬停显示删除按钮
                   </div>
                 </div>
 
@@ -560,6 +569,12 @@ const qrSettings = reactive<QRSettings>({
   margin: 0
 })
 
+// 拖拽状态
+const dragState = reactive({
+  draggedId: '',
+  dropTargetIndex: -1
+})
+
 // 计算属性
 const currentQRValue = computed(() => {
   switch (currentType.value) {
@@ -775,6 +790,79 @@ const loadTagsFromLocal = () => {
   }
 }
 
+// 拖拽事件处理
+const handleDragStart = (event: DragEvent, tag: TextTag, index: number) => {
+  // 如果当前标签正在编辑，阻止拖拽
+  if (editingTagId.value === tag.id) {
+    event.preventDefault()
+    return
+  }
+  
+  dragState.draggedId = tag.id
+  dragState.dropTargetIndex = -1
+  if (event.dataTransfer) {
+    event.dataTransfer.setData('text/plain', tag.id)
+    event.dataTransfer.effectAllowed = 'move'
+  }
+}
+
+const handleDragOver = (event: DragEvent, index: number) => {
+  event.preventDefault() // 允许放置
+  dragState.dropTargetIndex = index
+}
+
+const handleDragEnter = (event: DragEvent, index: number) => {
+  event.preventDefault()
+  if (dragState.draggedId) {
+    dragState.dropTargetIndex = index
+  }
+}
+
+const handleDragLeave = (event: DragEvent, index: number) => {
+  // 只有当鼠标真正离开元素时才清除高亮
+  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+  const x = event.clientX
+  const y = event.clientY
+  
+  if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+    if (dragState.dropTargetIndex === index) {
+      dragState.dropTargetIndex = -1
+    }
+  }
+}
+
+const handleDrop = (event: DragEvent, index: number) => {
+  event.preventDefault()
+  const draggedId = dragState.draggedId
+  
+  if (draggedId) {
+    const draggedIndex = textTags.value.findIndex(tag => tag.id === draggedId)
+    const targetIndex = index
+    
+    if (draggedIndex !== -1 && targetIndex !== -1 && draggedIndex !== targetIndex) {
+      // 移动标签到新位置
+      const [movedTag] = textTags.value.splice(draggedIndex, 1)
+      textTags.value.splice(targetIndex, 0, movedTag)
+      saveTagsToLocal()
+    }
+  }
+  
+  // 重置拖拽状态
+  dragState.draggedId = ''
+  dragState.dropTargetIndex = -1
+}
+
+const handleDragEnd = () => {
+  // 清理所有拖拽状态
+  dragState.draggedId = ''
+  dragState.dropTargetIndex = -1
+  
+  // 移除可能残留的样式
+  document.querySelectorAll('.tag-item').forEach(el => {
+    el.classList.remove('bg-base-300')
+  })
+}
+
 // 生命周期
 onMounted(() => {
   loadTagsFromLocal()
@@ -897,5 +985,41 @@ export default {
 /* 焦点状态样式 */
 .focus-within\:border-primary:focus-within {
   border-color: hsl(var(--p));
+}
+
+/* 拖拽相关样式 */
+.tag-item[draggable="true"] {
+  cursor: grab;
+}
+
+.tag-item[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.tag-item[draggable="false"] {
+  cursor: default;
+}
+
+.tag-editing {
+  cursor: default !important;
+}
+
+.tag-dragging {
+  opacity: 0.5;
+  transform: rotate(2deg);
+  z-index: 100;
+}
+
+.tag-drop-target {
+  background-color: rgba(59, 130, 246, 0.1);
+  border: 2px dashed rgba(59, 130, 246, 0.3);
+  border-radius: 0.5rem;
+  transform: scale(1.05);
+}
+
+/* 拖拽时的标签样式 */
+.tag-dragging .tag-badge {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  transform: rotate(-1deg);
 }
 </style> 
