@@ -1639,3 +1639,335 @@ body {
     display: none !important;
   }
 } 
+
+/* 全局移动端优化 */
+@media (max-width: 768px) {
+  /* 全局按钮触摸优化 */
+  .btn {
+    min-height: 2.75rem; /* 44px 最小触摸目标 */
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .btn-sm {
+    min-height: 2.25rem; /* 36px */
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+  }
+  
+  .btn-circle {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+  
+  /* 全局输入框优化 */
+  .input,
+  .select,
+  .textarea {
+    min-height: 2.75rem;
+    font-size: 1rem; /* 防止iOS缩放 */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .input-sm,
+  .select-sm {
+    min-height: 2.25rem;
+    font-size: 0.875rem;
+  }
+  
+  /* 移动端数字输入框优化 */
+  .input[type="number"] {
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+  }
+  
+  .input[type="number"]::-webkit-outer-spin-button,
+  .input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  /* 全局卡片优化 */
+  .card {
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  /* 全局网格优化 */
+  .tools-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  /* 全局容器优化 */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* 全局标题优化 */
+  h1 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+  
+  h2 {
+    font-size: 1.25rem;
+    line-height: 1.3;
+  }
+  
+  h3 {
+    font-size: 1.125rem;
+    line-height: 1.3;
+  }
+  
+  /* 全局文本优化 */
+  p {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  
+  /* 全局间距优化 */
+  .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 1rem;
+  }
+  
+  .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 1.5rem;
+  }
+  
+  /* 全局边距优化 */
+  .py-8 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+  
+  .my-8 {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .mb-8 {
+    margin-bottom: 1rem;
+  }
+  
+  .mt-8 {
+    margin-top: 1rem;
+  }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 480px) {
+  /* 超小屏幕按钮优化 */
+  .btn {
+    min-height: 2.5rem; /* 40px */
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+  }
+  
+  .btn-sm {
+    min-height: 2rem; /* 32px */
+    padding: 0.375rem 0.75rem;
+    font-size: 0.6875rem;
+  }
+  
+  /* 超小屏幕输入框优化 */
+  .input,
+  .select,
+  .textarea {
+    min-height: 2.5rem;
+    font-size: 0.875rem;
+  }
+  
+  /* 超小屏幕容器优化 */
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  /* 超小屏幕卡片优化 */
+  .card-body {
+    padding: 0.75rem;
+  }
+  
+  /* 超小屏幕网格优化 */
+  .grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+  
+  /* 超小屏幕标题优化 */
+  h1 {
+    font-size: 1.25rem;
+  }
+  
+  h2 {
+    font-size: 1.125rem;
+  }
+  
+  h3 {
+    font-size: 1rem;
+  }
+}
+
+/* 全局触摸优化 */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 全局用户选择优化 */
+.btn,
+.card,
+.tag-badge {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* 全局滚动条优化 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* 深色模式滚动条 */
+[data-theme="dark"] *::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] *::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* 全局焦点状态优化 */
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+  outline: 2px solid hsl(var(--p));
+  outline-offset: 2px;
+}
+
+/* 移动端焦点状态 */
+@media (max-width: 768px) {
+  input:focus,
+  select:focus,
+  textarea:focus,
+  button:focus {
+    outline-width: 3px;
+  }
+}
+
+/* 全局动画优化 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 安全区域适配 */
+@supports (padding: max(0px)) {
+  .safe-area-inset-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  
+  .safe-area-inset-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  .safe-area-inset-left {
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+  
+  .safe-area-inset-right {
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* 横屏模式优化 */
+@media (max-height: 500px) and (orientation: landscape) {
+  .py-8 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  .my-8 {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .btn {
+    min-height: 2.25rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  .card-body {
+    padding: 0.75rem;
+  }
+}
+
+/* 高分辨率屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .card {
+    border: 0.5px solid hsl(var(--b3));
+  }
+  
+  .btn {
+    border-width: 0.5px;
+  }
+  
+  .input,
+  .select,
+  .textarea {
+    border-width: 0.5px;
+  }
+}
+
+/* 性能优化 */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+/* GPU加速 */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+} 

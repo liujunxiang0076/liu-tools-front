@@ -1,49 +1,14 @@
 <template>
   <div id="app" class="min-h-screen bg-base-200">
-    <MainLayout />
+    <router-view />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onErrorCaptured } from 'vue'
-import { MainLayout } from '@/layouts'
-
-// 主布局组件引用
-const mainLayoutRef = ref<InstanceType<typeof MainLayout>>()
+import { ref, onMounted, onErrorCaptured } from 'vue'
 
 // 主题状态
 const theme = ref('light')
-
-// 消息状态 - 暂时移除
-// const message = reactive({
-//   show: false,
-//   text: '',
-//   type: 'success' as 'success' | 'error' | 'info'
-// })
-
-// 显示消息 - 暂时移除
-// const showMessage = (text: string, type: 'success' | 'error' | 'info' = 'success', duration = 3000) => {
-//   message.text = text
-//   message.type = type
-//   message.show = true
-//   
-//   setTimeout(() => {
-//     message.show = false
-//   }, duration)
-// }
-
-// 获取消息样式类 - 暂时移除
-// const getAlertClass = () => {
-//   switch (message.type) {
-//     case 'success':
-//       return 'bg-green-500'
-//     case 'error':
-//       return 'bg-red-500'
-//     case 'info':
-//     default:
-//       return 'bg-blue-500'
-//   }
-// }
 
 // 初始化主题
 const initializeTheme = () => {
@@ -78,18 +43,11 @@ const initializeTheme = () => {
 const initializeApp = () => {
   // 初始化主题
   initializeTheme()
-  
-  // 显示欢迎消息 - 暂时移除
-  // showMessage('欢迎使用在线工具箱！', 'success', 3000)
-
-  // 可以在这里添加其他应用级别的初始化逻辑
-  // 例如：用户认证、主题设置、语言设置等
 }
 
 // 全局错误处理
 const handleGlobalError = (error: Error, instance: any, info: string) => {
   console.error('全局错误:', error, info)
-  // showMessage('应用出现错误，请稍后重试', 'error', 5000) // 暂时移除消息提示
 }
 
 // 组件挂载时的初始化
@@ -112,112 +70,67 @@ body {
   font-family: 'Inter', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
 }
 
-#app {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* 防止选择文本时的蓝色高亮 */
+::selection {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: inherit;
 }
 
-/* 消息提示动画 - 暂时注释掉 */
-/* .alert {
-  animation: slideInRight 0.3s ease-out;
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-.alert.alert-leave {
-  animation: slideOutRight 0.3s ease-in;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
 }
 
-@keyframes slideOutRight {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-} */
-
-/* 全局加载状态样式 */
-.app-loading {
-  position: fixed;
-  inset: 0;
-  background-color: hsl(var(--b1));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
 }
 
-.loading-content {
-  text-align: center;
+/* 深色模式滚动条 */
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
 }
 
-.loading-spinner {
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 4px solid hsl(var(--b3));
-  border-top-color: hsl(var(--p));
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 1rem auto;
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+/* 输入框聚焦样式 */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
-.loading-text {
-  font-size: 0.875rem;
-  color: hsl(var(--bc) / 0.6);
+/* 按钮点击反馈 */
+.btn:active {
+  transform: scale(0.98);
 }
 
-/* 全局错误状态样式 */
-.app-error {
-  position: fixed;
-  inset: 0;
-  background-color: hsl(var(--b1));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 1.25rem;
+/* 卡片悬停效果 */
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-.error-content {
-  max-width: 28rem;
+/* 平滑过渡 */
+* {
+  transition: all 0.2s ease;
 }
 
-.error-icon {
-  width: 4rem;
-  height: 4rem;
-  color: hsl(var(--er));
-  margin: 0 auto 1rem auto;
-}
-
-.error-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: hsl(var(--bc));
-  margin-bottom: 0.5rem;
-}
-
-.error-message {
-  font-size: 0.875rem;
-  color: hsl(var(--bc) / 0.6);
-  margin-bottom: 1.25rem;
-  line-height: 1.625;
+/* 禁用某些元素的过渡 */
+.no-transition,
+.no-transition * {
+  transition: none !important;
 }
 </style> 

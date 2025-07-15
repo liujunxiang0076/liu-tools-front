@@ -1,0 +1,56 @@
+import { createRouter, createWebHistory } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
+
+// 导入页面组件
+import MainLayout from '@/layouts/MainLayout.vue'
+import QRCodeGenerator from '@/views/QRCodeGenerator.vue'
+import ColorPicker from '@/views/ColorPicker.vue'
+
+// 定义路由
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/',
+    name: 'Home',
+    component: MainLayout
+  },
+  {
+    path: '/qrcode',
+    name: 'QRCodeGenerator',
+    component: QRCodeGenerator
+  },
+  {
+    path: '/color-picker',
+    name: 'ColorPicker',
+    component: ColorPicker
+  },
+  // 工具路由组
+  {
+    path: '/tool',
+    redirect: '/',
+    children: [
+      {
+        path: 'qrcode',
+        name: 'ToolQRCode',
+        component: QRCodeGenerator
+      },
+      {
+        path: 'color-picker',
+        name: 'ToolColorPicker',
+        component: ColorPicker
+      }
+    ]
+  },
+  // 404 页面
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/'
+  }
+]
+
+// 创建路由实例
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
+
+export default router 

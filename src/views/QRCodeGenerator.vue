@@ -1,25 +1,25 @@
 <template>
   <div class="qrcode-generator-container min-h-screen bg-base-100">
     <!-- 页面标题 -->
-    <div class="bg-gradient-to-r from-primary/5 to-secondary/5 py-8">
+    <div class="bg-gradient-to-r from-primary/5 to-secondary/5 py-4 md:py-8">
       <div class="container mx-auto px-4">
         <div class="text-center">
           <!-- 返回按钮 -->
-          <div class="flex items-center justify-center mb-6">
+          <div class="flex items-center justify-center mb-4 md:mb-6">
             <button 
               @click="goBackToMain"
-              class="btn btn-ghost btn-circle mr-4"
+              class="btn btn-ghost btn-circle mr-2 md:mr-4 touch-manipulation"
               title="返回主页"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h1 class="text-4xl font-bold text-base-content">
+            <h1 class="text-2xl md:text-4xl font-bold text-base-content">
               📱 二维码生成器
             </h1>
           </div>
-          <p class="text-lg text-base-content/70 max-w-2xl mx-auto">
+          <p class="text-sm md:text-lg text-base-content/70 max-w-2xl mx-auto px-4">
             快速生成各种类型的二维码，支持自定义样式和智能标签管理
           </p>
         </div>
@@ -27,51 +27,53 @@
     </div>
 
     <!-- 主要内容区域 -->
-    <div class="container mx-auto px-4 py-8">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="container mx-auto px-4 py-4 md:py-8">
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-8">
         <!-- 左侧：内容输入区域 -->
-        <div class="space-y-6">
+        <div class="space-y-4 md:space-y-6">
           <!-- 内容类型选择 -->
           <div class="card bg-base-200 shadow-sm">
-            <div class="card-body p-6">
-              <h3 class="card-title text-lg mb-4">📝 选择内容类型</h3>
+            <div class="card-body p-4 md:p-6">
+              <h3 class="card-title text-base md:text-lg mb-3 md:mb-4">📝 选择内容类型</h3>
               
-              <!-- 选项卡导航 -->
-              <div class="tabs tabs-boxed mb-6">
-                <a 
-                  v-for="type in contentTypes" 
-                  :key="type.id"
-                  class="tab"
-                  :class="{ 'tab-active': currentType === type.id }"
-                  @click="switchContentType(type.id)"
-                >
-                  {{ type.icon }} {{ type.name }}
-                </a>
+              <!-- 选项卡导航 - 移动端优化 -->
+              <div class="tabs tabs-boxed mb-4 md:mb-6 overflow-x-auto">
+                <div class="flex min-w-max">
+                  <a 
+                    v-for="type in contentTypes" 
+                    :key="type.id"
+                    class="tab whitespace-nowrap text-xs md:text-sm px-2 md:px-4 py-2 touch-manipulation"
+                    :class="{ 'tab-active': currentType === type.id }"
+                    @click="switchContentType(type.id)"
+                  >
+                    {{ type.icon }} {{ type.name }}
+                  </a>
+                </div>
               </div>
 
               <!-- 内容输入表单 -->
-              <div class="space-y-4">
-                <!-- 文本类型 - 新的标签式设计 -->
+              <div class="space-y-3 md:space-y-4">
+                <!-- 文本类型 - 移动端优化 -->
                 <div v-show="currentType === 'text'">
                   <div class="flex items-center justify-between mb-2">
                     <label class="label p-0">
-                      <span class="label-text font-medium">文本内容</span>
+                      <span class="label-text font-medium text-sm md:text-base">文本内容</span>
                     </label>
-                    <!-- 清空按钮移动到这里 -->
+                    <!-- 清空按钮 -->
                     <button 
                       v-if="textTags.length > 0"
                       @click="clearAllTags"
-                      class="btn btn-ghost btn-sm text-red-500 hover:text-red-600 hover:bg-red-50 px-2 py-1 h-auto min-h-0"
+                      class="btn btn-ghost btn-sm text-red-500 hover:text-red-600 hover:bg-red-50 px-2 py-1 h-auto min-h-0 text-xs touch-manipulation"
                       title="清空所有标签"
                     >
-                      🗑️ 清空所有标签
+                      🗑️ <span class="hidden sm:inline">清空所有标签</span>
                     </button>
                   </div>
                   
-                  <!-- 标签容器 -->
-                  <div class="min-h-32 p-4 bg-base-100 rounded-lg border-2 border-base-300 focus-within:border-primary transition-colors">
+                  <!-- 标签容器 - 移动端优化 -->
+                  <div class="min-h-24 md:min-h-32 p-3 md:p-4 bg-base-100 rounded-lg border-2 border-base-300 focus-within:border-primary transition-colors">
                     <!-- 现有标签 -->
-                    <div class="flex flex-wrap gap-2 mb-3" v-if="textTags.length > 0">
+                    <div class="flex flex-wrap gap-1.5 md:gap-2 mb-2 md:mb-3" v-if="textTags.length > 0">
                       <div 
                         v-for="(tag, index) in textTags" 
                         :key="tag.id"
@@ -93,16 +95,16 @@
                         <!-- 正常显示模式 -->
                         <div 
                           v-if="editingTagId !== tag.id"
-                          class="tag-badge cursor-pointer transition-all"
+                          class="tag-badge cursor-pointer transition-all touch-manipulation"
                           :class="getTagColorClass(tag, selectedTagId === tag.id)"
                           @dblclick="startEditingTag(tag)"
                           @click="selectTag(tag)"
                           :title="`拖拽排序 • 双击编辑 • 单击选择生成二维码`"
                         >
-                          <span class="truncate flex-1 text-xs" style="font-family: 'Microsoft YaHei', sans-serif;">{{ tag.content }}</span>
+                          <span class="truncate flex-1 text-xs md:text-sm" style="font-family: 'Microsoft YaHei', sans-serif;">{{ tag.content }}</span>
                           <button 
                             @click.stop="deleteTag(tag.id)"
-                            class="delete-btn opacity-0 group-hover:opacity-100 transition-opacity ml-1"
+                            class="delete-btn opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity ml-1 touch-manipulation"
                             title="删除"
                           >
                             ✕
@@ -120,7 +122,7 @@
                             @keyup.enter="saveTagEdit(tag)"
                             @keyup.escape="cancelTagEdit"
                             @blur="saveTagEdit(tag)"
-                            class="bg-transparent border-none outline-none text-xs flex-1 min-w-0 placeholder-current"
+                            class="bg-transparent border-none outline-none text-xs md:text-sm flex-1 min-w-0 placeholder-current"
                             :class="getTagTextColorClass(tag)"
                             ref="tagEditInput"
                             :style="{ width: Math.max(60, editingContent.length * 8) + 'px', fontFamily: 'Microsoft YaHei, sans-serif' }"
@@ -136,7 +138,7 @@
                         @keyup.enter="addNewTag"
                         @keyup.escape="cancelAddTag"
                         @blur="handleAddTagBlur"
-                        class="input input-bordered input-sm w-full text-sm"
+                        class="input input-bordered input-sm w-full text-sm md:text-base"
                         style="font-family: 'Microsoft YaHei', sans-serif;"
                         placeholder="输入文本内容，回车确认，ESC取消..."
                         ref="newTagInput"
@@ -147,35 +149,36 @@
                     <button 
                       v-if="!isAddingTag"
                       @click="startAddingTag"
-                      class="btn btn-sm btn-outline btn-primary"
+                      class="btn btn-sm btn-outline btn-primary touch-manipulation"
                     >
                       ➕ 添加内容
                     </button>
                     
                     <!-- 空状态提示 -->
                     <div v-if="textTags.length === 0 && !isAddingTag" class="text-center py-4 text-base-content/50">
-                      <div class="text-3xl mb-2">📝</div>
-                      <p class="text-sm">点击"添加内容"开始创建文本标签</p>
+                      <div class="text-2xl md:text-3xl mb-2">📝</div>
+                      <p class="text-xs md:text-sm">点击"添加内容"开始创建文本标签</p>
                     </div>
                   </div>
                   
                   <!-- 操作提示 -->
                   <div class="text-xs text-base-content/60 mt-2">
-                    💡 自动生成最新标签二维码，单击切换选择，拖拽排序，双击编辑内容（回车确认，ESC取消），悬停显示删除按钮
+                    💡 <span class="hidden sm:inline">自动生成最新标签二维码，单击切换选择，拖拽排序，双击编辑内容（回车确认，ESC取消），悬停显示删除按钮</span>
+                    <span class="sm:hidden">单击选择，双击编辑，长按删除</span>
                   </div>
                 </div>
 
                 <!-- URL类型 -->
                 <div v-show="currentType === 'url'">
                   <label class="label">
-                    <span class="label-text font-medium">网址链接</span>
+                    <span class="label-text font-medium text-sm md:text-base">网址链接</span>
                   </label>
                   <label class="input input-bordered flex items-center gap-2">
                     🌐
                     <input 
                       v-model="contentData.url"
                       type="url" 
-                      class="grow" 
+                      class="grow text-sm md:text-base" 
                       placeholder="https://example.com"
                       @input="updateQRCode"
                     />
@@ -183,38 +186,38 @@
                 </div>
 
                 <!-- WiFi类型 -->
-                <div v-show="currentType === 'wifi'" class="space-y-4">
+                <div v-show="currentType === 'wifi'" class="space-y-3 md:space-y-4">
                   <div>
                     <label class="label">
-                      <span class="label-text font-medium">网络名称 (SSID)</span>
+                      <span class="label-text font-medium text-sm md:text-base">网络名称 (SSID)</span>
                     </label>
                     <input 
                       v-model="contentData.wifi.ssid"
                       type="text" 
-                      class="input input-bordered w-full"
+                      class="input input-bordered w-full text-sm md:text-base"
                       placeholder="WiFi网络名称"
                       @input="updateQRCode"
                     />
                   </div>
                   <div>
                     <label class="label">
-                      <span class="label-text font-medium">密码</span>
+                      <span class="label-text font-medium text-sm md:text-base">密码</span>
                     </label>
                     <input 
                       v-model="contentData.wifi.password"
                       type="password" 
-                      class="input input-bordered w-full"
+                      class="input input-bordered w-full text-sm md:text-base"
                       placeholder="WiFi密码"
                       @input="updateQRCode"
                     />
                   </div>
                   <div>
                     <label class="label">
-                      <span class="label-text font-medium">加密类型</span>
+                      <span class="label-text font-medium text-sm md:text-base">加密类型</span>
                     </label>
                     <select 
                       v-model="contentData.wifi.encryption"
-                      class="select select-bordered w-full"
+                      class="select select-bordered w-full text-sm md:text-base"
                       @change="updateQRCode"
                     >
                       <option value="WPA">WPA/WPA2</option>
@@ -225,39 +228,39 @@
                 </div>
 
                 <!-- 联系人类型 -->
-                <div v-show="currentType === 'contact'" class="space-y-4">
+                <div v-show="currentType === 'contact'" class="space-y-3 md:space-y-4">
                   <div>
                     <label class="label">
-                      <span class="label-text font-medium">姓名</span>
+                      <span class="label-text font-medium text-sm md:text-base">姓名</span>
                     </label>
                     <input 
                       v-model="contentData.contact.name"
                       type="text" 
-                      class="input input-bordered w-full"
+                      class="input input-bordered w-full text-sm md:text-base"
                       placeholder="联系人姓名"
                       @input="updateQRCode"
                     />
                   </div>
                   <div>
                     <label class="label">
-                      <span class="label-text font-medium">电话</span>
+                      <span class="label-text font-medium text-sm md:text-base">电话</span>
                     </label>
                     <input 
                       v-model="contentData.contact.phone"
                       type="tel" 
-                      class="input input-bordered w-full"
+                      class="input input-bordered w-full text-sm md:text-base"
                       placeholder="手机号码"
                       @input="updateQRCode"
                     />
                   </div>
                   <div>
                     <label class="label">
-                      <span class="label-text font-medium">邮箱</span>
+                      <span class="label-text font-medium text-sm md:text-base">邮箱</span>
                     </label>
                     <input 
                       v-model="contentData.contact.email"
                       type="email" 
-                      class="input input-bordered w-full"
+                      class="input input-bordered w-full text-sm md:text-base"
                       placeholder="邮箱地址"
                       @input="updateQRCode"
                     />
@@ -267,14 +270,14 @@
                 <!-- 电话类型 -->
                 <div v-show="currentType === 'phone'">
                   <label class="label">
-                    <span class="label-text font-medium">电话号码</span>
+                    <span class="label-text font-medium text-sm md:text-base">电话号码</span>
                   </label>
                   <label class="input input-bordered flex items-center gap-2">
                     📞
                     <input 
                       v-model="contentData.phone"
                       type="tel" 
-                      class="grow" 
+                      class="grow text-sm md:text-base" 
                       placeholder="手机号码或固定电话"
                       @input="updateQRCode"
                     />
@@ -282,26 +285,26 @@
                 </div>
 
                 <!-- 短信类型 -->
-                <div v-show="currentType === 'sms'" class="space-y-4">
+                <div v-show="currentType === 'sms'" class="space-y-3 md:space-y-4">
                   <div>
                     <label class="label">
-                      <span class="label-text font-medium">收件人号码</span>
+                      <span class="label-text font-medium text-sm md:text-base">收件人号码</span>
                     </label>
                     <input 
                       v-model="contentData.sms.number"
                       type="tel" 
-                      class="input input-bordered w-full"
+                      class="input input-bordered w-full text-sm md:text-base"
                       placeholder="收件人手机号"
                       @input="updateQRCode"
                     />
                   </div>
                   <div>
                     <label class="label">
-                      <span class="label-text font-medium">短信内容</span>
+                      <span class="label-text font-medium text-sm md:text-base">短信内容</span>
                     </label>
                     <textarea 
                       v-model="contentData.sms.message"
-                      class="textarea textarea-bordered w-full h-24"
+                      class="textarea textarea-bordered w-full h-20 md:h-24 text-sm md:text-base"
                       placeholder="预设短信内容（可选）"
                       @input="updateQRCode"
                     ></textarea>
@@ -309,34 +312,32 @@
                 </div>
 
                 <!-- 全局操作按钮 -->
-                <div class="flex gap-2 pt-4" v-if="currentType !== 'text'">
+                <div class="flex gap-2 pt-3 md:pt-4" v-if="currentType !== 'text'">
                   <button 
-                    class="btn btn-outline flex-1"
+                    class="btn btn-outline flex-1 touch-manipulation"
                     @click="clearCurrentContent"
                   >
                     🗑️ 清空
                   </button>
                 </div>
-                
-                <!-- 移除原来的文本类型操作按钮区域 -->
               </div>
             </div>
           </div>
 
           <!-- 外观设置 -->
           <div class="card bg-base-200 shadow-sm">
-            <div class="card-body p-6">
-              <h3 class="card-title text-lg mb-4">🎨 外观设置</h3>
+            <div class="card-body p-4 md:p-6">
+              <h3 class="card-title text-base md:text-lg mb-3 md:mb-4">🎨 外观设置</h3>
               
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                 <!-- 尺寸设置 -->
                 <div>
                   <label class="label">
-                    <span class="label-text font-medium">尺寸大小</span>
+                    <span class="label-text font-medium text-sm md:text-base">尺寸大小</span>
                   </label>
                   <select 
                     v-model="qrSettings.size"
-                    class="select select-bordered w-full"
+                    class="select select-bordered w-full text-sm md:text-base"
                     @change="updateQRCode"
                   >
                     <option :value="200">小尺寸 (200×200)</option>
@@ -349,11 +350,11 @@
                 <!-- 纠错级别 -->
                 <div>
                   <label class="label">
-                    <span class="label-text font-medium">纠错级别</span>
+                    <span class="label-text font-medium text-sm md:text-base">纠错级别</span>
                   </label>
                   <select 
                     v-model="qrSettings.level"
-                    class="select select-bordered w-full"
+                    class="select select-bordered w-full text-sm md:text-base"
                     @change="updateQRCode"
                   >
                     <option value="L">L - 低 (7%)</option>
@@ -366,12 +367,12 @@
                 <!-- 前景色 -->
                 <div>
                   <label class="label">
-                    <span class="label-text font-medium">前景色</span>
+                    <span class="label-text font-medium text-sm md:text-base">前景色</span>
                   </label>
                   <input 
                     v-model="qrSettings.foreground"
                     type="color" 
-                    class="input input-bordered w-full h-12"
+                    class="input input-bordered w-full h-10 md:h-12 touch-manipulation"
                     @input="updateQRCode"
                   />
                 </div>
@@ -379,12 +380,12 @@
                 <!-- 背景色 -->
                 <div>
                   <label class="label">
-                    <span class="label-text font-medium">背景色</span>
+                    <span class="label-text font-medium text-sm md:text-base">背景色</span>
                   </label>
                   <input 
                     v-model="qrSettings.background"
                     type="color" 
-                    class="input input-bordered w-full h-12"
+                    class="input input-bordered w-full h-10 md:h-12 touch-manipulation"
                     @input="updateQRCode"
                   />
                 </div>
@@ -394,39 +395,40 @@
         </div>
 
         <!-- 右侧：二维码预览区域 -->
-        <div class="space-y-6">
+        <div class="space-y-4 md:space-y-6">
           <div class="card bg-base-200 shadow-sm">
-            <div class="card-body p-6">
-              <h3 class="card-title text-lg mb-4">👁️ 二维码预览</h3>
+            <div class="card-body p-4 md:p-6">
+              <h3 class="card-title text-base md:text-lg mb-3 md:mb-4">👁️ 二维码预览</h3>
               
               <!-- 二维码显示区域 -->
-              <div class="bg-white rounded-lg p-8 flex items-center justify-center min-h-80">
+              <div class="bg-white rounded-lg p-4 md:p-8 flex items-center justify-center min-h-64 md:min-h-80">
                 <div v-if="currentQRValue" class="qr-preview">
                   <canvas 
                     ref="qrCanvas"
                     :width="qrSettings.size" 
                     :height="qrSettings.size"
-                    class="border border-gray-200 rounded-lg"
+                    class="border border-gray-200 rounded-lg max-w-full h-auto"
+                    :style="{ maxWidth: '100%', height: 'auto' }"
                   ></canvas>
                 </div>
                 <div v-else class="text-center text-base-content/50">
-                  <div class="text-6xl mb-4">📱</div>
-                  <p class="text-lg" v-if="currentType === 'text'">添加文本标签生成二维码</p>
-                  <p class="text-lg" v-else>请输入内容生成二维码</p>
-                  <p class="text-sm mt-2" v-if="currentType === 'text'">添加的第一个标签将自动生成二维码</p>
+                  <div class="text-4xl md:text-6xl mb-3 md:mb-4">📱</div>
+                  <p class="text-base md:text-lg" v-if="currentType === 'text'">添加文本标签生成二维码</p>
+                  <p class="text-base md:text-lg" v-else>请输入内容生成二维码</p>
+                  <p class="text-xs md:text-sm mt-2" v-if="currentType === 'text'">添加的第一个标签将自动生成二维码</p>
                 </div>
               </div>
 
               <!-- 操作按钮 -->
-              <div class="flex gap-2 mt-6" v-if="currentQRValue">
+              <div class="flex flex-col sm:flex-row gap-2 mt-4 md:mt-6" v-if="currentQRValue">
                 <button 
-                  class="btn btn-primary flex-1"
+                  class="btn btn-primary flex-1 touch-manipulation"
                   @click="downloadQRCode"
                 >
                   💾 下载PNG
                 </button>
                 <button 
-                  class="btn btn-outline"
+                  class="btn btn-outline touch-manipulation"
                   @click="copyQRCodeToClipboard"
                 >
                   📋 复制
@@ -434,10 +436,10 @@
               </div>
 
               <!-- 当前内容信息 -->
-              <div v-if="currentQRValue" class="mt-4 p-4 bg-base-100 rounded-lg">
-                <div class="text-sm text-base-content/70 mb-2">当前内容</div>
-                <div class="font-mono text-sm break-all">{{ currentQRValue }}</div>
-                <div class="mt-2 flex gap-4 text-xs text-base-content/60">
+              <div v-if="currentQRValue" class="mt-3 md:mt-4 p-3 md:p-4 bg-base-100 rounded-lg">
+                <div class="text-xs md:text-sm text-base-content/70 mb-2">当前内容</div>
+                <div class="font-mono text-xs md:text-sm break-all">{{ currentQRValue }}</div>
+                <div class="mt-2 flex flex-wrap gap-2 md:gap-4 text-xs text-base-content/60">
                   <span>类型: {{ getCurrentTypeName }}</span>
                   <span>尺寸: {{ qrSettings.size }}×{{ qrSettings.size }}</span>
                   <span>纠错: {{ qrSettings.level }}</span>
@@ -454,6 +456,10 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, nextTick, watch, getCurrentInstance } from 'vue'
 import * as QRCode from 'qrcode'
+import { useRouter } from 'vue-router'
+
+// 使用路由
+const router = useRouter()
 
 // 内容类型定义
 interface ContentType {
@@ -1052,19 +1058,8 @@ onMounted(() => {
 
 // 返回主页方法
 const goBackToMain = () => {
-  // 尝试调用父组件的方法
-  try {
-    const parent = getCurrentInstance()?.parent
-    if (parent && parent.exposed && parent.exposed.goBackToMain) {
-      parent.exposed.goBackToMain()
-    } else {
-      // 兜底方案：刷新页面回到主页
-      window.location.reload()
-    }
-  } catch (error) {
-    console.error('返回主页失败:', error)
-    window.location.reload()
-  }
+  // 使用路由跳转回主页
+  router.push('/')
 }
 </script>
 
@@ -1088,14 +1083,27 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.375rem;
+  padding: 0.375rem 0.75rem; /* 移动端增加触摸区域 */
+  border-radius: 0.5rem; /* 增大圆角 */
   border-width: 1px;
   font-size: 0.75rem;
   font-weight: 500;
   transition: all 0.2s ease;
   max-width: 200px;
   line-height: 1.2;
+  min-height: 2rem; /* 确保足够的触摸区域 */
+  touch-action: manipulation; /* 优化触摸响应 */
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .tag-badge {
+    padding: 0.5rem 1rem; /* 移动端增大触摸区域 */
+    min-height: 2.5rem; /* 44px 最小触摸目标 */
+    font-size: 0.875rem; /* 增大字体 */
+    border-radius: 0.75rem; /* 更大圆角 */
+    max-width: 100%; /* 移动端允许更宽 */
+  }
 }
 
 .tag-badge:hover {
@@ -1123,17 +1131,27 @@ export default {
 /* 删除按钮样式 */
 .delete-btn {
   border-radius: 50%;
-  width: 0.875rem;
-  height: 0.875rem;
+  width: 1.25rem; /* 增大触摸区域 */
+  height: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   line-height: 1;
   transition: all 0.2s ease;
   background: transparent;
   border: none;
   cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* 移动端删除按钮优化 */
+@media (max-width: 768px) {
+  .delete-btn {
+    width: 1.5rem; /* 24px 触摸目标 */
+    height: 1.5rem;
+    font-size: 0.875rem;
+  }
 }
 
 .delete-btn:hover {
@@ -1141,8 +1159,27 @@ export default {
   color: rgb(239, 68, 68);
 }
 
+/* 二维码预览区域 */
 .qr-preview {
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-preview canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+/* 移动端二维码预览优化 */
+@media (max-width: 768px) {
+  .qr-preview canvas {
+    max-width: calc(100vw - 8rem); /* 考虑容器padding */
+    max-height: 60vh; /* 限制最大高度 */
+  }
 }
 
 /* 标签编辑输入框样式 */
@@ -1151,6 +1188,16 @@ export default {
   border: none;
   outline: none;
   color: inherit;
+  min-width: 120px; /* 增大最小宽度 */
+  max-width: 300px;
+}
+
+/* 移动端输入框优化 */
+@media (max-width: 768px) {
+  .tag-editing input {
+    min-width: 100px;
+    font-size: 0.875rem;
+  }
 }
 
 /* 自适应输入框宽度 */
@@ -1214,5 +1261,99 @@ export default {
 .tag-dragging .tag-badge {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
   transform: rotate(-1deg);
+}
+
+/* 移动端触摸优化 */
+@media (max-width: 768px) {
+  /* 禁用移动端的拖拽，避免与滚动冲突 */
+  .tag-item[draggable="true"] {
+    cursor: pointer;
+  }
+  
+  /* 增大触摸区域 */
+  .btn {
+    min-height: 2.75rem; /* 44px 最小触摸目标 */
+    padding: 0.75rem 1.5rem;
+  }
+  
+  .btn-sm {
+    min-height: 2.25rem; /* 36px */
+    padding: 0.5rem 1rem;
+  }
+  
+  /* 输入框优化 */
+  .input,
+  .select,
+  .textarea {
+    min-height: 2.75rem;
+    font-size: 1rem; /* 防止iOS缩放 */
+  }
+  
+  .input-sm {
+    min-height: 2.25rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* 选项卡滚动优化 */
+.tabs.tabs-boxed {
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.tabs.tabs-boxed::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* 颜色选择器触摸优化 */
+input[type="color"] {
+  min-height: 2.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+@media (max-width: 768px) {
+  input[type="color"] {
+    min-height: 3rem; /* 48px 触摸目标 */
+  }
+}
+
+/* 响应式网格优化 */
+@media (max-width: 1280px) {
+  .xl\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 容器间距优化 */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* 卡片间距优化 */
+@media (max-width: 768px) {
+  .card-body {
+    padding: 1rem;
+  }
+}
+
+/* 操作按钮优化 */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 防止文本选择 */
+.tag-badge,
+.btn {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 </style> 
