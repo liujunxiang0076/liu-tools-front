@@ -1539,3 +1539,82 @@ body {
     height: 1.125rem; /* 18px */
   }
 } 
+
+/* 收藏管理按钮优化样式 */
+.favorite-manage-btn {
+  font-size: 0.75rem; /* 12px 小字体 */
+  padding: 0.25rem 0.5rem; /* 4px 8px 紧凑内边距 */
+  height: 1.5rem; /* 24px 固定高度 */
+  min-height: 1.5rem;
+  gap: 0.25rem; /* 4px 图标和文字间距 */
+  border-radius: 0.375rem; /* 6px 圆角 */
+  font-weight: 500;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  /* 确保图标和文字垂直居中 */
+  line-height: 1;
+}
+
+/* 收藏管理按钮悬停效果 */
+.favorite-manage-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.15);
+}
+
+/* 收藏管理按钮激活效果 */
+.favorite-manage-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(59, 130, 246, 0.1);
+}
+
+/* 收藏管理按钮图标优化 */
+.favorite-manage-btn svg {
+  width: 0.75rem; /* 12px */
+  height: 0.75rem; /* 12px */
+  flex-shrink: 0;
+}
+
+/* 移动端收藏管理按钮适配 */
+@media (max-width: 768px) {
+  .favorite-manage-btn {
+    font-size: 0.6875rem; /* 11px */
+    padding: 0.1875rem 0.375rem; /* 3px 6px */
+    height: 1.375rem; /* 22px */
+    min-height: 1.375rem;
+    border-radius: 0.3125rem; /* 5px */
+  }
+  
+  .favorite-manage-btn svg {
+    width: 0.6875rem; /* 11px */
+    height: 0.6875rem; /* 11px */
+  }
+  
+  /* 移动端只显示图标，隐藏文字 */
+  .favorite-manage-btn .hidden {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .favorite-manage-btn {
+    font-size: 0.625rem; /* 10px */
+    padding: 0.125rem 0.25rem; /* 2px 4px */
+    height: 1.25rem; /* 20px */
+    min-height: 1.25rem;
+    border-radius: 0.25rem; /* 4px */
+    /* 小屏幕上只显示图标，减少最小宽度 */
+    min-width: 1.25rem;
+  }
+  
+  .favorite-manage-btn svg {
+    width: 0.625rem; /* 10px */
+    height: 0.625rem; /* 10px */
+  }
+  
+  /* 超小屏幕只显示图标 */
+  .favorite-manage-btn .hidden {
+    display: none !important;
+  }
+} 

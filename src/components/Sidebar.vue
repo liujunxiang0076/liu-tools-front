@@ -45,9 +45,26 @@
     <div v-if="favoriteTools.length > 0" class="border-t border-base-200 p-4">
       <div class="flex items-center justify-between mb-3">
         <h3 class="text-sm font-semibold text-base-content/70">我的收藏</h3>
-        <!-- 收藏数量徽章 - 使用更专业的徽章样式 -->
-        <div class="badge badge-primary badge-sm">
-          {{ favoriteTools.length }}
+        
+        <!-- 右侧按钮组：收藏数量徽章 + 管理收藏按钮 -->
+        <div class="flex items-center gap-2">
+          <!-- 收藏数量徽章 -->
+          <div class="badge badge-primary badge-sm">
+            {{ favoriteTools.length }}
+          </div>
+          
+          <!-- 管理收藏按钮 - 只在收藏超过3个时显示 -->
+          <button 
+            v-if="favoriteTools.length > 3"
+            @click="emit('show-all-favorites')"
+            class="btn btn-xs btn-primary btn-outline hover:btn-primary transition-colors favorite-manage-btn"
+            title="管理收藏"
+          >
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"/>
+            </svg>
+            <span class="hidden sm:inline">管理</span>
+          </button>
         </div>
       </div>
       
@@ -91,12 +108,11 @@
           </div>
         </div>
         
-        <!-- 展开/收起按钮 -->
-        <div class="text-center pt-2">
+        <!-- 展开/收起按钮 - 保持居中显示 -->
+        <div v-if="favoriteTools.length > 5" class="text-center pt-2">
           <button 
-            v-if="favoriteTools.length > 5"
             @click="toggleShowAll"
-            class="text-xs font-medium px-3 py-2 rounded-lg transition-colors hover:bg-base-200 flex items-center gap-2"
+            class="text-xs font-medium px-3 py-2 rounded-lg transition-colors hover:bg-base-200 inline-flex items-center gap-2"
             :class="showAllFavorites ? 'text-primary bg-primary/10' : 'text-base-content/70'"
           >
             {{ showAllFavorites ? '收起' : '查看全部' }}
@@ -112,18 +128,6 @@
             >
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
             </svg>
-          </button>
-          
-          <!-- 管理收藏按钮 -->
-          <button 
-            v-if="favoriteTools.length > 3"
-            @click="emit('show-all-favorites')"
-            class="text-xs text-primary hover:text-primary/80 font-medium px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors ml-2 flex items-center gap-1"
-          >
-            管理收藏
-            <div class="badge badge-xs badge-primary badge-outline">
-              {{ favoriteTools.length }}
-            </div>
           </button>
         </div>
       </div>
