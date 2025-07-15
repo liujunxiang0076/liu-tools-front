@@ -108,3 +108,4 @@ const pixelIntensity = 0.5 + (scrollProgress * 0.4) // 整体强度
 - **降级方案** - 不支持的浏览器自动使用增强网格背景
 
 ## 🛠️ 技术栈
+ 
