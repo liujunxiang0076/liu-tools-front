@@ -53,8 +53,7 @@
             type="text" 
             v-model="localSearchQuery" 
             @input="handleSearchInput"
-            @keydown.enter="handleSearchEnter"
-            @keydown.escape="handleSearchEscape"
+            @keydown="handleKeyDown"
             @focus="handleSearchFocus"
             @blur="handleSearchBlur"
             placeholder="搜索工具..." 
@@ -85,7 +84,11 @@
             v-for="(suggestion, index) in localSuggestions"
             :key="index"
             @click="handleSuggestionClick(suggestion)"
-            class="search-suggestion-item"
+            @mouseenter="selectedSuggestionIndex = index"
+            :class="[
+              'search-suggestion-item',
+              { 'highlighted': index === selectedSuggestionIndex }
+            ]"
           >
             <svg class="w-5 h-5 text-base-content/40 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -166,6 +169,7 @@ const searchInputRef = ref<HTMLInputElement>()
 const isSearching = ref(false)
 const showSuggestions = ref(false)
 const searchTimeout = ref<NodeJS.Timeout>()
+const selectedSuggestionIndex = ref(-1) // 新增：当前选中的建议索引
 
 // 深色模式状态
 const isDark = ref(false)
@@ -292,6 +296,11 @@ const localSuggestions = computed(() => {
   return finalSuggestions.slice(0, 5) // 总共最多5个建议
 })
 
+// 监听localSuggestions变化，重置选中索引
+watch(localSuggestions, () => {
+  selectedSuggestionIndex.value = -1
+})
+
 // 防抖处理搜索输入 - 减少延迟，避免删除冲突
 const debouncedSearch = (value: string) => {
   if (searchTimeout.value) {
@@ -318,6 +327,68 @@ const handleSearchInput = (event: Event) => {
   debouncedSearch(value)
 }
 
+// 新增：处理键盘事件 - 支持上下键导航和回车选择
+const handleKeyDown = (event: KeyboardEvent) => {
+  // 只在显示建议时处理键盘导航
+  if (!showSuggestions.value || localSuggestions.value.length === 0) {
+    // 如果没有建议，按原有逻辑处理
+    if (event.key === 'Enter') {
+      handleSearchEnter(event)
+    } else if (event.key === 'Escape') {
+      handleSearchEscape(event)
+    }
+    return
+  }
+
+  switch (event.key) {
+    case 'ArrowDown':
+      event.preventDefault()
+      selectedSuggestionIndex.value = 
+        selectedSuggestionIndex.value < localSuggestions.value.length - 1 
+          ? selectedSuggestionIndex.value + 1 
+          : 0 // 循环到第一个
+      break
+      
+    case 'ArrowUp':
+      event.preventDefault()
+      selectedSuggestionIndex.value = 
+        selectedSuggestionIndex.value > 0 
+          ? selectedSuggestionIndex.value - 1 
+          : localSuggestions.value.length - 1 // 循环到最后一个
+      break
+      
+    case 'Enter':
+      event.preventDefault()
+      if (selectedSuggestionIndex.value >= 0 && selectedSuggestionIndex.value < localSuggestions.value.length) {
+        // 选择当前高亮的建议
+        const selectedSuggestion = localSuggestions.value[selectedSuggestionIndex.value]
+        handleSuggestionClick(selectedSuggestion)
+      } else {
+        // 没有选中建议时，使用当前输入值搜索
+        handleSearchEnter(event)
+      }
+      break
+      
+    case 'Escape':
+      event.preventDefault()
+      if (showSuggestions.value) {
+        // 如果建议框打开，先关闭建议框
+        showSuggestions.value = false
+        selectedSuggestionIndex.value = -1
+      } else {
+        // 如果建议框已关闭，清空搜索
+        handleClearSearch()
+      }
+      break
+      
+    case 'Tab':
+      // Tab键关闭建议
+      showSuggestions.value = false
+      selectedSuggestionIndex.value = -1
+      break
+  }
+}
+
 // 处理回车键搜索
 const handleSearchEnter = (event: KeyboardEvent) => {
   event.preventDefault()
@@ -329,6 +400,7 @@ const handleSearchEnter = (event: KeyboardEvent) => {
   emit('update:searchQuery', target.value)
   isSearching.value = false
   showSuggestions.value = false
+  selectedSuggestionIndex.value = -1
   
   // 失去焦点
   target.blur()
@@ -343,6 +415,7 @@ const handleSearchEscape = (event: KeyboardEvent) => {
 // 处理搜索框获得焦点
 const handleSearchFocus = () => {
   showSuggestions.value = true
+  selectedSuggestionIndex.value = -1 // 重置选中索引
 }
 
 // 处理搜索框失去焦点
@@ -350,6 +423,7 @@ const handleSearchBlur = () => {
   // 延迟隐藏建议，允许点击建议项
   setTimeout(() => {
     showSuggestions.value = false
+    selectedSuggestionIndex.value = -1
   }, 200)
 }
 
@@ -357,6 +431,7 @@ const handleSearchBlur = () => {
 const handleSuggestionClick = (suggestion: string) => {
   emit('update:searchQuery', suggestion)
   showSuggestions.value = false
+  selectedSuggestionIndex.value = -1
   
   // 重新聚焦到搜索框
   nextTick(() => {
@@ -375,6 +450,7 @@ const handleClearSearch = () => {
   emit('update:searchQuery', '')
   isSearching.value = false
   showSuggestions.value = false
+  selectedSuggestionIndex.value = -1
   
   // 重新聚焦到搜索框
   nextTick(() => {
@@ -392,6 +468,7 @@ const handleClickOutside = (event: MouseEvent) => {
   const target = event.target as HTMLElement
   if (!target.closest('.navbar-center')) {
     showSuggestions.value = false
+    selectedSuggestionIndex.value = -1
   }
 }
 

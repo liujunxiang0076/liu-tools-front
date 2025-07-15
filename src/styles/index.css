@@ -265,12 +265,30 @@ body {
   border-bottom: none;
 }
 
-.search-suggestion-item:hover {
+.search-suggestion-item:hover,
+.search-suggestion-item.highlighted {
   background-color: hsl(var(--p) / 0.08); /* 主色调背景 */
   color: hsl(var(--bc));
   transform: translateX(2px); /* 减少右移距离 */
   border-left: 2px solid hsl(var(--p)); /* 减少左侧边框宽度 */
   padding-left: calc(1.25rem - 2px); /* 调整内边距补偿边框 */
+}
+
+/* 键盘导航高亮样式 - 更明显的视觉反馈 */
+.search-suggestion-item.highlighted {
+  background-color: hsl(var(--p) / 0.12); /* 稍微加深背景色 */
+  box-shadow: 
+    inset 0 0 0 1px hsl(var(--p) / 0.2),
+    0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 深色模式下的键盘导航高亮 */
+[data-theme="dark"] .search-suggestion-item.highlighted {
+  background-color: hsl(var(--p) / 0.15);
+  color: hsl(var(--pc));
+  box-shadow: 
+    inset 0 0 0 1px hsl(var(--p) / 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .search-suggestion-item:first-child {
