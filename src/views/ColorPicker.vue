@@ -283,7 +283,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, getCurrentInstance } from 'vue'
 
 // 响应式状态
 const selectedColor = ref('#FF5733')
@@ -454,8 +454,19 @@ const copyToClipboard = async (text: string) => {
 }
 
 const goBack = () => {
-  // 返回主页面
-  history.back()
+  // 尝试调用父组件的方法
+  try {
+    const parent = getCurrentInstance()?.parent
+    if (parent && parent.exposed && parent.exposed.goBackToMain) {
+      parent.exposed.goBackToMain()
+    } else {
+      // 兜底方案：刷新页面回到主页
+      window.location.reload()
+    }
+  } catch (error) {
+    console.error('返回主页失败:', error)
+    window.location.reload()
+  }
 }
 
 // 初始化

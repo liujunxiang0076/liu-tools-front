@@ -1,59 +1,68 @@
 <template>
   <div class="h-screen flex flex-col overflow-hidden">
-    <!-- 顶部导航栏 -->
-    <TopNavBar
-      :search-query="searchQuery"
-      :view-mode="viewMode"
-      :sidebar-open="sidebarOpen"
-      @update:search-query="searchQuery = $event"
-      @update:view-mode="viewMode = $event"
-      @toggle-sidebar="toggleSidebar"
-    />
-
-    <!-- 主体内容区域 -->
-    <div class="flex flex-1 min-h-0">
-      <!-- 侧边栏 -->
-      <Sidebar
-        :categories="categories"
-        :selected-category-id="selectedCategory"
-        :favorite-tools="favoriteTools"
-        :total-tools="totalTools"
-        :is-open="sidebarOpen"
-        @category-select="handleCategorySelect"
-        @tool-select="handleToolSelect"
-        @show-all-favorites="handleShowAllFavorites"
-        @remove-favorite="handleRemoveFavorite"
-      />
-
-      <!-- 移动端侧边栏遮罩 -->
-      <div 
-        v-if="sidebarOpen" 
-        class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
-        @click="sidebarOpen = false"
-      ></div>
-
-      <!-- 主工作区 -->
-      <MainWorkspace
-        :selected-category="selectedCategory"
+    <!-- 如果是二维码页面，直接显示二维码组件 -->
+    <QRCodeGenerator v-if="currentPage === 'qrcode'" />
+    
+    <!-- 如果是颜色选择器页面，直接显示颜色选择器组件 -->
+    <ColorPicker v-else-if="currentPage === 'color-picker'" />
+    
+    <!-- 否则显示主界面 -->
+    <template v-else>
+      <!-- 顶部导航栏 -->
+      <TopNavBar
         :search-query="searchQuery"
         :view-mode="viewMode"
-        :favorite-ids="favoriteIds"
-        @update:favorite-ids="favoriteIds = $event"
+        :sidebar-open="sidebarOpen"
         @update:search-query="searchQuery = $event"
-        @tool-select="handleToolSelect"
+        @update:view-mode="viewMode = $event"
+        @toggle-sidebar="toggleSidebar"
       />
-    </div>
 
-    <!-- 收藏管理弹窗 -->
-    <FavoritesModal
-      :is-open="showFavoritesModal"
-      :favorite-tools="favoriteTools"
-      @close="showFavoritesModal = false"
-      @tool-select="handleToolSelect"
-      @tool-use="handleToolSelect"
-      @remove-favorite="handleRemoveFavorite"
-      @clear-all="handleClearAllFavorites"
-    />
+      <!-- 主体内容区域 -->
+      <div class="flex flex-1 min-h-0">
+        <!-- 侧边栏 -->
+        <Sidebar
+          :categories="categories"
+          :selected-category-id="selectedCategory"
+          :favorite-tools="favoriteTools"
+          :total-tools="totalTools"
+          :is-open="sidebarOpen"
+          @category-select="handleCategorySelect"
+          @tool-select="handleToolSelect"
+          @show-all-favorites="handleShowAllFavorites"
+          @remove-favorite="handleRemoveFavorite"
+        />
+
+        <!-- 移动端侧边栏遮罩 -->
+        <div 
+          v-if="sidebarOpen" 
+          class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          @click="sidebarOpen = false"
+        ></div>
+
+        <!-- 主工作区 -->
+        <MainWorkspace
+          :selected-category="selectedCategory"
+          :search-query="searchQuery"
+          :view-mode="viewMode"
+          :favorite-ids="favoriteIds"
+          @update:favorite-ids="favoriteIds = $event"
+          @update:search-query="searchQuery = $event"
+          @tool-select="handleToolSelect"
+        />
+      </div>
+
+      <!-- 收藏管理弹窗 -->
+      <FavoritesModal
+        :is-open="showFavoritesModal"
+        :favorite-tools="favoriteTools"
+        @close="showFavoritesModal = false"
+        @tool-select="handleToolSelect"
+        @tool-use="handleToolSelect"
+        @remove-favorite="handleRemoveFavorite"
+        @clear-all="handleClearAllFavorites"
+      />
+    </template>
   </div>
 </template>
 
@@ -64,6 +73,10 @@ import { categories, tools, getToolsByCategory } from '@/store/data'
 import type { Tool } from '@/types'
 // import { Message } from '@/utils/message' // 暂时移除消息提示
 
+// 导入页面组件
+import QRCodeGenerator from '@/views/QRCodeGenerator.vue'
+import ColorPicker from '@/views/ColorPicker.vue'
+
 // 响应式状态
 const searchQuery = ref('')
 const selectedCategory = ref('all')
@@ -71,6 +84,7 @@ const viewMode = ref<'grid' | 'list'>('grid')
 const favoriteIds = ref<number[]>([])
 const sidebarOpen = ref(false)
 const showFavoritesModal = ref(false)
+const currentPage = ref<string>('')
 
 // 计算属性
 const totalTools = computed(() => tools.length)
@@ -89,18 +103,21 @@ const handleCategorySelect = (categoryId: string) => {
 }
 
 const handleToolSelect = (tool: Tool) => {
-  // 模拟工具页面跳转
+  // 根据工具路径决定显示的页面
   console.log('Selected tool:', tool)
   
-  // 这里可以实现真正的路由跳转
   if (tool.path) {
-    // 示例：window.open(tool.path, '_blank')
-    // Message.success(`正在打开 ${tool.name}...`) // 暂时移除消息提示
-    
-    // 简单的页面跳转模拟
-    setTimeout(() => {
+    // 解析路径，提取页面名称
+    const pageName = tool.path.split('/').pop()
+    if (pageName === 'qrcode') {
+      currentPage.value = 'qrcode'
+    } else if (pageName === 'color-picker') {
+      currentPage.value = 'color-picker'
+    } else {
+      // 其他工具页面还在开发中
+      console.log(`${tool.name} 工具页面还在开发中`)
       // Message.info(`${tool.name} 工具页面还在开发中，敬请期待！`) // 暂时移除消息提示
-    }, 500)
+    }
   } else {
     // Message.warning(`${tool.name} 暂未配置页面路径`) // 暂时移除消息提示
   }
@@ -130,6 +147,16 @@ const handleClearAllFavorites = () => {
 const toggleSidebar = () => {
   sidebarOpen.value = !sidebarOpen.value
 }
+
+// 返回主页面
+const goBackToMain = () => {
+  currentPage.value = ''
+}
+
+// 全局暴露goBackToMain方法给子组件使用
+defineExpose({
+  goBackToMain
+})
 
 // 监听窗口大小变化
 const handleResize = () => {
