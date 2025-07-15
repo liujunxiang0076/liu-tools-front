@@ -33,7 +33,7 @@
 
     <!-- 中间搜索区域 -->
     <div class="navbar-center">
-      <div class="form-control w-full max-w-xs">
+      <div class="form-control w-full max-w-xs relative">
         <div class="relative">
           <!-- 搜索图标在左侧内部，距离左边16像素 -->
           <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-base-content/40 pointer-events-none">
@@ -51,7 +51,7 @@
           <input 
             ref="searchInputRef"
             type="text" 
-            :value="searchQuery" 
+            v-model="localSearchQuery" 
             @input="handleSearchInput"
             @keydown.enter="handleSearchEnter"
             @keydown.escape="handleSearchEscape"
@@ -65,7 +65,7 @@
           
           <!-- 清空按钮 - 增大点击区域 -->
           <button 
-            v-if="searchQuery.trim()"
+            v-if="localSearchQuery.trim()"
             @click="handleClearSearch"
             class="search-clear-button"
             title="清空搜索"
@@ -78,11 +78,11 @@
         
         <!-- 搜索建议下拉框 -->
         <div 
-          v-if="showSuggestions && searchSuggestions.length > 0"
+          v-if="showSuggestions && localSuggestions.length > 0"
           class="search-suggestions-dropdown"
         >
           <div 
-            v-for="(suggestion, index) in searchSuggestions"
+            v-for="(suggestion, index) in localSuggestions"
             :key="index"
             @click="handleSuggestionClick(suggestion)"
             class="search-suggestion-item"
@@ -177,20 +177,31 @@ const searchSuggestions = computed(() => {
   const query = props.searchQuery.toLowerCase()
   const suggestions = new Set<string>()
   
-  // 从工具名称中提取建议
+  // 优化搜索逻辑：优先匹配工具名称，然后匹配标签
+  const toolNameMatches = new Set<string>()
+  const tagMatches = new Set<string>()
+  
   tools.forEach(tool => {
+    // 工具名称匹配 - 优先级更高
     if (tool.name.toLowerCase().includes(query)) {
-      suggestions.add(tool.name)
+      toolNameMatches.add(tool.name)
     }
-    // 从标签中提取建议
+    
+    // 标签匹配 - 优先级较低，且排除已在工具名称中的
     tool.tags.forEach(tag => {
-      if (tag.toLowerCase().includes(query)) {
-        suggestions.add(tag)
+      if (tag.toLowerCase().includes(query) && !toolNameMatches.has(tag)) {
+        tagMatches.add(tag)
       }
     })
   })
   
-  return Array.from(suggestions).slice(0, 5)
+  // 合并结果：工具名称优先，然后是标签
+  const finalSuggestions = [
+    ...Array.from(toolNameMatches).slice(0, 3), // 最多3个工具名称
+    ...Array.from(tagMatches).slice(0, 2)       // 最多2个标签
+  ]
+  
+  return finalSuggestions.slice(0, 5) // 总共最多5个建议
 })
 
 // 初始化主题状态
@@ -238,7 +249,50 @@ const toggleDarkMode = () => {
   localStorage.setItem('theme', newTheme)
 }
 
-// 防抖处理搜索输入
+// 本地搜索建议状态 - 立即响应
+const localSearchQuery = ref('')
+
+// 同步props变化到本地状态
+watch(() => props.searchQuery, (newValue) => {
+  if (localSearchQuery.value !== newValue) {
+    localSearchQuery.value = newValue
+  }
+}, { immediate: true })
+
+const localSuggestions = computed(() => {
+  if (!localSearchQuery.value.trim()) return []
+  
+  const query = localSearchQuery.value.toLowerCase()
+  const suggestions = new Set<string>()
+  
+  // 优化搜索逻辑：优先匹配工具名称，然后匹配标签
+  const toolNameMatches = new Set<string>()
+  const tagMatches = new Set<string>()
+  
+  tools.forEach(tool => {
+    // 工具名称匹配 - 优先级更高
+    if (tool.name.toLowerCase().includes(query)) {
+      toolNameMatches.add(tool.name)
+    }
+    
+    // 标签匹配 - 优先级较低，且排除已在工具名称中的
+    tool.tags.forEach(tag => {
+      if (tag.toLowerCase().includes(query) && !toolNameMatches.has(tag)) {
+        tagMatches.add(tag)
+      }
+    })
+  })
+  
+  // 合并结果：工具名称优先，然后是标签
+  const finalSuggestions = [
+    ...Array.from(toolNameMatches).slice(0, 3), // 最多3个工具名称
+    ...Array.from(tagMatches).slice(0, 2)       // 最多2个标签
+  ]
+  
+  return finalSuggestions.slice(0, 5) // 总共最多5个建议
+})
+
+// 防抖处理搜索输入 - 减少延迟，避免删除冲突
 const debouncedSearch = (value: string) => {
   if (searchTimeout.value) {
     clearTimeout(searchTimeout.value)
@@ -247,17 +301,20 @@ const debouncedSearch = (value: string) => {
   isSearching.value = true
   
   searchTimeout.value = setTimeout(() => {
-    emit('update:searchQuery', value)
+    // 只有当本地状态和要更新的值一致时才更新父组件状态
+    if (localSearchQuery.value === value) {
+      emit('update:searchQuery', value)
+    }
     isSearching.value = false
-  }, 300) // 300ms 防抖延迟
+  }, 150) // 减少到150ms防抖延迟
 }
 
-// 处理搜索输入
+// 处理搜索输入 - v-model已自动更新localSearchQuery
 const handleSearchInput = (event: Event) => {
   const target = event.target as HTMLInputElement
   const value = target.value
   
-  // 立即更新本地显示
+  // 防抖更新父组件状态
   debouncedSearch(value)
 }
 
@@ -313,6 +370,8 @@ const handleClearSearch = () => {
     clearTimeout(searchTimeout.value)
   }
   
+  // 同时清空本地状态和父组件状态
+  localSearchQuery.value = ''
   emit('update:searchQuery', '')
   isSearching.value = false
   showSuggestions.value = false
