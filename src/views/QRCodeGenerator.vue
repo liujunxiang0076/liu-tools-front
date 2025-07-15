@@ -73,15 +73,16 @@
                         <!-- 正常显示模式 -->
                         <div 
                           v-if="editingTagId !== tag.id"
-                          class="badge badge-primary badge-lg gap-2 cursor-pointer hover:badge-secondary transition-all p-3 max-w-xs"
+                          class="tag-badge cursor-pointer transition-all"
+                          :class="getTagColorClass(tag, selectedTagId === tag.id)"
                           @dblclick="startEditingTag(tag)"
                           @click="selectTag(tag)"
                           :title="`双击编辑 • 单击选择生成二维码`"
                         >
-                          <span class="truncate flex-1 font-mono text-sm">{{ tag.content }}</span>
+                          <span class="truncate flex-1 font-mono text-xs">{{ tag.content }}</span>
                           <button 
                             @click.stop="deleteTag(tag.id)"
-                            class="opacity-0 group-hover:opacity-100 transition-opacity hover:text-error ml-1"
+                            class="delete-btn opacity-0 group-hover:opacity-100 transition-opacity ml-1"
                             title="删除"
                           >
                             ✕
@@ -91,16 +92,18 @@
                         <!-- 编辑模式 -->
                         <div 
                           v-else
-                          class="badge badge-warning badge-lg p-3 flex items-center"
+                          class="tag-badge transition-all border-dashed"
+                          :class="getTagColorClass(tag, selectedTagId === tag.id, true)"
                         >
                           <input 
                             v-model="editingContent"
                             @keyup.enter="saveTagEdit(tag)"
                             @keyup.escape="cancelTagEdit"
                             @blur="saveTagEdit(tag)"
-                            class="input input-xs bg-transparent border-none outline-none font-mono text-sm flex-1 min-w-0 p-0"
+                            class="bg-transparent border-none outline-none font-mono text-xs flex-1 min-w-0 placeholder-current"
+                            :class="getTagTextColorClass(tag)"
                             ref="tagEditInput"
-                            :style="{ width: Math.max(100, editingContent.length * 8) + 'px' }"
+                            :style="{ width: Math.max(60, editingContent.length * 7) + 'px' }"
                           />
                         </div>
                       </div>
@@ -484,6 +487,50 @@ const contentTypes: ContentType[] = [
   { id: 'sms', name: '短信', icon: '💬' }
 ]
 
+// 标签颜色配置
+const tagColors = [
+  {
+    light: { bg: 'bg-blue-100', border: 'border-blue-200', text: 'text-blue-800' },
+    dark: { bg: 'bg-blue-200', border: 'border-blue-400', text: 'text-blue-900' }
+  },
+  {
+    light: { bg: 'bg-green-100', border: 'border-green-200', text: 'text-green-800' },
+    dark: { bg: 'bg-green-200', border: 'border-green-400', text: 'text-green-900' }
+  },
+  {
+    light: { bg: 'bg-purple-100', border: 'border-purple-200', text: 'text-purple-800' },
+    dark: { bg: 'bg-purple-200', border: 'border-purple-400', text: 'text-purple-900' }
+  },
+  {
+    light: { bg: 'bg-pink-100', border: 'border-pink-200', text: 'text-pink-800' },
+    dark: { bg: 'bg-pink-200', border: 'border-pink-400', text: 'text-pink-900' }
+  },
+  {
+    light: { bg: 'bg-indigo-100', border: 'border-indigo-200', text: 'text-indigo-800' },
+    dark: { bg: 'bg-indigo-200', border: 'border-indigo-400', text: 'text-indigo-900' }
+  },
+  {
+    light: { bg: 'bg-teal-100', border: 'border-teal-200', text: 'text-teal-800' },
+    dark: { bg: 'bg-teal-200', border: 'border-teal-400', text: 'text-teal-900' }
+  },
+  {
+    light: { bg: 'bg-orange-100', border: 'border-orange-200', text: 'text-orange-800' },
+    dark: { bg: 'bg-orange-200', border: 'border-orange-400', text: 'text-orange-900' }
+  },
+  {
+    light: { bg: 'bg-red-100', border: 'border-red-200', text: 'text-red-800' },
+    dark: { bg: 'bg-red-200', border: 'border-red-400', text: 'text-red-900' }
+  },
+  {
+    light: { bg: 'bg-cyan-100', border: 'border-cyan-200', text: 'text-cyan-800' },
+    dark: { bg: 'bg-cyan-200', border: 'border-cyan-400', text: 'text-cyan-900' }
+  },
+  {
+    light: { bg: 'bg-emerald-100', border: 'border-emerald-200', text: 'text-emerald-800' },
+    dark: { bg: 'bg-emerald-200', border: 'border-emerald-400', text: 'text-emerald-900' }
+  }
+]
+
 // 内容数据
 const contentData = reactive({
   url: '',
@@ -615,6 +662,32 @@ const selectTag = (tag: TextTag) => {
   updateQRCode()
 }
 
+// 获取标签颜色类名
+const getTagColorClass = (tag: TextTag, isSelected: boolean, isEditing: boolean = false) => {
+  // 根据标签ID的哈希值确定颜色索引，确保同一标签始终使用同一颜色
+  const colorIndex = Math.abs(tag.id.split('').reduce((a, b) => {
+    return ((a << 5) - a + b.charCodeAt(0)) | 0
+  }, 0)) % tagColors.length
+  
+  const colorScheme = tagColors[colorIndex]
+  const colors = isSelected ? colorScheme.dark : colorScheme.light
+  
+  if (isEditing) {
+    return `${colors.bg} ${colors.border} ${colors.text} border-dashed`
+  }
+  return `${colors.bg} ${colors.border} ${colors.text} border-2 rounded-full`
+}
+
+const getTagTextColorClass = (tag: TextTag) => {
+  // 根据标签ID的哈希值确定颜色索引，确保同一标签始终使用同一颜色
+  const colorIndex = Math.abs(tag.id.split('').reduce((a, b) => {
+    return ((a << 5) - a + b.charCodeAt(0)) | 0
+  }, 0)) % tagColors.length
+  
+  const colorScheme = tagColors[colorIndex]
+  return colorScheme.light.text
+}
+
 const startEditingTag = (tag: TextTag) => {
   editingTagId.value = tag.id
   editingContent.value = tag.content
@@ -740,24 +813,51 @@ export default {
   transition: all 0.3s ease;
 }
 
-.tag-item .badge {
+/* 新的标签样式 */
+.tag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  border-width: 1px;
+  font-size: 0.75rem;
+  font-weight: 500;
   transition: all 0.2s ease;
+  max-width: 200px;
+  line-height: 1.2;
 }
 
-.tag-item:hover .badge {
+.tag-badge:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.tag-editing .badge {
-  background: hsl(var(--wa)) !important;
-  border-color: hsl(var(--wa)) !important;
+/* 选中状态的额外样式 */
+.tag-selected .tag-badge {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  transform: scale(1.02);
 }
 
-.tag-selected .badge {
-  background: hsl(var(--su)) !important;
-  border-color: hsl(var(--su)) !important;
-  box-shadow: 0 0 0 3px hsl(var(--su) / 0.3);
+/* 删除按钮样式 */
+.delete-btn {
+  border-radius: 50%;
+  width: 0.875rem;
+  height: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  line-height: 1;
+  transition: all 0.2s ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: rgb(239, 68, 68);
 }
 
 .qr-preview {
