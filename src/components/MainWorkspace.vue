@@ -189,7 +189,7 @@ import type { Tool } from '@/types'
 import ToolCard from './ToolCard.vue'
 import ToolDetailPanel from './ToolDetailPanel.vue'
 import { categories, tools, getToolsByCategory, searchTools } from '@/store/data'
-import { Message } from '@/utils/message'
+// import { Message } from '@/utils/message' // 暂时移除消息提示
 
 // Props
 const props = defineProps<{
@@ -380,11 +380,11 @@ const handleFavoriteToggle = (tool: Tool) => {
   if (index > -1) {
     // 取消收藏
     currentFavorites.splice(index, 1)
-    Message.success(`已取消收藏 ${tool.name}`)
+    // Message.success(`已取消收藏 ${tool.name}`) // 移除消息提示
   } else {
     // 添加收藏
     currentFavorites.push(tool.id)
-    Message.success(`已收藏 ${tool.name}`)
+    // Message.success(`已收藏 ${tool.name}`) // 移除消息提示
   }
   
   emit('update:favoriteIds', currentFavorites)
@@ -394,7 +394,7 @@ const handleFavoriteToggle = (tool: Tool) => {
 const handleToolUse = (tool: Tool) => {
   // 这里可以添加使用统计等逻辑
   emit('tool-select', tool)
-  Message.info(`正在打开 ${tool.name}...`)
+  // Message.info(`正在打开 ${tool.name}...`) // 移除消息提示
 }
 
 // 处理工具详情

@@ -249,7 +249,7 @@
 import { ref, computed, watch } from 'vue'
 import type { Tool } from '@/types'
 import { categories } from '@/store/data'
-import { Message } from '@/utils/message'
+// import { Message } from '@/utils/message' // 暂时移除消息提示
 
 // Props
 const props = defineProps<{
@@ -389,13 +389,11 @@ const handleToolUse = (tool: Tool) => {
 
 const handleRemoveFavorite = (tool: Tool) => {
   emit('remove-favorite', tool)
-  Message.success(`已取消收藏 ${tool.name}`)
 }
 
 const handleClearAll = () => {
   if (confirm(`确定要清空所有 ${props.favoriteTools.length} 个收藏吗？此操作不可撤销。`)) {
     emit('clear-all')
-    Message.success('已清空所有收藏')
   }
 }
 

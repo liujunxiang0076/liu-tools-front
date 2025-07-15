@@ -62,7 +62,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 
 import { categories, tools, getToolsByCategory } from '@/store/data'
 import type { Tool } from '@/types'
-import { Message } from '@/utils/message'
+// import { Message } from '@/utils/message' // 暂时移除消息提示
 
 // 响应式状态
 const searchQuery = ref('')
@@ -95,14 +95,14 @@ const handleToolSelect = (tool: Tool) => {
   // 这里可以实现真正的路由跳转
   if (tool.path) {
     // 示例：window.open(tool.path, '_blank')
-    Message.success(`正在打开 ${tool.name}...`)
+    // Message.success(`正在打开 ${tool.name}...`) // 暂时移除消息提示
     
     // 简单的页面跳转模拟
     setTimeout(() => {
-      Message.info(`${tool.name} 工具页面还在开发中，敬请期待！`)
+      // Message.info(`${tool.name} 工具页面还在开发中，敬请期待！`) // 暂时移除消息提示
     }, 500)
   } else {
-    Message.warning(`${tool.name} 暂未配置页面路径`)
+    // Message.warning(`${tool.name} 暂未配置页面路径`) // 暂时移除消息提示
   }
 }
 
@@ -117,13 +117,13 @@ const handleRemoveFavorite = (tool: Tool) => {
   if (index > -1) {
     currentFavorites.splice(index, 1)
     favoriteIds.value = currentFavorites
-    Message.success(`已取消收藏 ${tool.name}`)
+    // Message.success(`已取消收藏 ${tool.name}`) // 暂时移除消息提示
   }
 }
 
 const handleClearAllFavorites = () => {
   favoriteIds.value = []
-  Message.success('已清空所有收藏')
+  // Message.success('已清空所有收藏') // 暂时移除消息提示
 }
 
 // 切换侧边栏（移动端）

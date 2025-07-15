@@ -14,36 +14,36 @@ const mainLayoutRef = ref<InstanceType<typeof MainLayout>>()
 // 主题状态
 const theme = ref('light')
 
-// 消息状态
-const message = reactive({
-  show: false,
-  text: '',
-  type: 'success' as 'success' | 'error' | 'info'
-})
+// 消息状态 - 暂时移除
+// const message = reactive({
+//   show: false,
+//   text: '',
+//   type: 'success' as 'success' | 'error' | 'info'
+// })
 
-// 显示消息
-const showMessage = (text: string, type: 'success' | 'error' | 'info' = 'success', duration = 3000) => {
-  message.text = text
-  message.type = type
-  message.show = true
-  
-  setTimeout(() => {
-    message.show = false
-  }, duration)
-}
+// 显示消息 - 暂时移除
+// const showMessage = (text: string, type: 'success' | 'error' | 'info' = 'success', duration = 3000) => {
+//   message.text = text
+//   message.type = type
+//   message.show = true
+//   
+//   setTimeout(() => {
+//     message.show = false
+//   }, duration)
+// }
 
-// 获取消息样式类
-const getAlertClass = () => {
-  switch (message.type) {
-    case 'success':
-      return 'bg-green-500'
-    case 'error':
-      return 'bg-red-500'
-    case 'info':
-    default:
-      return 'bg-blue-500'
-  }
-}
+// 获取消息样式类 - 暂时移除
+// const getAlertClass = () => {
+//   switch (message.type) {
+//     case 'success':
+//       return 'bg-green-500'
+//     case 'error':
+//       return 'bg-red-500'
+//     case 'info':
+//     default:
+//       return 'bg-blue-500'
+//   }
+// }
 
 // 初始化主题
 const initializeTheme = () => {
@@ -79,8 +79,8 @@ const initializeApp = () => {
   // 初始化主题
   initializeTheme()
   
-  // 显示欢迎消息
-  showMessage('欢迎使用在线工具箱！', 'success', 3000)
+  // 显示欢迎消息 - 暂时移除
+  // showMessage('欢迎使用在线工具箱！', 'success', 3000)
 
   // 可以在这里添加其他应用级别的初始化逻辑
   // 例如：用户认证、主题设置、语言设置等
@@ -89,7 +89,7 @@ const initializeApp = () => {
 // 全局错误处理
 const handleGlobalError = (error: Error, instance: any, info: string) => {
   console.error('全局错误:', error, info)
-  showMessage('应用出现错误，请稍后重试', 'error', 5000)
+  // showMessage('应用出现错误，请稍后重试', 'error', 5000) // 暂时移除消息提示
 }
 
 // 组件挂载时的初始化
@@ -117,8 +117,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 消息提示动画 */
-.alert {
+/* 消息提示动画 - 暂时注释掉 */
+/* .alert {
   animation: slideInRight 0.3s ease-out;
 }
 
@@ -146,7 +146,7 @@ body {
     transform: translateX(100%);
     opacity: 0;
   }
-}
+} */
 
 /* 全局加载状态样式 */
 .app-loading {
