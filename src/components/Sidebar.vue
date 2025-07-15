@@ -49,7 +49,7 @@
         <!-- 右侧按钮组：收藏数量徽章 + 管理收藏按钮 -->
         <div class="flex items-center gap-2">
           <!-- 收藏数量徽章 -->
-          <div class="badge badge-primary badge-sm">
+          <div class="badge badge-error badge-sm">
             {{ favoriteTools.length }}
           </div>
           

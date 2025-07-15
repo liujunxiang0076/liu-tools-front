@@ -567,7 +567,7 @@ body {
   border: none;
   background: hsl(var(--b1) / 0.9);
   backdrop-filter: blur(8px);
-  color: hsl(var(--bc) / 0.6);
+  color: #ef4444; /* 直接使用红色 red-500 */
   cursor: pointer;
   transition: all 0.15s ease;
   display: flex;
@@ -588,15 +588,15 @@ body {
 
 /* 列表视图收藏按钮悬停效果 */
 .tool-list-item .favorite-btn:hover {
-  color: hsl(var(--er));
-  background: hsl(var(--er) / 0.1);
+  color: #dc2626; /* 更深的红色 red-600 */
+  background: rgba(239, 68, 68, 0.1); /* red-500/10 */
   transform: scale(1.1);
 }
 
 /* 列表视图已收藏状态 */
 .tool-list-item .favorite-btn.favorited {
-  color: hsl(var(--er));
-  background: hsl(var(--er) / 0.1);
+  color: #ef4444; /* 红色 red-500 */
+  background: rgba(239, 68, 68, 0.1); /* red-500/10 */
   opacity: 1;
   transform: scale(1);
 }
@@ -846,7 +846,7 @@ body {
   border: none;
   background: hsl(var(--b1) / 0.9);
   backdrop-filter: blur(8px);
-  color: hsl(var(--bc) / 0.6);
+  color: #ef4444; /* 直接使用红色 red-500 */
   cursor: pointer;
   transition: all 0.15s ease; /* 优化切换速度 */
   display: flex;
@@ -867,15 +867,15 @@ body {
 
 /* 收藏按钮悬停效果 */
 .favorite-btn:hover {
-  color: hsl(var(--er)); /* 红色 */
-  background: hsl(var(--er) / 0.1);
+  color: #dc2626; /* 更深的红色 red-600 */
+  background: rgba(239, 68, 68, 0.1); /* red-500/10 */
   transform: scale(1.1);
 }
 
 /* 已收藏状态 */
 .favorite-btn.favorited {
-  color: hsl(var(--er)); /* 红色 */
-  background: hsl(var(--er) / 0.1);
+  color: #ef4444; /* 红色 red-500 */
+  background: rgba(239, 68, 68, 0.1); /* red-500/10 */
   /* 已收藏时始终显示 */
   opacity: 1;
   transform: scale(1);
