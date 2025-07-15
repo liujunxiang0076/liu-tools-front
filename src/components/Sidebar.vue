@@ -9,8 +9,8 @@
     </div>
 
     <!-- 分类菜单 -->
-    <div class="flex-1 overflow-y-auto p-4">
-      <nav class="space-y-1">
+    <div class="flex-1 overflow-y-auto px-4 pb-2">
+      <nav class="space-y-1 py-2">
         <div 
           v-for="category in categories"
           :key="category.id"
@@ -42,8 +42,8 @@
     </div>
 
     <!-- 收藏区域：优化后的显示 -->
-    <div v-if="favoriteTools.length > 0" class="border-t border-base-200 p-4">
-      <div class="flex items-center justify-between mb-3">
+    <div v-if="favoriteTools.length > 0" class="border-t border-base-200 px-4 py-3 flex-shrink-0">
+      <div class="flex items-center justify-between mb-2">
         <h3 class="text-sm font-semibold text-base-content/70">我的收藏</h3>
         
         <!-- 右侧按钮组：收藏数量徽章 + 管理收藏按钮 -->
@@ -68,7 +68,7 @@
         </div>
       </div>
       
-      <div class="space-y-2">
+      <div class="space-y-1.5">
         <!-- 显示最多3个收藏工具，按最先收藏的顺序 -->
         <div 
           v-for="tool in visibleFavorites"
@@ -76,16 +76,16 @@
           @click="emit('tool-select', tool)"
           class="favorite-tool-card group"
         >
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2.5">
             <!-- 工具图标 -->
-            <span class="text-lg flex-shrink-0">{{ tool.icon }}</span>
+            <span class="text-base flex-shrink-0">{{ tool.icon }}</span>
             
             <!-- 工具信息 -->
             <div class="flex-1 min-w-0">
               <div class="text-sm font-medium text-base-content truncate">
                 {{ tool.name }}
               </div>
-              <div class="flex items-center gap-2 mt-1">
+              <div class="flex items-center gap-1.5 mt-0.5">
                 <!-- 添加分类徽章 -->
                 <div :class="['badge badge-xs badge-outline', getCategoryBadgeClass(tool.category)]">
                   {{ getCategoryName(tool.category) }}
@@ -111,9 +111,9 @@
     </div>
 
     <!-- 空收藏状态：优化后的引导 -->
-    <div v-else class="border-t border-base-200 p-4">
-      <div class="text-center py-4">
-        <div class="text-2xl mb-2">❤️</div>
+    <div v-else class="border-t border-base-200 px-4 py-3 flex-shrink-0">
+      <div class="text-center py-3">
+        <div class="text-xl mb-2">❤️</div>
         <div class="text-sm text-base-content/60 mb-1">
           还没有收藏的工具
         </div>

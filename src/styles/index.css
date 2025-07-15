@@ -372,15 +372,16 @@ body {
 }
 
 .sidebar-header {
-  padding: 1.5rem; /* 保持24px内边距 */
+  padding: 1.25rem 1.5rem; /* 减少顶部和底部内边距：20px 24px */
   border-bottom: 1px solid hsl(var(--b3));
+  flex-shrink: 0; /* 防止头部被压缩 */
 }
 
 .sidebar-title {
   font-size: 1.125rem; /* 18像素 */
   font-weight: 600; /* 半粗体 */
   color: hsl(var(--bc));
-  margin: 0 0 1rem 0; /* 底部间距16像素 */
+  margin: 0 0 0.75rem 0; /* 减少底部间距到12像素 */
 }
 
 .tools-count-badge {
@@ -997,17 +998,19 @@ body {
   gap: 1rem;
 }
 
-/* 收藏工具卡片 - 新配色规范 */
+/* 收藏工具卡片 - 新配色规范，优化空间利用 */
 .favorite-tool-card {
   background: #ffffff; /* 纯白色背景 */
   border: 1px solid hsl(var(--b3) / 0.8);
-  border-radius: 0.75rem;
-  padding: 0.75rem;
+  border-radius: 0.5rem; /* 减少圆角到8px */
+  padding: 0.5rem; /* 减少内边距到8px */
   transition: all 0.15s ease;
   cursor: pointer;
   box-shadow: 
-    0 2px 6px rgba(0, 0, 0, 0.08),
-    0 1px 3px rgba(0, 0, 0, 0.06);
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 1px 2px rgba(0, 0, 0, 0.04);
+  /* 限制最小高度，提高空间利用率 */
+  min-height: 2.75rem; /* 44px 最小高度 */
 }
 
 /* 深色模式收藏工具卡片 - 暗灰色背景 */
