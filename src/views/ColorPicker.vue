@@ -551,6 +551,7 @@ input[type="color"]:active {
   }
   
   .input[type="number"] {
+    appearance: none;
     -webkit-appearance: none;
     -moz-appearance: textfield;
   }
