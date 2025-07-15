@@ -2,7 +2,7 @@
   "name": "liu-tools-front",
   "version": "1.0.0",
   "type": "module",
-  "description": "",
+  "description": "一个基于 Vue 3 + TypeScript + Vite + DaisyUI 的现代化在线工具箱",
   "main": "index.js",
   "scripts": {
     "dev": "vite",
@@ -10,9 +10,32 @@
     "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "vue3",
+    "typescript",
+    "vite",
+    "daisyui",
+    "tools",
+    "online-tools",
+    "json-formatter",
+    "base64",
+    "md5",
+    "timestamp",
+    "regex",
+    "password-generator",
+    "qr-code",
+    "color-picker"
+  ],
+  "author": "Your Name",
   "license": "ISC",
+  "homepage": "https://liu-tools-front.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/liu-tools-front.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/liu-tools-front/issues"
+  },
   "packageManager": "pnpm@10.13.1",
   "devDependencies": {
     "@types/node": "^24.0.10",
