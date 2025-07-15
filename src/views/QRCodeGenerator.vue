@@ -673,9 +673,9 @@ const getTagColorClass = (tag: TextTag, isSelected: boolean, isEditing: boolean 
   const colors = isSelected ? colorScheme.dark : colorScheme.light
   
   if (isEditing) {
-    return `${colors.bg} ${colors.border} ${colors.text} border-dashed`
+    return `${colors.bg} border-dashed ${colors.text}`
   }
-  return `${colors.bg} ${colors.border} ${colors.text} border-2 rounded-full`
+  return `${colors.bg} ${colors.border} ${colors.text}`
 }
 
 const getTagTextColorClass = (tag: TextTag) => {
