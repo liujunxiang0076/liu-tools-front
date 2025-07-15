@@ -122,7 +122,7 @@
                             @blur="saveTagEdit(tag)"
                             class="bg-transparent border-none outline-none font-mono text-xs flex-1 min-w-0 placeholder-current"
                             :class="getTagTextColorClass(tag)"
-                            :ref="el => { if (el && editingTagId === tag.id) tagEditInputRef = el }"
+                            ref="tagEditInput"
                             :style="{ width: Math.max(60, editingContent.length * 7) + 'px' }"
                           />
                         </div>
@@ -138,7 +138,7 @@
                         @blur="handleAddTagBlur"
                         class="input input-bordered input-sm w-full font-mono text-sm"
                         placeholder="输入文本内容，回车确认，ESC取消..."
-                        :ref="el => { if (el) newTagInputRef = el }"
+                        ref="newTagInput"
                       />
                     </div>
                     
@@ -488,10 +488,6 @@ const newTagContent = ref<string>('')
 // 文本标签数据
 const textTags = ref<TextTag[]>([])
 
-// 添加编辑输入框的ref
-const tagEditInputRef = ref<HTMLInputElement | null>(null)
-const newTagInputRef = ref<HTMLInputElement | null>(null)
-
 // 内容类型配置
 const contentTypes: ContentType[] = [
   { id: 'text', name: '文本', icon: '📝' },
@@ -502,47 +498,97 @@ const contentTypes: ContentType[] = [
   { id: 'sms', name: '短信', icon: '💬' }
 ]
 
-// 标签颜色配置
+// 标签颜色配置 - 重新设计更美观的颜色方案
 const tagColors = [
   {
-    light: { bg: 'bg-blue-100', border: 'border-blue-200', text: 'text-blue-800' },
-    dark: { bg: 'bg-blue-200', border: 'border-blue-400', text: 'text-blue-900' }
+    name: 'blue',
+    bg: 'bg-blue-500',
+    text: 'text-blue-500',
+    border: 'border-blue-500'
   },
   {
-    light: { bg: 'bg-green-100', border: 'border-green-200', text: 'text-green-800' },
-    dark: { bg: 'bg-green-200', border: 'border-green-400', text: 'text-green-900' }
+    name: 'emerald', 
+    bg: 'bg-emerald-500',
+    text: 'text-emerald-500',
+    border: 'border-emerald-500'
   },
   {
-    light: { bg: 'bg-purple-100', border: 'border-purple-200', text: 'text-purple-800' },
-    dark: { bg: 'bg-purple-200', border: 'border-purple-400', text: 'text-purple-900' }
+    name: 'purple',
+    bg: 'bg-purple-500', 
+    text: 'text-purple-500',
+    border: 'border-purple-500'
   },
   {
-    light: { bg: 'bg-pink-100', border: 'border-pink-200', text: 'text-pink-800' },
-    dark: { bg: 'bg-pink-200', border: 'border-pink-400', text: 'text-pink-900' }
+    name: 'pink',
+    bg: 'bg-pink-500',
+    text: 'text-pink-500', 
+    border: 'border-pink-500'
   },
   {
-    light: { bg: 'bg-indigo-100', border: 'border-indigo-200', text: 'text-indigo-800' },
-    dark: { bg: 'bg-indigo-200', border: 'border-indigo-400', text: 'text-indigo-900' }
+    name: 'amber',
+    bg: 'bg-amber-500',
+    text: 'text-amber-500',
+    border: 'border-amber-500'
   },
   {
-    light: { bg: 'bg-teal-100', border: 'border-teal-200', text: 'text-teal-800' },
-    dark: { bg: 'bg-teal-200', border: 'border-teal-400', text: 'text-teal-900' }
+    name: 'cyan',
+    bg: 'bg-cyan-500',
+    text: 'text-cyan-500',
+    border: 'border-cyan-500'
   },
   {
-    light: { bg: 'bg-orange-100', border: 'border-orange-200', text: 'text-orange-800' },
-    dark: { bg: 'bg-orange-200', border: 'border-orange-400', text: 'text-orange-900' }
+    name: 'rose',
+    bg: 'bg-rose-500',
+    text: 'text-rose-500',
+    border: 'border-rose-500'
   },
   {
-    light: { bg: 'bg-red-100', border: 'border-red-200', text: 'text-red-800' },
-    dark: { bg: 'bg-red-200', border: 'border-red-400', text: 'text-red-900' }
+    name: 'violet',
+    bg: 'bg-violet-500',
+    text: 'text-violet-500',
+    border: 'border-violet-500'
   },
   {
-    light: { bg: 'bg-cyan-100', border: 'border-cyan-200', text: 'text-cyan-800' },
-    dark: { bg: 'bg-cyan-200', border: 'border-cyan-400', text: 'text-cyan-900' }
+    name: 'lime',
+    bg: 'bg-lime-500',
+    text: 'text-lime-500',
+    border: 'border-lime-500'
   },
   {
-    light: { bg: 'bg-emerald-100', border: 'border-emerald-200', text: 'text-emerald-800' },
-    dark: { bg: 'bg-emerald-200', border: 'border-emerald-400', text: 'text-emerald-900' }
+    name: 'orange',
+    bg: 'bg-orange-500',
+    text: 'text-orange-500',
+    border: 'border-orange-500'
+  },
+  {
+    name: 'teal',
+    bg: 'bg-teal-500',
+    text: 'text-teal-500',
+    border: 'border-teal-500'
+  },
+  {
+    name: 'indigo',
+    bg: 'bg-indigo-500',
+    text: 'text-indigo-500',
+    border: 'border-indigo-500'
+  },
+  {
+    name: 'fuchsia',
+    bg: 'bg-fuchsia-500',
+    text: 'text-fuchsia-500',
+    border: 'border-fuchsia-500'
+  },
+  {
+    name: 'green',
+    bg: 'bg-green-500',
+    text: 'text-green-500',
+    border: 'border-green-500'
+  },
+  {
+    name: 'red',
+    bg: 'bg-red-500',
+    text: 'text-red-500',
+    border: 'border-red-500'
   }
 ]
 
@@ -635,8 +681,9 @@ const startAddingTag = () => {
   newTagContent.value = ''
   nextTick(() => {
     setTimeout(() => {
-      if (newTagInputRef.value) {
-        newTagInputRef.value.focus()
+      const input = document.querySelector('input[ref="newTagInput"]') as HTMLInputElement
+      if (input) {
+        input.focus()
       }
     }, 10)
   })
@@ -677,7 +724,7 @@ const handleAddTagBlur = () => {
 const cancelAddTag = () => {
   isAddingTag.value = false
   newTagContent.value = ''
-  newTagInputRef.value = null
+  // newTagInputRef.value = null // This ref is removed
 }
 
 const selectTag = (tag: TextTag) => {
@@ -693,22 +740,24 @@ const getTagColorClass = (tag: TextTag, isSelected: boolean, isEditing: boolean 
   }, 0)) % tagColors.length
   
   const colorScheme = tagColors[colorIndex]
-  const colors = isSelected ? colorScheme.dark : colorScheme.light
   
   if (isEditing) {
-    return `${colors.bg} border-dashed ${colors.text}`
+    // 编辑状态：使用彩色背景和白色文字
+    return `${colorScheme.bg} ${colorScheme.border} text-white`
   }
-  return `${colors.bg} ${colors.border} ${colors.text}`
+  
+  // 选中状态：深色背景 + 白色文字
+  // 未选中状态：透明背景 + 彩色文字
+  if (isSelected) {
+    return `${colorScheme.bg} ${colorScheme.border} text-white shadow-sm`
+  } else {
+    return `bg-transparent ${colorScheme.border} border-opacity-40 ${colorScheme.text}`
+  }
 }
 
 const getTagTextColorClass = (tag: TextTag) => {
-  // 根据标签ID的哈希值确定颜色索引，确保同一标签始终使用同一颜色
-  const colorIndex = Math.abs(tag.id.split('').reduce((a, b) => {
-    return ((a << 5) - a + b.charCodeAt(0)) | 0
-  }, 0)) % tagColors.length
-  
-  const colorScheme = tagColors[colorIndex]
-  return colorScheme.light.text
+  // 编辑时使用白色文字以确保在彩色背景上清晰可见
+  return 'text-white'
 }
 
 const startEditingTag = (tag: TextTag) => {
@@ -719,11 +768,12 @@ const startEditingTag = (tag: TextTag) => {
   nextTick(() => {
     // 使用setTimeout确保ref已经正确设置
     setTimeout(() => {
-      if (tagEditInputRef.value) {
-        tagEditInputRef.value.focus()
+      const input = document.querySelector('input[ref="tagEditInput"]') as HTMLInputElement
+      if (input) {
+        input.focus()
         // 将光标定位到文本末尾
-        const length = tagEditInputRef.value.value.length
-        tagEditInputRef.value.setSelectionRange(length, length)
+        const length = input.value.length
+        input.setSelectionRange(length, length)
       }
     }, 10)
   })
@@ -740,7 +790,7 @@ const saveTagEdit = (tag: TextTag) => {
 const cancelTagEdit = () => {
   editingTagId.value = ''
   editingContent.value = ''
-  tagEditInputRef.value = null
+  // tagEditInputRef.value = null // This ref is removed
 }
 
 const deleteTag = (tagId: string) => {
@@ -938,8 +988,19 @@ export default {
 
 /* 选中状态的额外样式 */
 .tag-selected .tag-badge {
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
   transform: scale(1.02);
+  transition: all 0.2s ease;
+}
+
+/* 未选中状态的标签 */
+.tag-item:not(.tag-selected) .tag-badge {
+  transition: all 0.2s ease;
+  background-color: transparent !important;
+}
+
+.tag-item:not(.tag-selected):hover .tag-badge {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  border-opacity: 0.6 !important;
 }
 
 /* 删除按钮样式 */
