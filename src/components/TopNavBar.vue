@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar toolbar fade-in">
     <!-- Logo 品牌区域 -->
-    <div class="navbar-start flex-none">
+    <div class="navbar-start">
       <div class="flex items-center gap-4">
         <!-- 移动端菜单按钮 -->
         <div class="dropdown lg:hidden">
@@ -32,8 +32,8 @@
     </div>
 
     <!-- 中间搜索区域 -->
-    <div class="flex-1 mx-4 lg:mx-6 xl:mx-8" style="max-width: 16rem;">
-      <div class="form-control w-full">
+    <div class="navbar-center">
+      <div class="form-control w-full max-w-xs">
         <div class="relative">
           <!-- 搜索图标在左侧内部，距离左边16像素 -->
           <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-base-content/40 pointer-events-none">
@@ -97,7 +97,7 @@
     </div>
 
     <!-- 右侧控制区 -->
-    <div class="navbar-end flex-none">
+    <div class="navbar-end">
       <div class="flex items-center gap-3">
         <!-- 视图切换按钮组 -->
         <div class="view-toggle">
