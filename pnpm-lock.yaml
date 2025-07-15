@@ -27,6 +27,9 @@ importers:
       '@types/node':
         specifier: ^24.0.10
         version: 24.0.10
+      '@types/qrcode':
+        specifier: ^1.5.5
+        version: 1.5.5
       autoprefixer:
         specifier: ^10.4.21
         version: 10.4.21(postcss@8.5.6)
@@ -366,6 +369,9 @@ packages:
 
   '@types/node@24.0.10':
     resolution: {integrity: sha512-ENHwaH+JIRTDIEEbDK6QSQntAYGtbvdDXnMXnZaZ6k13Du1dPMmprkEHIL7ok2Wl2aZevetwTAb5S+7yIF+enA==}
+
+  '@types/qrcode@1.5.5':
+    resolution: {integrity: sha512-CdfBi/e3Qk+3Z/fXYShipBT13OJ2fDO2Q2w5CIP5anLTLIndQG9z6P1cnm+8zCWSpm5dnxMFd/uREtb0EXuQzg==}
 
   '@types/web-bluetooth@0.0.16':
     resolution: {integrity: sha512-oh8q2Zc32S6gd/j50GowEjKLoOVOwHP/bWVjKJInBwQqdOYMdPrf1oVlelTlyfFK3CKxL1uahMDAr+vy8T7yMQ==}
@@ -1399,6 +1405,10 @@ snapshots:
   '@types/node@24.0.10':
     dependencies:
       undici-types: 7.8.0
+
+  '@types/qrcode@1.5.5':
+    dependencies:
+      '@types/node': 24.0.10
 
   '@types/web-bluetooth@0.0.16':
     optional: true

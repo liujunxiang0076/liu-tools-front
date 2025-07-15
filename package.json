@@ -16,6 +16,7 @@
   "packageManager": "pnpm@10.13.1",
   "devDependencies": {
     "@types/node": "^24.0.10",
+    "@types/qrcode": "^1.5.5",
     "autoprefixer": "^10.4.21",
     "daisyui": "^5.0.46",
     "postcss": "^8.5.6",
