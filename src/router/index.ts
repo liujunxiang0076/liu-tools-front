@@ -9,6 +9,8 @@ import JsonFormatter from '@/views/JsonFormatter.vue'
 import Base64Tool from '@/views/Base64Tool.vue'
 import MD5Tool from '@/views/MD5Tool.vue'
 import TimestampTool from '@/views/TimestampTool.vue'
+import RegexTool from '@/views/RegexTool.vue'
+import PasswordGenerator from '@/views/PasswordGenerator.vue'
 
 // 定义路由
 const routes: RouteRecordRaw[] = [
@@ -61,6 +63,16 @@ const routes: RouteRecordRaw[] = [
         path: 'timestamp',
         name: 'ToolTimestamp',
         component: TimestampTool
+      },
+      {
+        path: 'regex-test',
+        name: 'ToolRegexTest',
+        component: RegexTool
+      },
+      {
+        path: 'password-generator',
+        name: 'ToolPasswordGenerator',
+        component: PasswordGenerator
       }
     ]
   },
