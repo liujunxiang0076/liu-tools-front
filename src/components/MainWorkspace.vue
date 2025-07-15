@@ -85,55 +85,58 @@
               </svg>
             </button>
 
-            <div class="flex items-center gap-4">
-              <!-- 工具图标 -->
-              <div class="flex-shrink-0">
-                <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl">
-                  {{ tool.icon }}
+            <!-- 工具图标 -->
+            <div class="flex-shrink-0">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl">
+                {{ tool.icon }}
+              </div>
+            </div>
+            
+            <!-- 工具信息 -->
+            <div class="tool-content">
+              <div class="flex items-center gap-3 mb-2">
+                <h3 class="tool-title truncate">
+                  {{ tool.name }}
+                </h3>
+                <div :class="['category-tag', tool.category, 'flex-shrink-0']">
+                  {{ getCategoryName(tool.category) }}
                 </div>
               </div>
               
-              <!-- 工具信息 -->
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-3 mb-2">
-                  <h3 class="text-lg font-semibold text-base-content truncate">
-                    {{ tool.name }}
-                  </h3>
-                  <div :class="['category-tag', tool.category, 'flex-shrink-0']">
-                    {{ getCategoryName(tool.category) }}
-                  </div>
-                </div>
-                
-                <p class="text-sm text-base-content/70 line-clamp-2 mb-2">
-                  {{ tool.description }}
-                </p>
-                
-                <!-- 标签 -->
-                <div class="flex flex-wrap gap-1">
-                  <span 
-                    v-for="tag in tool.tags.slice(0, 4)" 
-                    :key="tag"
-                    class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-base-200 text-base-content/60"
-                  >
-                    {{ tag }}
-                  </span>
-                  <span 
-                    v-if="tool.tags.length > 4"
-                    class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-base-200 text-base-content/40"
-                  >
-                    +{{ tool.tags.length - 4 }}
-                  </span>
-                </div>
+              <p class="tool-description line-clamp-2">
+                {{ tool.description }}
+              </p>
+              
+              <!-- 标签 -->
+              <div class="flex flex-wrap gap-1 mb-3">
+                <span 
+                  v-for="tag in tool.tags.slice(0, 4)" 
+                  :key="tag"
+                  class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-base-200 text-base-content/60"
+                >
+                  {{ tag }}
+                </span>
+                <span 
+                  v-if="tool.tags.length > 4"
+                  class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-base-200 text-base-content/40"
+                >
+                  +{{ tool.tags.length - 4 }}
+                </span>
               </div>
               
               <!-- 操作按钮 -->
-              <div class="flex items-center gap-2 flex-shrink-0">
-                <!-- 使用按钮 -->
+              <div class="action-buttons">
                 <button 
                   @click.stop="handleToolUse(tool)"
                   class="action-btn primary"
                 >
                   立即使用
+                </button>
+                <button 
+                  @click.stop="handleToolDetails(tool)"
+                  class="action-btn secondary"
+                >
+                  详情
                 </button>
               </div>
             </div>
