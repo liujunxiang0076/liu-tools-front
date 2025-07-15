@@ -53,9 +53,20 @@
               <div class="space-y-4">
                 <!-- 文本类型 - 新的标签式设计 -->
                 <div v-show="currentType === 'text'">
-                  <label class="label">
-                    <span class="label-text font-medium">文本内容</span>
-                  </label>
+                  <div class="flex items-center justify-between mb-2">
+                    <label class="label p-0">
+                      <span class="label-text font-medium">文本内容</span>
+                    </label>
+                    <!-- 清空按钮移动到这里 -->
+                    <button 
+                      v-if="textTags.length > 0"
+                      @click="clearAllTags"
+                      class="btn btn-ghost btn-sm text-red-500 hover:text-red-600 hover:bg-red-50 px-2 py-1 h-auto min-h-0"
+                      title="清空所有标签"
+                    >
+                      🗑️ 清空所有标签
+                    </button>
+                  </div>
                   
                   <!-- 标签容器 -->
                   <div class="min-h-32 p-4 bg-base-100 rounded-lg border-2 border-base-300 focus-within:border-primary transition-colors">
@@ -111,7 +122,7 @@
                             @blur="saveTagEdit(tag)"
                             class="bg-transparent border-none outline-none font-mono text-xs flex-1 min-w-0 placeholder-current"
                             :class="getTagTextColorClass(tag)"
-                            ref="tagEditInput"
+                            :ref="el => { if (el && editingTagId === tag.id) tagEditInputRef = el }"
                             :style="{ width: Math.max(60, editingContent.length * 7) + 'px' }"
                           />
                         </div>
@@ -127,7 +138,7 @@
                         @blur="handleAddTagBlur"
                         class="input input-bordered input-sm w-full font-mono text-sm"
                         placeholder="输入文本内容，回车确认，ESC取消..."
-                        ref="newTagInput"
+                        :ref="el => { if (el) newTagInputRef = el }"
                       />
                     </div>
                     
@@ -306,16 +317,7 @@
                   </button>
                 </div>
                 
-                <!-- 文本类型的操作按钮 -->
-                <div class="flex gap-2 pt-4" v-if="currentType === 'text'">
-                  <button 
-                    class="btn btn-outline flex-1"
-                    @click="clearAllTags"
-                    :disabled="textTags.length === 0"
-                  >
-                    🗑️ 清空所有标签
-                  </button>
-                </div>
+                <!-- 移除原来的文本类型操作按钮区域 -->
               </div>
             </div>
           </div>
@@ -486,6 +488,10 @@ const newTagContent = ref<string>('')
 // 文本标签数据
 const textTags = ref<TextTag[]>([])
 
+// 添加编辑输入框的ref
+const tagEditInputRef = ref<HTMLInputElement | null>(null)
+const newTagInputRef = ref<HTMLInputElement | null>(null)
+
 // 内容类型配置
 const contentTypes: ContentType[] = [
   { id: 'text', name: '文本', icon: '📝' },
@@ -628,10 +634,11 @@ const startAddingTag = () => {
   isAddingTag.value = true
   newTagContent.value = ''
   nextTick(() => {
-    const input = document.querySelector('input[ref="newTagInput"]') as HTMLInputElement
-    if (input) {
-      input.focus()
-    }
+    setTimeout(() => {
+      if (newTagInputRef.value) {
+        newTagInputRef.value.focus()
+      }
+    }, 10)
   })
 }
 
@@ -670,6 +677,7 @@ const handleAddTagBlur = () => {
 const cancelAddTag = () => {
   isAddingTag.value = false
   newTagContent.value = ''
+  newTagInputRef.value = null
 }
 
 const selectTag = (tag: TextTag) => {
@@ -706,12 +714,18 @@ const getTagTextColorClass = (tag: TextTag) => {
 const startEditingTag = (tag: TextTag) => {
   editingTagId.value = tag.id
   editingContent.value = tag.content
+  
+  // 使用nextTick确保DOM更新完成后再聚焦
   nextTick(() => {
-    const input = document.querySelector('input[ref="tagEditInput"]') as HTMLInputElement
-    if (input) {
-      input.focus()
-      input.select()
-    }
+    // 使用setTimeout确保ref已经正确设置
+    setTimeout(() => {
+      if (tagEditInputRef.value) {
+        tagEditInputRef.value.focus()
+        // 将光标定位到文本末尾
+        const length = tagEditInputRef.value.value.length
+        tagEditInputRef.value.setSelectionRange(length, length)
+      }
+    }, 10)
   })
 }
 
@@ -726,6 +740,7 @@ const saveTagEdit = (tag: TextTag) => {
 const cancelTagEdit = () => {
   editingTagId.value = ''
   editingContent.value = ''
+  tagEditInputRef.value = null
 }
 
 const deleteTag = (tagId: string) => {
