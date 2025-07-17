@@ -77,14 +77,12 @@
                       <div 
                         v-for="(tag, index) in textTags" 
                         :key="tag.id"
-                        :data-tag-id="tag.id"
                         class="tag-item group"
                         :class="{ 
                           'tag-editing': editingTagId === tag.id,
                           'tag-selected': selectedTagId === tag.id,
                           'tag-dragging': dragState.draggedId === tag.id,
-                          'tag-drop-target': dragState.dropTargetIndex === index,
-                          'tag-highlighted': highlightedTagId === tag.id
+                          'tag-drop-target': dragState.dropTargetIndex === index
                         }"
                         :draggable="editingTagId !== tag.id"
                         @dragstart="handleDragStart($event, tag, index)"
@@ -497,7 +495,6 @@ const editingTagId = ref<string>('')
 const editingContent = ref<string>('')
 const isAddingTag = ref<boolean>(false)
 const newTagContent = ref<string>('')
-const highlightedTagId = ref<string>('') // 用于高亮闪烁效果
 
 // 文本标签数据
 const textTags = ref<TextTag[]>([])
@@ -716,9 +713,6 @@ const addNewTag = () => {
     if (existingTag) {
       // 如果存在相同内容，聚焦到已存在的标签
       selectedTagId.value = existingTag.id
-      
-      // 添加视觉反馈 - 高亮闪烁效果
-      highlightExistingTag(existingTag.id)
       
       // 可选：显示提示信息
       console.log(`💡 内容"${trimmedContent}"已存在，已自动选择现有标签并生成二维码`)
@@ -1024,28 +1018,6 @@ const handleDragEnd = () => {
   })
 }
 
-// 高亮闪烁效果
-const highlightExistingTag = (tagId: string) => {
-  highlightedTagId.value = tagId
-  
-  // 滚动到标签位置（如果需要）
-  nextTick(() => {
-    const tagElement = document.querySelector(`[data-tag-id="${tagId}"]`)
-    if (tagElement) {
-      tagElement.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'nearest',
-        inline: 'center'
-      })
-    }
-  })
-  
-  // 清除高亮效果
-  setTimeout(() => {
-    highlightedTagId.value = ''
-  }, 1000) // 与动画时间保持一致
-}
-
 // 二维码Canvas引用
 const qrCanvas = ref<HTMLCanvasElement | null>(null)
 
@@ -1116,49 +1088,6 @@ export default {
 <style scoped>
 .qrcode-generator-container {
   min-height: 100vh;
-}
-
-/* 标签高亮闪烁效果 */
-.tag-highlighted {
-  animation: highlightPulse 1s ease-in-out;
-  z-index: 10; /* 确保高亮标签在其他标签之上 */
-}
-
-@keyframes highlightPulse {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
-  }
-  20% {
-    transform: scale(1.02);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
-  }
-  40% {
-    transform: scale(1.04);
-    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.2);
-  }
-  60% {
-    transform: scale(1.02);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-  }
-  80% {
-    transform: scale(1.01);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
-  }
-}
-
-/* 高亮时的标签样式增强 - 只增强边框，不改变颜色 */
-.tag-highlighted .tag-badge {
-  border-color: #3b82f6 !important;
-  border-width: 2px !important;
-  box-shadow: 
-    0 0 15px rgba(59, 130, 246, 0.3),
-    0 0 30px rgba(59, 130, 246, 0.1);
-  transition: all 0.3s ease;
 }
 
 /* 标签容器优化 */
