@@ -1,6 +1,6 @@
-# 刘工具箱 - 在线工具集合
+# 刘工具箱 - 现代化在线工具集合
 
-一个基于 Vue 3 + TypeScript + Vite + DaisyUI 的现代化在线工具箱。
+一个基于 Vue 3 + TypeScript + Vite + DaisyUI 的现代化在线工具箱，提供丰富的日常开发和办公工具。
 
 ## 🚀 一键部署
 
@@ -33,134 +33,152 @@ pnpm build
 pnpm preview
 ```
 
-## ✨ 特性
+## ✨ 核心特性
 
-- 🎨 现代化的玻璃质感设计
-- 🌙 深色/浅色主题切换
-- 📱 完全响应式设计，支持移动端
-- 🔍 智能搜索功能，支持实时建议
-- ❤️ 工具收藏功能
-- 🎯 分类浏览和排序
-- ⚡ **渐进式滚动模糊效果** - 页面向上滚动时工具区域头部自动添加动态毛玻璃模糊背景
-- 🚀 基于 Vite 的快速开发体验
+### 🎨 现代化设计
+- **玻璃质感UI** - 采用现代毛玻璃设计风格，视觉层次丰富
+- **深色/浅色主题** - 完整的双主题支持，自动适应系统偏好
+- **响应式布局** - 完美适配桌面端、平板和移动设备
+- **品牌渐变** - 蓝色到紫色的品牌渐变色彩系统
 
-## 🛠️ 工具列表
+### 🔍 智能交互
+- **实时搜索** - 支持工具名称、描述、标签的全文搜索
+- **搜索建议** - 智能搜索建议和历史记录
+- **工具收藏** - 一键收藏常用工具，快速访问
+- **分类浏览** - 按功能分类整理，便于查找
 
-### 开发工具
-- 📄 **JSON格式化工具** - JSON数据格式化、压缩和验证
-- 🔐 **Base64编码解码** - 文本和文件的Base64编码转换
-- 🔒 **MD5加密工具** - 文本和文件的MD5哈希计算
-- ⏰ **时间戳转换** - Unix时间戳与日期时间相互转换
-- 🔍 **正则表达式测试** - 正则表达式在线测试和验证
+### ⚡ 渐进式滚动模糊效果
 
-### 效率工具
-- 🔑 **密码生成器** - 生成安全的随机密码
-- 📱 **二维码生成器** - 生成各种类型的二维码
-- 🎨 **颜色选择器** - 专业的颜色选择和调色板工具
+参考 iOS/macOS 风格的毛玻璃设计，实现了业界领先的滚动视觉效果：
 
-## 🆕 渐进式滚动模糊效果
+#### 🎭 核心特性
+- **渐进式模糊** - 根据滚动距离动态调整模糊强度（4px → 16px）
+- **温和饱和度** - 滚动时饱和度从 1.1 提升到 1.7，避免过度饱和
+- **自然透明度** - 背景透明度从 65% 渐变到 90%，层次感更自然
+- **高性能优化** - requestAnimationFrame + 防抖延迟确保 60fps 流畅体验
 
-参考了 iOS/macOS 风格的毛玻璃设计，实现了业界领先的滚动模糊效果：
+#### 🎨 创新"像素画"效果
+在毛玻璃基础上叠加的独特像素化视觉效果：
+- **像素化遮罩** - 使用 `backdrop-filter` + `radial-gradient` 创建网格圆点
+- **动态密度** - 圆点网格密度 16px → 10px 实时响应滚动
+- **双重叠加** - 背景模糊 + 圆点网格 = "低分辨率"视觉效果
+- **GPU硬件加速** - `transform: translateZ(0)` + `will-change` 性能优化
 
-### ✨ 核心特性
-- **🎨 渐进式模糊** - 根据滚动距离动态调整模糊强度（4px → 16px）
-- **🌈 温和饱和度** - 滚动时饱和度从 1.1 提升到 1.7，避免过度饱和
-- **💫 自然透明度** - 背景透明度从 65% 渐变到 90%，层次感更自然
-- **⚡ 高性能优化** - requestAnimationFrame + 8ms 防抖延迟
-- **🎯 敏感触发** - 5px 滚动阈值，80px 优雅完全激活
-- **🎭 平滑过渡** - easeOutQuart 缓动函数，0.4s 过渡动画
-
-### 🎭 视觉效果（UI 优化版）
-- **浅色模式**: `rgba(255, 255, 255, 0.65-0.9)` + 温和亮度增强
-- **深色模式**: `rgba(30, 41, 59, 0.65-0.9)` + 优雅对比度调整
-- **层次阴影**: 20px + 8px + 3px 三层自然阴影
-- **柔和边框**: 降低边框透明度，减少突兀感
-- **内光效果**: 顶部内嵌高光，增强立体感但不过度
-
-### 🎨 UI设计原则
-- **避免过度效果**: 模糊和饱和度适中，保持文字可读性
-- **自然过渡曲线**: 使用 easeOutQuart 缓动函数替代线性变化
-- **渐进激活**: 80px 滚动距离让用户有充分的适应时间
-- **性能优先**: requestAnimationFrame 确保 60fps 流畅体验
-- **跨设备兼容**: 在不同设备和浏览器上保持一致的视觉效果
-
-## 🎨 神奇的"像素画"滚动效果
-
-在原有毛玻璃效果基础上，新增了创新的像素化视觉效果，让滚动区域呈现出独特的"像素画"风格：
-
-### ✨ 像素化核心特性
-- **🎮 像素化遮罩** - 使用 `backdrop-filter: blur()` + `radial-gradient` 网格圆点背景
-- **🔄 渐进式变化** - 模糊强度 4px → 12px，网格密度 16px → 10px 动态调整
-- **🌈 双重效果** - 背景模糊 + 圆点网格叠加，创造"低分辨率"视觉效果
-- **⚡ 动态参数** - 圆点透明度、网格大小、模糊强度实时响应滚动进度
-
-### 🎭 像素化视觉原理
-- **模糊层**: `backdrop-filter: blur(4-12px)` 让背景内容变得模糊
-- **网格层**: `radial-gradient` 创建一格格"透明+白色/深色"的小圆点
-- **密度控制**: `background-size: 16px → 10px` 控制像素密度
-- **叠加效果**: 人眼看到部分清晰 + 部分圆点模糊 = "像素画"效果
-
-### 🚀 性能优化特性
-- **GPU 硬件加速** - `transform: translateZ(0)` + `will-change` 优化
-- **响应式适配** - 移动端自动降低像素密度和模糊强度
-- **浏览器兼容** - 为不支持 `backdrop-filter` 的浏览器提供降级方案
-- **Safari 专用优化** - 针对 Safari 浏览器的特殊渲染优化
-
-### 🎨 视觉效果详解
-- **浅色模式**: 白色圆点网格 + 温和模糊，呈现清新像素风格
-- **深色模式**: 深灰圆点网格 + 对比度调整，保持暗黑美学
-- **渐进激活**: 5px 触发，80px 完全激活，过渡自然流畅
-- **层次叠加**: 圆点透明度 0.3 → 0.8，整体强度 0.5 → 0.9
-
-### 🔧 技术实现
-
-- 使用 `backdrop-filter: blur() saturate() brightness()` 创建毛玻璃效果
-- CSS 自定义属性 `--dynamic-blur` 和 `--dynamic-opacity` 实现动态调整
-- Vue 3 响应式系统 + easeOutQuart 缓动函数计算滚动进度
-- requestAnimationFrame 优化，确保 60fps 流畅动画
-- 支持 `-webkit-backdrop-filter` 前缀确保 Safari 兼容性
-- 使用 `@supports` 查询为老旧浏览器提供降级方案
-
-### 🎨 像素化技术实现细节
-
-#### 核心CSS结构
+#### 🚀 技术实现
 ```css
+/* 动态模糊效果 */
+.workspace-header-scrolled {
+  backdrop-filter: var(--dynamic-blur, blur(16px) saturate(1.7));
+  background: rgba(255, 255, 255, var(--dynamic-opacity, 0.65));
+}
+
 /* 像素化遮罩层 */
 .workspace-header-scrolled::before {
-  backdrop-filter: var(--pixel-blur, blur(8px));
+  backdrop-filter: var(--pixel-blur, blur(12px));
   background-image: radial-gradient(circle at center, 
-    rgba(255, 255, 255, var(--pixel-opacity)) 30%, 
-    transparent 35%
+    rgba(255, 255, 255, var(--pixel-opacity)) 15%, 
+    transparent 40%
   );
-  background-size: var(--pixel-size, 12px) var(--pixel-size, 12px);
+  background-size: var(--pixel-size, 16px) var(--pixel-size, 16px);
 }
 ```
 
-#### 动态参数控制
-```javascript
-// 像素化参数计算
-const pixelBlur = 4 + (scrollProgress * 8)      // 模糊强度
-const pixelSize = 16 - (scrollProgress * 6)     // 网格密度  
-const pixelOpacity = 0.3 + (scrollProgress * 0.5) // 圆点透明度
-const pixelIntensity = 0.5 + (scrollProgress * 0.4) // 整体强度
-```
-
-### 📱 浏览器兼容性
-- **Chrome 76+** - 完整支持所有像素化效果
-- **Safari 9+** - 通过 -webkit- 前缀支持，专用优化
-- **Firefox 103+** - 原生支持 backdrop-filter 和网格效果
+#### 📱 浏览器兼容性
+- **Chrome 76+** - 完整支持所有视觉效果
+- **Safari 9+** - 专用优化，通过 `-webkit-` 前缀支持
+- **Firefox 103+** - 原生支持 `backdrop-filter`
 - **Edge 79+** - 基于 Chromium 完整支持
 - **降级方案** - 不支持的浏览器自动使用增强网格背景
 
+## 🛠️ 工具列表
+
+### 开发工具 (Development)
+- **📄 JSON格式化工具** - JSON数据格式化、压缩和验证，支持语法高亮和错误提示
+- **🔐 Base64编码解码** - 文本和文件的Base64编码转换，支持批量处理
+- **🔒 MD5加密工具** - 文本和文件的MD5哈希计算，支持文件校验
+- **⏰ 时间戳转换** - Unix时间戳与日期时间相互转换，支持多种时区和格式
+- **🔍 正则表达式测试** - 正则表达式在线测试和验证，实时匹配结果预览和语法解释
+
+### 设计工具 (Design)
+- **🎨 颜色选择器** - 专业的颜色选择和调色板工具，支持HEX、RGB、HSL、HSV格式互转，一键复制颜色值
+
+### 效率工具 (Efficiency)
+- **🔑 密码生成器** - 生成安全的随机密码，支持自定义长度和字符类型，实时强度分析
+- **📱 二维码生成器** - 快速生成各种类型的二维码（文本、URL、WiFi、联系人、电话、短信），支持自定义样式、尺寸和颜色，可下载PNG格式
+
+### 🎯 工具特色功能
+
+#### JSON格式化工具
+- 语法高亮显示
+- 错误提示和定位
+- 格式化和压缩
+- 数据统计信息
+
+#### Base64编码解码
+- 文本编码/解码
+- 文件编码/解码
+- 批量处理支持
+- 实时预览
+
+#### MD5加密工具
+- 文本MD5计算
+- 文件MD5校验
+- 拖拽上传支持
+- 进度显示
+
+#### 时间戳转换
+- Unix时间戳转换
+- 多种日期格式
+- 时区支持
+- 实时转换
+
+#### 正则表达式测试
+- 实时匹配预览
+- 语法解释
+- 常用表达式模板
+- 匹配结果高亮
+
+#### 密码生成器
+- 自定义长度（4-128位）
+- 字符类型选择
+- 实时强度分析
+- 批量生成
+
+#### 二维码生成器
+- **多种内容类型**：文本、URL、WiFi、联系人、电话、短信
+- **智能标签管理**：支持添加、编辑、删除、拖拽排序
+- **自定义样式**：尺寸、颜色、纠错级别
+- **优化编辑体验**：防止浏览器密码提示，自适应标签宽度
+- **完整内容显示**：标签内容自动换行，不再截断
+
+#### 颜色选择器
+- 专业调色板
+- 多种格式支持
+- 颜色历史记录
+- 一键复制功能
+
 ## 🛠️ 技术栈
 
-- **前端框架**: Vue 3 + TypeScript
-- **构建工具**: Vite
-- **UI 框架**: DaisyUI + Tailwind CSS
-- **路由**: Vue Router 4
-- **图标**: Lucide Vue Next
-- **二维码**: QRCode.js
-- **包管理**: pnpm
+### 前端技术
+- **Vue 3** - 组合式API + `<script setup>` 语法
+- **TypeScript** - 完整的类型安全
+- **Vite** - 极速开发构建工具
+- **Vue Router 4** - 现代化路由管理
+
+### UI/UX
+- **DaisyUI** - 语义化组件库
+- **Tailwind CSS** - 原子化CSS框架
+- **Lucide Vue Next** - 现代图标库
+- **自定义CSS** - 渐进式滚动模糊效果
+
+### 工具库
+- **QRCode.js** - 二维码生成
+- **自研算法** - MD5加密、Base64编码等
+
+### 开发工具
+- **unplugin-auto-import** - 自动导入优化
+- **unplugin-vue-components** - 组件自动注册
+- **PostCSS + Autoprefixer** - CSS兼容性处理
 
 ## 📦 项目结构
 
@@ -168,25 +186,120 @@ const pixelIntensity = 0.5 + (scrollProgress * 0.4) // 整体强度
 liu-tools-front/
 ├── src/
 │   ├── components/          # 公共组件
+│   │   ├── MainWorkspace.vue    # 主工作区（滚动模糊效果）
+│   │   ├── Sidebar.vue          # 侧边栏导航
+│   │   ├── TopNavBar.vue        # 顶部导航栏
+│   │   └── ToolCard.vue         # 工具卡片组件
 │   ├── layouts/            # 布局组件
-│   ├── views/              # 页面组件
+│   │   └── MainLayout.vue       # 主布局
+│   ├── views/              # 工具页面
+│   │   ├── JsonFormatter.vue    # JSON格式化
+│   │   ├── Base64Tool.vue       # Base64编码
+│   │   ├── MD5Tool.vue          # MD5加密
+│   │   ├── TimestampTool.vue    # 时间戳转换
+│   │   ├── RegexTool.vue        # 正则表达式
+│   │   ├── PasswordGenerator.vue # 密码生成器
+│   │   ├── QRCodeGenerator.vue  # 二维码生成器
+│   │   └── ColorPicker.vue      # 颜色选择器
 │   ├── router/             # 路由配置
-│   ├── assets/             # 静态资源
+│   ├── store/              # 数据管理
+│   │   └── data.ts             # 工具数据和分类
+│   ├── styles/             # 样式文件
+│   │   └── index.css           # 全局样式（包含滚动模糊效果）
+│   ├── types/              # TypeScript类型定义
 │   └── main.ts             # 入口文件
-├── public/                 # 公共资源
-├── vercel.json            # Vercel 部署配置
-├── vite.config.ts         # Vite 配置
-├── tailwind.config.js     # Tailwind 配置
+├── public/                 # 静态资源
+├── vercel.json            # Vercel部署配置
+├── vite.config.ts         # Vite配置
+├── tailwind.config.js     # Tailwind配置
+├── daisyui.config.js      # DaisyUI配置
 └── package.json           # 项目配置
+```
+
+## 🎨 设计系统
+
+### 色彩规范
+- **主色调**: 蓝色到紫色渐变 (#3b82f6 → #8b5cf6)
+- **功能色**: 成功(绿)、警告(黄)、错误(红)、信息(蓝)
+- **中性色**: 基于HSL的语义化色彩系统
+
+### 组件规范
+- **卡片设计**: 圆角、阴影、悬停效果
+- **按钮系统**: 多种尺寸和状态
+- **输入框**: 统一的聚焦和验证状态
+- **图标**: 一致的尺寸和颜色规范
+
+### 响应式断点
+- **移动端**: < 640px
+- **平板**: 640px - 1024px  
+- **桌面**: > 1024px
+
+## 🚀 性能优化
+
+### 构建优化
+- **Vite HMR** - 极速热重载
+- **Tree Shaking** - 自动移除未使用代码
+- **代码分割** - 按路由懒加载
+- **资源压缩** - 自动压缩JS/CSS/HTML
+
+### 运行时优化
+- **组合式API** - 更好的性能和类型推断
+- **响应式优化** - 精确的依赖追踪
+- **虚拟滚动** - 大列表性能优化
+- **GPU加速** - 滚动模糊效果硬件加速
+
+### 用户体验
+- **渐进式加载** - 关键资源优先加载
+- **错误边界** - 优雅的错误处理
+- **加载状态** - 友好的等待提示
+- **离线缓存** - Service Worker支持
+
+## 🔧 开发指南
+
+### 添加新工具
+1. 在 `src/views/` 创建工具组件
+2. 在 `src/store/data.ts` 添加工具配置
+3. 在 `src/router/` 添加路由配置
+4. 更新类型定义（如需要）
+
+### 自定义主题
+```css
+/* 在 src/styles/index.css 中修改 */
+:root {
+  --primary: your-primary-color;
+  --secondary: your-secondary-color;
+  /* 更多主题变量... */
+}
+```
+
+### 构建部署
+```bash
+# 本地构建
+pnpm build
+
+# 构建分析
+pnpm build --analyze
+
+# 预览构建结果
+pnpm preview
 ```
 
 ## 🤝 贡献指南
 
 1. Fork 本项目
-2. 创建新的功能分支 (`git checkout -b feature/amazing-feature`)
-3. 提交更改 (`git commit -m 'Add some amazing feature'`)
+2. 创建功能分支 (`git checkout -b feature/amazing-feature`)
+3. 提交更改 (`git commit -m 'feat: add amazing feature'`)
 4. 推送到分支 (`git push origin feature/amazing-feature`)
 5. 创建 Pull Request
+
+### 提交规范
+- `feat:` 新功能
+- `fix:` 修复bug
+- `docs:` 文档更新
+- `style:` 样式修改
+- `refactor:` 代码重构
+- `test:` 测试相关
+- `chore:` 构建/工具相关
 
 ## 📄 许可证
 
@@ -197,8 +310,16 @@ liu-tools-front/
 - [在线演示](https://liu-tools-front.vercel.app) (替换为您的实际部署地址)
 - [GitHub 仓库](https://github.com/your-username/liu-tools-front)
 - [问题反馈](https://github.com/your-username/liu-tools-front/issues)
+- [功能建议](https://github.com/your-username/liu-tools-front/discussions)
 
 ## 🙏 致谢
+
+感谢以下开源项目和社区：
+- [Vue.js](https://vuejs.org/) - 渐进式JavaScript框架
+- [Vite](https://vitejs.dev/) - 下一代前端构建工具
+- [Tailwind CSS](https://tailwindcss.com/) - 实用优先的CSS框架
+- [DaisyUI](https://daisyui.com/) - 最受欢迎的Tailwind组件库
+- [Vercel](https://vercel.com/) - 现代化部署平台
 
 感谢所有为这个项目做出贡献的开发者！
 
