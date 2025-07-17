@@ -681,7 +681,16 @@ const getCurrentTypeName = computed(() => {
 // 方法
 const switchContentType = (typeId: string) => {
   currentType.value = typeId
-  selectedTagId.value = '' // 切换类型时清空选中状态
+  if (typeId === 'text') {
+    // 切回文本类型时，自动选中最后一个标签（如果有标签）
+    if (textTags.value.length > 0) {
+      selectedTagId.value = textTags.value[textTags.value.length - 1].id
+    } else {
+      selectedTagId.value = ''
+    }
+  } else {
+    selectedTagId.value = '' // 切换到其他类型时清空选中状态
+  }
   updateQRCode()
 }
 
