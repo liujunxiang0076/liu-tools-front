@@ -101,10 +101,10 @@
                           @click="selectTag(tag)"
                           :title="`拖拽排序 • 双击编辑 • 单击选择生成二维码`"
                         >
-                          <span class="truncate flex-1 text-xs md:text-sm" style="font-family: 'Microsoft YaHei', sans-serif;">{{ tag.content }}</span>
+                          <span class="flex-1 text-xs md:text-sm break-words" style="font-family: 'Microsoft YaHei', sans-serif;">{{ tag.content }}</span>
                           <button 
                             @click.stop="deleteTag(tag.id)"
-                            class="delete-btn opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity ml-1 touch-manipulation"
+                            class="delete-btn opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity ml-1 touch-manipulation flex-shrink-0"
                             title="删除"
                           >
                             ✕
@@ -119,13 +119,16 @@
                         >
                           <input 
                             v-model="editingContent"
+                            type="text"
                             @keyup.enter="saveTagEdit(tag)"
                             @keyup.escape="cancelTagEdit"
                             @blur="saveTagEdit(tag)"
                             class="bg-transparent border-none outline-none text-xs md:text-sm flex-1 min-w-0 placeholder-current"
                             :class="getTagTextColorClass(tag)"
                             ref="tagEditInput"
-                            :style="{ width: Math.max(60, editingContent.length * 8) + 'px', fontFamily: 'Microsoft YaHei, sans-serif' }"
+                            autocomplete="off"
+                            spellcheck="false"
+                            :style="{ width: Math.max(100, editingContent.length * 10) + 'px', fontFamily: 'Microsoft YaHei, sans-serif' }"
                           />
                         </div>
                       </div>
@@ -135,12 +138,15 @@
                     <div v-if="isAddingTag" class="mb-2">
                       <input 
                         v-model="newTagContent"
+                        type="text"
                         @keyup.enter="addNewTag"
                         @keyup.escape="cancelAddTag"
                         @blur="handleAddTagBlur"
                         class="input input-bordered input-sm w-full text-sm md:text-base"
                         style="font-family: 'Microsoft YaHei', sans-serif;"
                         placeholder="输入文本内容，回车确认，ESC取消..."
+                        autocomplete="off"
+                        spellcheck="false"
                         ref="newTagInput"
                       />
                     </div>
@@ -1074,8 +1080,24 @@ export default {
   min-height: 100vh;
 }
 
+/* 标签容器优化 */
 .tag-item {
   transition: all 0.3s ease;
+  max-width: 100%; /* 确保标签不会超出容器 */
+}
+
+/* 标签内容文本优化 */
+.tag-badge .break-words {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+  line-height: 1.3;
+}
+
+/* 标签删除按钮定位优化 */
+.tag-badge .delete-btn {
+  flex-shrink: 0; /* 确保删除按钮不会被压缩 */
+  margin-left: 0.5rem;
 }
 
 /* 新的标签样式 */
@@ -1089,10 +1111,12 @@ export default {
   font-size: 0.75rem;
   font-weight: 500;
   transition: all 0.2s ease;
-  max-width: 200px;
+  max-width: 100%; /* 移除固定宽度限制，允许自适应 */
   line-height: 1.2;
   min-height: 2rem; /* 确保足够的触摸区域 */
   touch-action: manipulation; /* 优化触摸响应 */
+  word-break: break-word; /* 长单词换行 */
+  white-space: normal; /* 允许文本换行 */
 }
 
 /* 移动端优化 */
@@ -1188,22 +1212,37 @@ export default {
   border: none;
   outline: none;
   color: inherit;
-  min-width: 120px; /* 增大最小宽度 */
-  max-width: 300px;
+  min-width: 100px; /* 增大最小宽度 */
+  max-width: 100%; /* 允许自适应容器宽度 */
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  resize: none; /* 禁止调整大小 */
 }
 
 /* 移动端输入框优化 */
 @media (max-width: 768px) {
   .tag-editing input {
-    min-width: 100px;
+    min-width: 80px;
     font-size: 0.875rem;
   }
 }
 
-/* 自适应输入框宽度 */
-.tag-editing input {
-  min-width: 100px;
-  max-width: 300px;
+/* 自适应输入框宽度 - 移除重复定义 */
+.tag-editing input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* 防止输入框被浏览器自动填充样式影响 */
+.tag-editing input:-webkit-autofill,
+.tag-editing input:-webkit-autofill:hover,
+.tag-editing input:-webkit-autofill:focus,
+.tag-editing input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+  -webkit-text-fill-color: inherit !important;
+  background-color: transparent !important;
+  background-image: none !important;
 }
 
 /* 标签动画效果 */
