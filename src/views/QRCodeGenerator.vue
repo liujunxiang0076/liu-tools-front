@@ -718,12 +718,12 @@ const addNewTag = () => {
       console.log(`💡 内容"${trimmedContent}"已存在，已自动选择现有标签并生成二维码`)
     } else {
       // 创建新标签
-      const newTag: TextTag = {
-        id: Date.now().toString(),
+    const newTag: TextTag = {
+      id: Date.now().toString(),
         content: trimmedContent,
-        timestamp: Date.now()
-      }
-      
+      timestamp: Date.now()
+    }
+    
       textTags.value.push(newTag) // 添加到末尾
       
       // 限制标签数量，如果超出则删除最老的标签
@@ -732,9 +732,9 @@ const addNewTag = () => {
       }
       
       saveTagsToLocal()
-      
-      // 自动选中新添加的标签
-      selectedTagId.value = newTag.id
+    
+    // 自动选中新添加的标签
+    selectedTagId.value = newTag.id
     }
   }
   

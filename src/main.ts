@@ -24,6 +24,6 @@ router.onError((error) => {
 })
 
 console.log('挂载应用到DOM...')
-app.mount('#app')
+app.mount('#app') 
 
 console.log('应用挂载完成') 
