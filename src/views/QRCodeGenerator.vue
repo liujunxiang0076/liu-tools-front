@@ -77,12 +77,14 @@
                       <div 
                         v-for="(tag, index) in textTags" 
                         :key="tag.id"
+                        :data-tag-id="tag.id"
                         class="tag-item group"
                         :class="{ 
                           'tag-editing': editingTagId === tag.id,
                           'tag-selected': selectedTagId === tag.id,
                           'tag-dragging': dragState.draggedId === tag.id,
-                          'tag-drop-target': dragState.dropTargetIndex === index
+                          'tag-drop-target': dragState.dropTargetIndex === index,
+                          'tag-highlighted': highlightedTagId === tag.id
                         }"
                         :draggable="editingTagId !== tag.id"
                         @dragstart="handleDragStart($event, tag, index)"
@@ -169,8 +171,8 @@
                   
                   <!-- 操作提示 -->
                   <div class="text-xs text-base-content/60 mt-2">
-                    💡 <span class="hidden sm:inline">自动生成最新标签二维码，单击切换选择，拖拽排序，双击编辑内容（回车确认，ESC取消），悬停显示删除按钮</span>
-                    <span class="sm:hidden">单击选择，双击编辑，长按删除</span>
+                    💡 <span class="hidden sm:inline">自动生成最新标签二维码，单击切换选择，拖拽排序，双击编辑内容（回车确认，ESC取消），悬停显示删除按钮。添加重复内容时会自动聚焦到已存在的标签。</span>
+                    <span class="sm:hidden">单击选择，双击编辑，长按删除。重复内容会自动聚焦已存在标签。</span>
                   </div>
                 </div>
 
@@ -495,6 +497,7 @@ const editingTagId = ref<string>('')
 const editingContent = ref<string>('')
 const isAddingTag = ref<boolean>(false)
 const newTagContent = ref<string>('')
+const highlightedTagId = ref<string>('') // 用于高亮闪烁效果
 
 // 文本标签数据
 const textTags = ref<TextTag[]>([])
@@ -705,15 +708,28 @@ const startAddingTag = () => {
 
 const addNewTag = () => {
   if (newTagContent.value.trim()) {
-    const newTag: TextTag = {
-      id: Date.now().toString(),
-      content: newTagContent.value.trim(),
-      timestamp: Date.now()
-    }
+    const trimmedContent = newTagContent.value.trim()
     
-    // 避免重复添加相同内容
-    const existingIndex = textTags.value.findIndex(tag => tag.content === newTag.content)
-    if (existingIndex === -1) {
+    // 检查是否存在相同内容的标签
+    const existingTag = textTags.value.find(tag => tag.content === trimmedContent)
+    
+    if (existingTag) {
+      // 如果存在相同内容，聚焦到已存在的标签
+      selectedTagId.value = existingTag.id
+      
+      // 添加视觉反馈 - 高亮闪烁效果
+      highlightExistingTag(existingTag.id)
+      
+      // 可选：显示提示信息
+      console.log(`💡 内容"${trimmedContent}"已存在，已自动选择现有标签并生成二维码`)
+    } else {
+      // 创建新标签
+      const newTag: TextTag = {
+        id: Date.now().toString(),
+        content: trimmedContent,
+        timestamp: Date.now()
+      }
+      
       textTags.value.push(newTag) // 添加到末尾
       
       // 限制标签数量，如果超出则删除最老的标签
@@ -722,10 +738,10 @@ const addNewTag = () => {
       }
       
       saveTagsToLocal()
+      
+      // 自动选中新添加的标签
+      selectedTagId.value = newTag.id
     }
-    
-    // 自动选中新添加的标签
-    selectedTagId.value = newTag.id
   }
   
   cancelAddTag()
@@ -1008,6 +1024,28 @@ const handleDragEnd = () => {
   })
 }
 
+// 高亮闪烁效果
+const highlightExistingTag = (tagId: string) => {
+  highlightedTagId.value = tagId
+  
+  // 滚动到标签位置（如果需要）
+  nextTick(() => {
+    const tagElement = document.querySelector(`[data-tag-id="${tagId}"]`)
+    if (tagElement) {
+      tagElement.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'nearest',
+        inline: 'center'
+      })
+    }
+  })
+  
+  // 清除高亮效果
+  setTimeout(() => {
+    highlightedTagId.value = ''
+  }, 1200) // 闪烁持续1.2秒
+}
+
 // 二维码Canvas引用
 const qrCanvas = ref<HTMLCanvasElement | null>(null)
 
@@ -1078,6 +1116,59 @@ export default {
 <style scoped>
 .qrcode-generator-container {
   min-height: 100vh;
+}
+
+/* 标签高亮闪烁效果 */
+.tag-highlighted {
+  animation: highlightPulse 1.2s ease-in-out;
+  z-index: 10; /* 确保高亮标签在其他标签之上 */
+}
+
+@keyframes highlightPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6);
+  }
+  15% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0.4);
+  }
+  30% {
+    transform: scale(1.12);
+    box-shadow: 0 0 0 15px rgba(59, 130, 246, 0.2);
+  }
+  45% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0.3);
+  }
+  60% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.2);
+  }
+  75% {
+    transform: scale(1.03);
+    box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.1);
+  }
+  90% {
+    transform: scale(1.01);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.05);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+/* 高亮时的标签样式增强 */
+.tag-highlighted .tag-badge {
+  border-color: #3b82f6 !important;
+  box-shadow: 
+    0 0 25px rgba(59, 130, 246, 0.4),
+    0 0 50px rgba(59, 130, 246, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #3b82f6, #6366f1) !important;
+  color: white !important;
+  transition: all 0.3s ease;
 }
 
 /* 标签容器优化 */
