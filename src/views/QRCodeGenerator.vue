@@ -1043,7 +1043,7 @@ const highlightExistingTag = (tagId: string) => {
   // 清除高亮效果
   setTimeout(() => {
     highlightedTagId.value = ''
-  }, 1200) // 闪烁持续1.2秒
+  }, 1000) // 与动画时间保持一致
 }
 
 // 二维码Canvas引用
@@ -1120,38 +1120,30 @@ export default {
 
 /* 标签高亮闪烁效果 */
 .tag-highlighted {
-  animation: highlightPulse 1.2s ease-in-out;
+  animation: highlightPulse 1s ease-in-out;
   z-index: 10; /* 确保高亮标签在其他标签之上 */
 }
 
 @keyframes highlightPulse {
   0% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
   }
-  15% {
-    transform: scale(1.08);
-    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0.4);
+  20% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
   }
-  30% {
-    transform: scale(1.12);
-    box-shadow: 0 0 0 15px rgba(59, 130, 246, 0.2);
-  }
-  45% {
-    transform: scale(1.08);
-    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0.3);
+  40% {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.2);
   }
   60% {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.2);
+    transform: scale(1.02);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
   }
-  75% {
-    transform: scale(1.03);
-    box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.1);
-  }
-  90% {
+  80% {
     transform: scale(1.01);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.05);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
   }
   100% {
     transform: scale(1);
@@ -1159,15 +1151,13 @@ export default {
   }
 }
 
-/* 高亮时的标签样式增强 */
+/* 高亮时的标签样式增强 - 只增强边框，不改变颜色 */
 .tag-highlighted .tag-badge {
   border-color: #3b82f6 !important;
+  border-width: 2px !important;
   box-shadow: 
-    0 0 25px rgba(59, 130, 246, 0.4),
-    0 0 50px rgba(59, 130, 246, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  background: linear-gradient(135deg, #3b82f6, #6366f1) !important;
-  color: white !important;
+    0 0 15px rgba(59, 130, 246, 0.3),
+    0 0 30px rgba(59, 130, 246, 0.1);
   transition: all 0.3s ease;
 }
 
