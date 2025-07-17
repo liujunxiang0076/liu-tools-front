@@ -1,4 +1,4 @@
-# 刘工具箱 - 现代化在线工具集合
+# 在线工具集合
 
 一个基于 Vue 3 + TypeScript + Vite + DaisyUI 的现代化在线工具箱，提供丰富的日常开发和办公工具。
 
@@ -308,9 +308,9 @@ pnpm preview
 ## 🔗 相关链接
 
 - [在线演示](https://liu-tools-front.vercel.app) (替换为您的实际部署地址)
-- [GitHub 仓库](https://github.com/your-username/liu-tools-front)
-- [问题反馈](https://github.com/your-username/liu-tools-front/issues)
-- [功能建议](https://github.com/your-username/liu-tools-front/discussions)
+- [GitHub 仓库](https://github.com/liujunxiang0076/liu-tools-front)
+- [问题反馈](https://github.com/liujunxiang0076/liu-tools-front/issues)
+- [功能建议](https://github.com/liujunxiang0076/liu-tools-front/discussions)
 
 ## 🙏 致谢
 
