@@ -413,8 +413,10 @@
                     ref="qrCanvas"
                     :width="qrSettings.size" 
                     :height="qrSettings.size"
-                    class="border border-gray-200 rounded-lg max-w-full h-auto"
+                    class="border border-gray-200 rounded-lg max-w-full h-auto cursor-pointer"
                     :style="{ maxWidth: '100%', height: 'auto' }"
+                    @dblclick="openFullscreenModal"
+                    title="双击全屏查看"
                   ></canvas>
                 </div>
                 <div v-else class="text-center text-base-content/50">
@@ -456,6 +458,49 @@
         </div>
       </div>
     </div>
+
+    <!-- 全屏二维码模态框 -->
+    <dialog ref="fullscreenModal" class="modal">
+      <div class="modal-box w-11/12 max-w-7xl h-5/6 bg-black/90 backdrop-blur-sm border-0 p-8 flex flex-col items-center justify-center">
+        <!-- 关闭按钮 -->
+        <form method="dialog">
+          <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 text-white hover:bg-white/10">✕</button>
+        </form>
+        
+        <!-- 全屏二维码容器 -->
+        <div class="flex-1 flex items-center justify-center w-full">
+          <div 
+            class="qr-fullscreen-container" 
+            @wheel.prevent="handleWheelZoom"
+            @touchstart="handleTouchStart"
+            @touchmove="handleTouchMove"
+            @touchend="handleTouchEnd"
+          >
+            <canvas 
+              ref="fullscreenQRCanvas"
+              :width="fullscreenQRSize" 
+              :height="fullscreenQRSize"
+              class="max-w-full max-h-full rounded-lg shadow-2xl select-none"
+              :style="{ 
+                maxWidth: '90vw', 
+                maxHeight: '70vh',
+                filter: 'drop-shadow(0 25px 50px rgba(0, 0, 0, 0.5))'
+              }"
+            ></canvas>
+          </div>
+        </div>
+        
+        <!-- 操作提示 -->
+        <div class="text-center text-white/70 text-sm mt-4 space-y-2">
+          <p class="hidden sm:block">🖱️ 鼠标滚轮调整大小 | ⌨️ ESC键或点击外侧退出</p>
+          <p class="sm:hidden">👆 双指缩放调整大小 | 点击外侧退出</p>
+          <p class="text-xs">当前尺寸: {{ fullscreenQRSize }}×{{ fullscreenQRSize }}px</p>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button>关闭</button>
+      </form>
+    </dialog>
   </div>
 </template>
 
@@ -1034,6 +1079,11 @@ const qrCanvas = ref<HTMLCanvasElement | null>(null)
 const tagEditInput = ref<HTMLInputElement | null>(null)
 const newTagInput = ref<HTMLInputElement | null>(null)
 
+// 全屏二维码模态框引用
+const fullscreenModal = ref<HTMLDialogElement | null>(null)
+const fullscreenQRCanvas = ref<HTMLCanvasElement | null>(null)
+const fullscreenQRSize = ref<number>(qrSettings.size) // 全屏二维码尺寸
+
 // 生成二维码
 const generateQRCode = async () => {
   if (!currentQRValue.value || !qrCanvas.value) return
@@ -1053,6 +1103,25 @@ const generateQRCode = async () => {
   }
 }
 
+// 全屏二维码生成
+const generateFullscreenQRCode = async () => {
+  if (!currentQRValue.value || !fullscreenQRCanvas.value) return
+  
+  try {
+    await QRCode.toCanvas(fullscreenQRCanvas.value, currentQRValue.value, {
+      width: fullscreenQRSize.value,
+      margin: qrSettings.margin, // 使用主二维码的边距
+      color: {
+        dark: qrSettings.foreground,
+        light: qrSettings.background
+      },
+      errorCorrectionLevel: qrSettings.level
+    })
+  } catch (error) {
+    console.error('全屏二维码生成失败:', error)
+  }
+}
+
 // 监听二维码内容变化
 watch(currentQRValue, () => {
   nextTick(() => {
@@ -1064,6 +1133,13 @@ watch(currentQRValue, () => {
 watch(qrSettings, () => {
   nextTick(() => {
     generateQRCode()
+  })
+}, { deep: true })
+
+// 监听全屏尺寸变化
+watch(fullscreenQRSize, () => {
+  nextTick(() => {
+    generateFullscreenQRCode()
   })
 }, { deep: true })
 
@@ -1085,6 +1161,90 @@ onMounted(() => {
 const goBackToMain = () => {
   // 使用路由跳转回主页
   router.push('/')
+}
+
+// 打开全屏模态框
+const openFullscreenModal = () => {
+  if (fullscreenModal.value) {
+    fullscreenModal.value.showModal()
+    fullscreenQRSize.value = qrSettings.size // 初始化全屏尺寸
+    generateFullscreenQRCode() // 生成全屏二维码
+  }
+}
+
+// 关闭全屏模态框
+const closeFullscreenModal = () => {
+  if (fullscreenModal.value) {
+    fullscreenModal.value.close()
+  }
+}
+
+// 鼠标滚轮控制全屏二维码大小
+const handleWheelZoom = (event: WheelEvent) => {
+  const delta = event.deltaY
+  const currentSize = fullscreenQRSize.value
+  const newSize = delta > 0 ? currentSize * 1.1 : currentSize * 0.9
+  
+  if (newSize >= 200 && newSize <= 1000) { // 限制尺寸范围
+    fullscreenQRSize.value = newSize
+  }
+}
+
+// 双指缩放控制全屏二维码大小
+const initialPinchDistance = ref<number>(0)
+const lastPinchDistance = ref<number>(0)
+
+const calculateDistance = (touch1: Touch, touch2: Touch): number => {
+  const dx = touch1.clientX - touch2.clientX
+  const dy = touch1.clientY - touch2.clientY
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
+const pinchZoom = (event: TouchEvent) => {
+  if (event.touches.length === 2) {
+    const currentDistance = calculateDistance(event.touches[0], event.touches[1])
+    
+    if (initialPinchDistance.value === 0) {
+      initialPinchDistance.value = currentDistance
+      lastPinchDistance.value = currentDistance
+      return
+    }
+    
+    const scale = currentDistance / initialPinchDistance.value
+    const sizeChange = (currentDistance - lastPinchDistance.value) / 50 // 调整灵敏度
+    
+    const currentSize = fullscreenQRSize.value
+    const newSize = currentSize + sizeChange * 20 // 调整缩放速度
+    
+    if (newSize >= 200 && newSize <= 1000) {
+      fullscreenQRSize.value = Math.round(newSize)
+    }
+    
+    lastPinchDistance.value = currentDistance
+  }
+}
+
+// 双指缩放开始
+const handleTouchStart = (event: TouchEvent) => {
+  if (event.touches.length === 2) {
+    event.preventDefault()
+    initialPinchDistance.value = 0 // 重置初始距离
+    pinchZoom(event)
+  }
+}
+
+// 双指缩放移动
+const handleTouchMove = (event: TouchEvent) => {
+  if (event.touches.length === 2) {
+    event.preventDefault()
+    pinchZoom(event)
+  }
+}
+
+// 双指缩放结束
+const handleTouchEnd = () => {
+  initialPinchDistance.value = 0
+  lastPinchDistance.value = 0
 }
 </script>
 
@@ -1413,5 +1573,64 @@ input[type="color"] {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+/* 全屏模态框样式 */
+.qr-fullscreen-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  touch-action: none; /* 防止移动端默认手势 */
+}
+
+/* 全屏二维码动画 */
+.qr-fullscreen-container canvas {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+/* 全屏模态框背景动画 */
+.modal-box {
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .modal-box {
+    width: 95vw !important;
+    height: 90vh !important;
+    max-width: none !important;
+    padding: 1rem !important;
+  }
+  
+  .qr-fullscreen-container canvas {
+    max-width: 85vw !important;
+    max-height: 60vh !important;
+  }
+}
+
+/* 防止模态框内容溢出 */
+.modal-box {
+  overflow: hidden;
+}
+
+/* 全屏二维码容器防止溢出 */
+.qr-fullscreen-container {
+  overflow: hidden;
+  border-radius: 0.5rem;
 }
 </style> 
