@@ -474,11 +474,11 @@ const highlightedJson = computed(() => {
 }
 
 .custom-json-viewer {
-  border: 1.5px solid #e5e7eb; /* base-300 */
-  border-radius: 1rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 0.75rem; /* 与 rounded-lg 一致 */
   box-shadow: 0 2px 16px 0 rgba(0,0,0,0.06);
-  background: #f8fafc; /* base-200 */
-  padding: 1.5rem;
+  background: #fff; /* 与 textarea-bordered 默认一致 */
+  padding: 1.25rem; /* 与输入区内边距一致 */
   min-height: 20rem;
   font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Menlo', 'Courier', monospace;
 }
@@ -489,6 +489,10 @@ const highlightedJson = computed(() => {
 .textarea, textarea {
   font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Menlo', 'Courier', monospace;
   font-size: 15px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.06);
+  background: #fff;
 }
 .json-pre {
   margin: 0;
