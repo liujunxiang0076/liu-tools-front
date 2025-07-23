@@ -101,10 +101,13 @@
           </div>
           
           <div class="relative">
-            <pre 
-              class="bg-base-200 p-4 rounded-lg h-[38rem] overflow-auto text-sm font-mono whitespace-pre-wrap"
-              :class="{ 'text-base-content/50': hasError }"
-            ><code v-if="!hasError && formattedJson" class="json-highlight">{{ formattedJson }}</code><div v-else-if="hasError" class="text-error/60 italic">JSON格式错误，请检查输入</div><div v-else class="text-base-content/40 italic">格式化结果将在此显示...</div></pre>
+            <div class="bg-base-200 p-4 rounded-lg h-[38rem] overflow-auto custom-json-viewer">
+              <template v-if="!hasError && formattedJson">
+                <pre class="json-pre"><code v-html="highlightedJson"></code></pre>
+              </template>
+              <div v-else-if="hasError" class="text-error/60 italic">JSON格式错误，请检查输入</div>
+              <div v-else class="text-base-content/40 italic">格式化结果将在此显示...</div>
+            </div>
           </div>
         </div>
       </div>
@@ -187,6 +190,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
+// 移除json-viewer相关import
+// import { JsonViewer } from 'vue3-json-viewer'
+// import 'vue3-json-viewer/dist/vue3-json-viewer.css'
 
 const router = useRouter()
 
@@ -228,6 +234,16 @@ const exampleJson = `{
     }
   }
 }`
+
+// 移除parsedJson和isDarkTheme相关内容
+// const parsedJson = computed(() => {
+//   if (hasError.value || !inputJson.value.trim()) return null
+//   try {
+//     return JSON.parse(inputJson.value)
+//   } catch {
+//     return null
+//   }
+// })
 
 // 返回上一页
 const goBack = () => {
@@ -400,6 +416,24 @@ watch(inputJson, () => {
     formatJson()
   }
 })
+
+// 新增高亮方法
+const highlightedJson = computed(() => {
+  if (!formattedJson.value) return ''
+  let json = formattedJson.value
+  json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  // 先高亮key（带冒号）
+  json = json.replace(/("[^"]+")(?=\s*:)/g, '<span class="json-key">$1</span>')
+  // 再高亮value的字符串（冒号后，非key）
+  json = json.replace(/(:\s*)"(.*?)"/g, '$1<span class="json-string">"$2"</span>')
+  // 数字
+  json = json.replace(/(:\s*)(-?\d+(?:\.\d+)?)/g, '$1<span class="json-number">$2</span>')
+  // 布尔
+  json = json.replace(/(:\s*)(true|false)/g, '$1<span class="json-boolean">$2</span>')
+  // null
+  json = json.replace(/(:\s*)(null)/g, '$1<span class="json-null">$2</span>')
+  return json
+})
 </script>
 
 <style scoped>
@@ -438,4 +472,40 @@ watch(inputJson, () => {
     height: 16rem;
   }
 }
+
+.custom-json-viewer {
+  border: 1.5px solid #e5e7eb; /* base-300 */
+  border-radius: 1rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.06);
+  background: #f8fafc; /* base-200 */
+  padding: 1.5rem;
+  min-height: 20rem;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Menlo', 'Courier', monospace;
+}
+.dark .custom-json-viewer {
+  background: #23272e;
+  border-color: #2a2e37;
+}
+.textarea, textarea {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Menlo', 'Courier', monospace;
+  font-size: 15px;
+}
+.json-pre {
+  margin: 0;
+  font-size: 15px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Menlo', 'Courier', monospace;
+  background: transparent;
+  color: #22292f;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.dark .json-pre {
+  color: #e5e7eb;
+}
+.json-key { color: #8b5cf6; }
+.json-string { color: #22c55e; }
+.json-number { color: #3b82f6; }
+.json-boolean { color: #f59e0b; }
+.json-null { color: #ef4444; }
 </style> 
