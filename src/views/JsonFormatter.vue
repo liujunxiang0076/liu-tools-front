@@ -197,7 +197,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 // 响应式数据
-const inputJson = ref('')
+const inputJson = ref(localStorage.getItem('json-formatter-input') || '')
 const formattedJson = ref('')
 const hasError = ref(false)
 const errorMessage = ref('')
@@ -408,6 +408,7 @@ const clearInput = () => {
   hasError.value = false
   errorMessage.value = ''
   jsonStats.value = null
+  localStorage.removeItem('json-formatter-input')
 }
 
 // 监听输入变化
@@ -415,6 +416,8 @@ watch(inputJson, () => {
   if (inputJson.value.trim()) {
     formatJson()
   }
+  // 持久化到localStorage
+  localStorage.setItem('json-formatter-input', inputJson.value)
 })
 
 // 新增高亮方法
