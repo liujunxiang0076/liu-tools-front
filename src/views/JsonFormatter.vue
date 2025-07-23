@@ -48,7 +48,7 @@
               v-model="inputJson"
               @input="handleInputChange"
               placeholder="请输入JSON数据..."
-              class="textarea textarea-bordered w-full h-96 font-mono text-sm resize-none"
+              class="textarea textarea-bordered w-full h-[38rem] font-mono text-sm resize-none"
               :class="{ 'textarea-error': hasError }"
             ></textarea>
             
@@ -102,7 +102,7 @@
           
           <div class="relative">
             <pre 
-              class="bg-base-200 p-4 rounded-lg h-96 overflow-auto text-sm font-mono whitespace-pre-wrap"
+              class="bg-base-200 p-4 rounded-lg h-[38rem] overflow-auto text-sm font-mono whitespace-pre-wrap"
               :class="{ 'text-base-content/50': hasError }"
             ><code v-if="!hasError && formattedJson" class="json-highlight">{{ formattedJson }}</code><div v-else-if="hasError" class="text-error/60 italic">JSON格式错误，请检查输入</div><div v-else class="text-base-content/40 italic">格式化结果将在此显示...</div></pre>
           </div>
