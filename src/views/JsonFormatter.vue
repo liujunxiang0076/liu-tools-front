@@ -15,13 +15,205 @@
           <span class="text-2xl md:text-3xl">📄</span>
           <h1 class="text-xl md:text-2xl font-bold text-base-content">JSON格式化工具</h1>
         </div>
-        <p class="text-sm md:text-base text-base-content/70 px-4 md:px-0">
-          JSON数据格式化、压缩和验证工具，支持语法高亮和错误提示
-        </p>
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between px-4 md:px-0">
+          <p class="text-sm md:text-base text-base-content/70 mb-3 md:mb-0">
+            JSON数据格式化、压缩和验证工具，支持语法高亮和错误提示
+          </p>
+          
+          <!-- 模式切换器 -->
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-base-content/60">模式:</span>
+            <div class="join">
+              <button 
+                @click="switchMode('format')"
+                class="btn btn-sm join-item"
+                :class="{ 'btn-primary': currentMode === 'format', 'btn-outline': currentMode !== 'format' }"
+              >
+                格式化
+              </button>
+              <button 
+                @click="switchMode('diff')"
+                class="btn btn-sm join-item"
+                :class="{ 'btn-primary': currentMode === 'diff', 'btn-outline': currentMode !== 'diff' }"
+              >
+                对比
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 主要内容区域 -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div v-if="currentMode === 'format'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- 格式化模式的原有内容 -->
+      </div>
+      
+      <!-- 对比模式的内容区域 -->
+      <div v-else-if="currentMode === 'diff'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- 第一个JSON输入区域 -->
+        <div class="bg-base-100 rounded-2xl p-6 shadow-lg">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-base-content">JSON A</h2>
+            <div class="flex gap-2">
+              <button 
+                @click="clearJsonA"
+                class="btn btn-sm btn-ghost"
+                :disabled="!jsonA"
+              >
+                清空
+              </button>
+              <button 
+                @click="loadExampleA"
+                class="btn btn-sm btn-outline"
+              >
+                示例
+              </button>
+            </div>
+          </div>
+          
+          <div class="relative">
+            <textarea
+              v-model="jsonA"
+              @input="handleJsonAChange"
+              placeholder="请输入第一个JSON数据..."
+              class="textarea textarea-bordered w-full h-[38rem] font-mono text-sm resize-none"
+              :class="{ 'textarea-error': hasErrorA }"
+            ></textarea>
+            
+            <div class="absolute bottom-2 right-2 text-xs text-base-content/50">
+              {{ jsonA.length }} 字符
+            </div>
+          </div>
+          
+          <!-- 错误提示 -->
+          <div v-if="hasErrorA" class="mt-3 p-3 bg-error/10 border border-error/20 rounded-lg">
+            <div class="flex items-start gap-2">
+              <svg class="w-4 h-4 text-error flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              <div>
+                <div class="text-sm font-medium text-error">JSON A 格式错误</div>
+                <div class="text-xs text-error/80 mt-1">{{ errorMessageA }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 第二个JSON输入区域 -->
+        <div class="bg-base-100 rounded-2xl p-6 shadow-lg">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-base-content">JSON B</h2>
+            <div class="flex gap-2">
+              <button 
+                @click="clearJsonB"
+                class="btn btn-sm btn-ghost"
+                :disabled="!jsonB"
+              >
+                清空
+              </button>
+              <button 
+                @click="loadExampleB"
+                class="btn btn-sm btn-outline"
+              >
+                示例
+              </button>
+            </div>
+          </div>
+          
+          <div class="relative">
+            <textarea
+              v-model="jsonB"
+              @input="handleJsonBChange"
+              placeholder="请输入第二个JSON数据..."
+              class="textarea textarea-bordered w-full h-[38rem] font-mono text-sm resize-none"
+              :class="{ 'textarea-error': hasErrorB }"
+            ></textarea>
+            
+            <div class="absolute bottom-2 right-2 text-xs text-base-content/50">
+              {{ jsonB.length }} 字符
+            </div>
+          </div>
+          
+          <!-- 错误提示 -->
+          <div v-if="hasErrorB" class="mt-3 p-3 bg-error/10 border border-error/20 rounded-lg">
+            <div class="flex items-start gap-2">
+              <svg class="w-4 h-4 text-error flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              <div>
+                <div class="text-sm font-medium text-error">JSON B 格式错误</div>
+                <div class="text-xs text-error/80 mt-1">{{ errorMessageB }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 对比结果显示区域 -->
+      <div v-if="currentMode === 'diff'" class="mt-6 bg-base-100 rounded-2xl p-6 shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-base-content">差异对比结果</h2>
+          <div class="flex gap-2">
+            <button 
+              @click="compareJson"
+              class="btn btn-primary"
+              :disabled="!jsonA || !jsonB || hasErrorA || hasErrorB"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
+              开始对比
+            </button>
+            <button 
+              @click="exportDiff"
+              class="btn btn-outline"
+              :disabled="!diffResult"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              导出差异
+            </button>
+          </div>
+        </div>
+        
+        <div class="bg-base-200 p-4 rounded-lg h-[20rem] overflow-auto">
+          <div v-if="!diffResult" class="text-base-content/40 italic">
+            对比结果将在此显示...
+          </div>
+          <div v-else-if="diffResult.identical" class="text-success">
+            ✅ 两个JSON完全相同
+          </div>
+          <div v-else class="space-y-2">
+            <div class="text-sm font-medium text-base-content mb-3">
+              发现 {{ diffResult.differences.length }} 处差异:
+            </div>
+            <div v-for="(diff, index) in diffResult.differences" :key="index" class="border-l-4 pl-4 py-2 text-sm font-mono"
+                 :class="{
+                   'border-red-500 bg-red-50 dark:bg-red-900/20': diff.type === 'removed',
+                   'border-green-500 bg-green-50 dark:bg-green-900/20': diff.type === 'added',
+                   'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20': diff.type === 'changed'
+                 }">
+              <div class="font-semibold text-xs text-base-content/70 mb-1">
+                {{ diff.path }} - {{ diff.type === 'removed' ? '删除' : diff.type === 'added' ? '新增' : '修改' }}
+              </div>
+              <div v-if="diff.type === 'removed'" class="text-red-600 dark:text-red-400">
+                - {{ diff.oldValue }}
+              </div>
+              <div v-else-if="diff.type === 'added'" class="text-green-600 dark:text-green-400">
+                + {{ diff.newValue }}
+              </div>
+              <div v-else-if="diff.type === 'changed'">
+                <div class="text-red-600 dark:text-red-400">- {{ diff.oldValue }}</div>
+                <div class="text-green-600 dark:text-green-400">+ {{ diff.newValue }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 格式化模式的原有内容区域 -->
+      <div v-if="currentMode === 'format'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- 输入区域 -->
         <div class="bg-base-100 rounded-2xl p-6 shadow-lg">
           <div class="flex items-center justify-between mb-4">
@@ -202,6 +394,30 @@ const formattedJson = ref('')
 const hasError = ref(false)
 const errorMessage = ref('')
 const indentSize = ref('2')
+
+// 对比模式相关状态
+const currentMode = ref<'format' | 'diff'>('format')
+const jsonA = ref('')
+const jsonB = ref('')
+const hasErrorA = ref(false)
+const hasErrorB = ref(false)
+const errorMessageA = ref('')
+const errorMessageB = ref('')
+
+// 差异对比结果
+interface DiffItem {
+  path: string
+  type: 'added' | 'removed' | 'changed'
+  oldValue?: any
+  newValue?: any
+}
+
+interface DiffResult {
+  identical: boolean
+  differences: DiffItem[]
+}
+
+const diffResult = ref<DiffResult | null>(null)
 
 // JSON统计信息
 interface JsonStats {
@@ -419,6 +635,180 @@ watch(inputJson, () => {
   // 持久化到localStorage
   localStorage.setItem('json-formatter-input', inputJson.value)
 })
+
+// 模式切换方法
+const switchMode = (mode: 'format' | 'diff') => {
+  currentMode.value = mode
+  if (mode === 'diff') {
+    diffResult.value = null
+  }
+}
+
+// JSON A 相关方法
+const handleJsonAChange = () => {
+  try {
+    if (jsonA.value.trim()) {
+      JSON.parse(jsonA.value)
+      hasErrorA.value = false
+      errorMessageA.value = ''
+    }
+  } catch (error) {
+    hasErrorA.value = true
+    errorMessageA.value = error instanceof Error ? error.message : '解析错误'
+  }
+}
+
+const clearJsonA = () => {
+  jsonA.value = ''
+  hasErrorA.value = false
+  errorMessageA.value = ''
+  diffResult.value = null
+}
+
+const loadExampleA = () => {
+  jsonA.value = exampleJson
+  handleJsonAChange()
+}
+
+// JSON B 相关方法
+const handleJsonBChange = () => {
+  try {
+    if (jsonB.value.trim()) {
+      JSON.parse(jsonB.value)
+      hasErrorB.value = false
+      errorMessageB.value = ''
+    }
+  } catch (error) {
+    hasErrorB.value = true
+    errorMessageB.value = error instanceof Error ? error.message : '解析错误'
+  }
+}
+
+const clearJsonB = () => {
+  jsonB.value = ''
+  hasErrorB.value = false
+  errorMessageB.value = ''
+  diffResult.value = null
+}
+
+const loadExampleB = () => {
+  const exampleB = `{
+  "name": "李四",
+  "age": 28,
+  "email": "lisi@example.com",
+  "address": {
+    "city": "上海",
+    "district": "浦东新区",
+    "street": "世纪大道456号"
+  },
+  "hobbies": ["读书", "游戏", "音乐"],
+  "isActive": false,
+  "profile": {
+    "bio": "产品经理",
+    "skills": ["Product Design", "User Research", "Agile"],
+    "experience": {
+      "years": 5,
+      "companies": ["公司C", "公司D", "公司E"]
+    }
+  }
+}`
+  jsonB.value = exampleB
+  handleJsonBChange()
+}
+
+// 深度对比两个对象
+const deepCompare = (obj1: any, obj2: any, path = ''): DiffItem[] => {
+  const differences: DiffItem[] = []
+  
+  // 处理基本类型
+  if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null) {
+    if (obj1 !== obj2) {
+      differences.push({
+        path: path || 'root',
+        type: 'changed',
+        oldValue: obj1,
+        newValue: obj2
+      })
+    }
+    return differences
+  }
+  
+  // 获取所有键
+  const keys1 = Object.keys(obj1)
+  const keys2 = Object.keys(obj2)
+  const allKeys = new Set([...keys1, ...keys2])
+  
+  for (const key of allKeys) {
+    const currentPath = path ? `${path}.${key}` : key
+    const hasKey1 = key in obj1
+    const hasKey2 = key in obj2
+    
+    if (!hasKey1 && hasKey2) {
+      // 新增的键
+      differences.push({
+        path: currentPath,
+        type: 'added',
+        newValue: obj2[key]
+      })
+    } else if (hasKey1 && !hasKey2) {
+      // 删除的键
+      differences.push({
+        path: currentPath,
+        type: 'removed',
+        oldValue: obj1[key]
+      })
+    } else if (hasKey1 && hasKey2) {
+      // 递归比较
+      differences.push(...deepCompare(obj1[key], obj2[key], currentPath))
+    }
+  }
+  
+  return differences
+}
+
+// JSON对比方法
+const compareJson = () => {
+  try {
+    const parsedA = JSON.parse(jsonA.value)
+    const parsedB = JSON.parse(jsonB.value)
+    
+    const differences = deepCompare(parsedA, parsedB)
+    
+    diffResult.value = {
+      identical: differences.length === 0,
+      differences
+    }
+  } catch (error) {
+    console.error('JSON对比失败:', error)
+  }
+}
+
+// 导出差异结果
+const exportDiff = () => {
+  if (!diffResult.value) return
+  
+  const diffReport = {
+    timestamp: new Date().toISOString(),
+    identical: diffResult.value.identical,
+    differences: diffResult.value.differences,
+    summary: {
+      totalDifferences: diffResult.value.differences.length,
+      added: diffResult.value.differences.filter(d => d.type === 'added').length,
+      removed: diffResult.value.differences.filter(d => d.type === 'removed').length,
+      changed: diffResult.value.differences.filter(d => d.type === 'changed').length
+    }
+  }
+  
+  const blob = new Blob([JSON.stringify(diffReport, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `json-diff-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
 
 // 新增高亮方法
 const highlightedJson = computed(() => {
