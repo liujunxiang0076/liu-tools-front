@@ -515,10 +515,11 @@ const highlightedJson = computed(() => {
 .dark .json-pre {
   color: #e5e7eb;
 }
-.json-key { color: #8b5cf6; }
-.json-string { color: #22c55e; }
-.json-number { color: #3b82f6; }
-.json-boolean { color: #f59e0b; }
-.json-null { color: #ef4444; }
+/* VSCode风格的JSON语法高亮 */
+.json-key { color: #0ea5e9; font-weight: 500; } /* 蓝色键名 */
+.json-string { color: #dc2626; } /* 红色字符串值 */
+.json-number { color: #059669; } /* 绿色数字 */
+.json-boolean { color: #7c3aed; } /* 紫色布尔值 */
+.json-null { color: #6b7280; font-style: italic; } /* 灰色null值 */
 </style> 
  
