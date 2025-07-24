@@ -481,7 +481,7 @@ const highlightedJson = computed(() => {
   border-radius: 0.75rem; /* 与 rounded-lg 一致 */
   box-shadow: 0 2px 16px 0 rgba(0,0,0,0.06);
   background: #fff; /* 与 textarea-bordered 默认一致 */
-  padding: 1.25rem; /* 与输入区内边距一致 */
+  padding: 0; /* 移除容器内边距，由内部json-pre控制 */
   min-height: 20rem;
   font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Menlo', 'Courier', monospace;
 }
@@ -496,6 +496,10 @@ const highlightedJson = computed(() => {
   border-radius: 0.75rem;
   box-shadow: 0 2px 16px 0 rgba(0,0,0,0.06);
   background: #fff;
+  padding: 0.75rem !important; /* 统一内边距 */
+  line-height: 1.7; /* 与格式化结果保持一致 */
+  white-space: pre-wrap; /* 与格式化结果完全一致 */
+  word-break: break-all; /* 与格式化结果完全一致 */
 }
 .json-pre {
   margin: 0;
@@ -506,6 +510,7 @@ const highlightedJson = computed(() => {
   line-height: 1.7;
   white-space: pre-wrap;
   word-break: break-all;
+  padding: 0.75rem; /* 统一内边距 */
 }
 .dark .json-pre {
   color: #e5e7eb;
@@ -516,3 +521,4 @@ const highlightedJson = computed(() => {
 .json-boolean { color: #f59e0b; }
 .json-null { color: #ef4444; }
 </style> 
+ 
