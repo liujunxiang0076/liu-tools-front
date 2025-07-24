@@ -44,14 +44,49 @@
       </div>
 
       <!-- 主要内容区域 -->
-      <div v-if="currentMode === 'format'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div v-if="currentMode === 'format'" class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <!-- 格式化模式的原有内容 -->
       </div>
       
       <!-- 对比模式的内容区域 -->
-      <div v-else-if="currentMode === 'diff'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- 第一个JSON输入区域 -->
-        <div class="bg-base-100 rounded-2xl p-6 shadow-lg">
+      <div v-else-if="currentMode === 'diff'" class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        <!-- 移动端工具栏 -->
+        <div class="lg:hidden flex items-center justify-between bg-base-100 rounded-xl p-4 shadow-lg">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-base-content/60">当前编辑:</span>
+            <div class="join">
+              <button 
+                @click="setMobileTab('A')"
+                class="btn btn-sm join-item"
+                :class="{ 'btn-primary': mobileTab === 'A', 'btn-outline': mobileTab !== 'A' }"
+              >
+                JSON A
+              </button>
+              <button 
+                @click="setMobileTab('B')"
+                class="btn btn-sm join-item"
+                :class="{ 'btn-primary': mobileTab === 'B', 'btn-outline': mobileTab !== 'B' }"
+              >
+                JSON B
+              </button>
+            </div>
+          </div>
+          <button 
+            @click="compareJson"
+            class="btn btn-sm btn-primary"
+            :disabled="!jsonA || !jsonB || hasErrorA || hasErrorB"
+          >
+            开始对比
+          </button>
+        </div>
+                  <!-- 第一个JSON输入区域 -->
+          <div 
+            class="bg-base-100 rounded-2xl p-4 md:p-6 shadow-lg"
+            :class="{ 'lg:block': true, 'hidden': mobileTab === 'B', 'block': mobileTab === 'A' }"
+            @touchstart="initTouchStart"
+            @touchmove="handleTouchMove"
+            @touchend="handleTouchStart = { x: 0, y: 0 }"
+          >
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-base-content">JSON A</h2>
             <div class="flex gap-2">
@@ -99,8 +134,14 @@
           </div>
         </div>
 
-        <!-- 第二个JSON输入区域 -->
-        <div class="bg-base-100 rounded-2xl p-6 shadow-lg">
+                  <!-- 第二个JSON输入区域 -->
+          <div 
+            class="bg-base-100 rounded-2xl p-4 md:p-6 shadow-lg"
+            :class="{ 'lg:block': true, 'hidden': mobileTab === 'A', 'block': mobileTab === 'B' }"
+            @touchstart="initTouchStart"
+            @touchmove="handleTouchMove"
+            @touchend="handleTouchStart = { x: 0, y: 0 }"
+          >
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-base-content">JSON B</h2>
             <div class="flex gap-2">
@@ -150,7 +191,7 @@
       </div>
       
       <!-- 对比结果显示区域 -->
-      <div v-if="currentMode === 'diff'" class="mt-6 bg-base-100 rounded-2xl p-6 shadow-lg">
+      <div v-if="currentMode === 'diff'" class="mt-4 md:mt-6 bg-base-100 rounded-2xl p-4 md:p-6 shadow-lg">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold text-base-content">差异对比结果</h2>
           <div class="flex gap-2">
@@ -403,6 +444,38 @@ const hasErrorA = ref(false)
 const hasErrorB = ref(false)
 const errorMessageA = ref('')
 const errorMessageB = ref('')
+
+// 移动端相关状态
+const mobileTab = ref<'A' | 'B'>('A')
+const setMobileTab = (tab: 'A' | 'B') => {
+  mobileTab.value = tab
+}
+
+// 移动端手势处理
+const handleTouchStart = ref({ x: 0, y: 0 })
+const handleTouchMove = (event: TouchEvent) => {
+  if (!handleTouchStart.value.x || !handleTouchStart.value.y) return
+  
+  const deltaX = event.touches[0].clientX - handleTouchStart.value.x
+  const deltaY = event.touches[0].clientY - handleTouchStart.value.y
+  
+  // 只处理水平滑动，忽略垂直滑动
+  if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+    if (deltaX > 0 && mobileTab.value === 'B') {
+      setMobileTab('A')
+    } else if (deltaX < 0 && mobileTab.value === 'A') {
+      setMobileTab('B')
+    }
+    handleTouchStart.value = { x: 0, y: 0 }
+  }
+}
+
+const initTouchStart = (event: TouchEvent) => {
+  handleTouchStart.value = {
+    x: event.touches[0].clientX,
+    y: event.touches[0].clientY
+  }
+}
 
 // 差异对比结果
 interface DiffItem {
@@ -858,7 +931,30 @@ const highlightedJson = computed(() => {
 /* 响应式调整 */
 @media (max-width: 768px) {
   .textarea {
-    height: 16rem;
+    height: calc(100vh - 20rem);
+    min-height: 16rem;
+    font-size: 14px;
+  }
+  
+  pre {
+    font-size: 14px;
+  }
+  
+  .btn {
+    min-height: 2.5rem;
+    height: 2.5rem;
+    min-width: 2.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .btn-sm {
+    min-height: 2rem;
+    height: 2rem;
+    min-width: 2rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    font-size: 0.875rem;
   }
   
   pre {
