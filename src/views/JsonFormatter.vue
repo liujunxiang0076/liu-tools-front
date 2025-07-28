@@ -67,6 +67,7 @@
           @touchstart="initTouchStart" @touchmove="handleTouchMove" @touchend="handleTouchStart = { x: 0, y: 0 }">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-base-content">JSON A</h2>
+            <span v-if="autoFormatA" class="text-sm text-base-content/60">已自动格式化</span>
             <div class="flex gap-2">
               <button @click="clearJsonA" class="btn btn-sm btn-ghost" :disabled="!jsonA">
                 清空
@@ -108,6 +109,10 @@
           @touchstart="initTouchStart" @touchmove="handleTouchMove" @touchend="handleTouchStart = { x: 0, y: 0 }">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-base-content">JSON B</h2>
+            <div v-if="autoFormatB" class="text-sm text-base-content/60">
+              <span class="text-success">已自动格式化</span>
+              <button @click="autoFormatB = false" class="btn btn-sm btn-ghost">还原</button>
+            </div>
             <div class="flex gap-2">
               <button @click="clearJsonB" class="btn btn-sm btn-ghost" :disabled="!jsonB">
                 清空
@@ -362,6 +367,8 @@ const hasErrorA = ref(false)
 const hasErrorB = ref(false)
 const errorMessageA = ref('')
 const errorMessageB = ref('')
+const autoFormatA = ref(false)
+const autoFormatB = ref(false)
 
 // 移动端相关状态
 const mobileTab = ref<'A' | 'B'>('A')
