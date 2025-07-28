@@ -4,10 +4,7 @@
       <!-- 页面标题 -->
       <div class="mb-6 md:mb-8">
         <div class="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
-          <button 
-            @click="goBack"
-            class="btn btn-ghost btn-circle touch-manipulation"
-          >
+          <button @click="goBack" class="btn btn-ghost btn-circle touch-manipulation">
             <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
@@ -19,23 +16,17 @@
           <p class="text-sm md:text-base text-base-content/70 mb-3 md:mb-0">
             JSON数据格式化、压缩和验证工具，支持语法高亮和错误提示
           </p>
-          
+
           <!-- 模式切换器 -->
           <div class="flex items-center gap-2">
             <span class="text-sm text-base-content/60">模式:</span>
             <div class="join">
-              <button 
-                @click="switchMode('format')"
-                class="btn btn-sm join-item"
-                :class="{ 'btn-primary': currentMode === 'format', 'btn-outline': currentMode !== 'format' }"
-              >
+              <button @click="switchMode('format')" class="btn btn-sm join-item"
+                :class="{ 'btn-primary': currentMode === 'format', 'btn-outline': currentMode !== 'format' }">
                 格式化
               </button>
-              <button 
-                @click="switchMode('diff')"
-                class="btn btn-sm join-item"
-                :class="{ 'btn-primary': currentMode === 'diff', 'btn-outline': currentMode !== 'diff' }"
-              >
+              <button @click="switchMode('diff')" class="btn btn-sm join-item"
+                :class="{ 'btn-primary': currentMode === 'diff', 'btn-outline': currentMode !== 'diff' }">
                 对比
               </button>
             </div>
@@ -47,7 +38,7 @@
       <div v-if="currentMode === 'format'" class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <!-- 格式化模式的原有内容 -->
       </div>
-      
+
       <!-- 对比模式的内容区域 -->
       <div v-else-if="currentMode === 'diff'" class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <!-- 移动端工具栏 -->
@@ -55,76 +46,53 @@
           <div class="flex items-center gap-2">
             <span class="text-sm text-base-content/60">当前编辑:</span>
             <div class="join">
-              <button 
-                @click="setMobileTab('A')"
-                class="btn btn-sm join-item"
-                :class="{ 'btn-primary': mobileTab === 'A', 'btn-outline': mobileTab !== 'A' }"
-              >
+              <button @click="setMobileTab('A')" class="btn btn-sm join-item"
+                :class="{ 'btn-primary': mobileTab === 'A', 'btn-outline': mobileTab !== 'A' }">
                 JSON A
               </button>
-              <button 
-                @click="setMobileTab('B')"
-                class="btn btn-sm join-item"
-                :class="{ 'btn-primary': mobileTab === 'B', 'btn-outline': mobileTab !== 'B' }"
-              >
+              <button @click="setMobileTab('B')" class="btn btn-sm join-item"
+                :class="{ 'btn-primary': mobileTab === 'B', 'btn-outline': mobileTab !== 'B' }">
                 JSON B
               </button>
             </div>
           </div>
-          <button 
-            @click="compareJson"
-            class="btn btn-sm btn-primary"
-            :disabled="!jsonA || !jsonB || hasErrorA || hasErrorB"
-          >
+          <button @click="compareJson" class="btn btn-sm btn-primary"
+            :disabled="!jsonA || !jsonB || hasErrorA || hasErrorB">
             开始对比
           </button>
         </div>
-                  <!-- 第一个JSON输入区域 -->
-          <div 
-            class="bg-base-100 rounded-2xl p-4 md:p-6 shadow-lg"
-            :class="{ 'lg:block': true, 'hidden': mobileTab === 'B', 'block': mobileTab === 'A' }"
-            @touchstart="initTouchStart"
-            @touchmove="handleTouchMove"
-            @touchend="handleTouchStart = { x: 0, y: 0 }"
-          >
+        <!-- 第一个JSON输入区域 -->
+        <div class="bg-base-100 rounded-2xl p-4 md:p-6 shadow-lg"
+          :class="{ 'lg:block': true, 'hidden': mobileTab === 'B', 'block': mobileTab === 'A' }"
+          @touchstart="initTouchStart" @touchmove="handleTouchMove" @touchend="handleTouchStart = { x: 0, y: 0 }">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-base-content">JSON A</h2>
             <div class="flex gap-2">
-              <button 
-                @click="clearJsonA"
-                class="btn btn-sm btn-ghost"
-                :disabled="!jsonA"
-              >
+              <button @click="clearJsonA" class="btn btn-sm btn-ghost" :disabled="!jsonA">
                 清空
               </button>
-              <button 
-                @click="loadExampleA"
-                class="btn btn-sm btn-outline"
-              >
+              <button @click="loadExampleA" class="btn btn-sm btn-outline">
                 示例
               </button>
             </div>
           </div>
-          
+
           <div class="relative">
-            <textarea
-              v-model="jsonA"
-              @input="handleJsonAChange"
-              placeholder="请输入第一个JSON数据..."
+            <textarea v-model="jsonA" @input="handleJsonAChange" placeholder="请输入第一个JSON数据..."
               class="textarea textarea-bordered w-full h-[38rem] font-mono text-sm resize-none"
-              :class="{ 'textarea-error': hasErrorA }"
-            ></textarea>
-            
+              :class="{ 'textarea-error': hasErrorA }"></textarea>
+
             <div class="absolute bottom-2 right-2 text-xs text-base-content/50">
               {{ jsonA.length }} 字符
             </div>
           </div>
-          
+
           <!-- 错误提示 -->
           <div v-if="hasErrorA" class="mt-3 p-3 bg-error/10 border border-error/20 rounded-lg">
             <div class="flex items-start gap-2">
               <svg class="w-4 h-4 text-error flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
               </svg>
               <div>
                 <div class="text-sm font-medium text-error">JSON A 格式错误</div>
@@ -134,52 +102,38 @@
           </div>
         </div>
 
-                  <!-- 第二个JSON输入区域 -->
-          <div 
-            class="bg-base-100 rounded-2xl p-4 md:p-6 shadow-lg"
-            :class="{ 'lg:block': true, 'hidden': mobileTab === 'A', 'block': mobileTab === 'B' }"
-            @touchstart="initTouchStart"
-            @touchmove="handleTouchMove"
-            @touchend="handleTouchStart = { x: 0, y: 0 }"
-          >
+        <!-- 第二个JSON输入区域 -->
+        <div class="bg-base-100 rounded-2xl p-4 md:p-6 shadow-lg"
+          :class="{ 'lg:block': true, 'hidden': mobileTab === 'A', 'block': mobileTab === 'B' }"
+          @touchstart="initTouchStart" @touchmove="handleTouchMove" @touchend="handleTouchStart = { x: 0, y: 0 }">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-base-content">JSON B</h2>
             <div class="flex gap-2">
-              <button 
-                @click="clearJsonB"
-                class="btn btn-sm btn-ghost"
-                :disabled="!jsonB"
-              >
+              <button @click="clearJsonB" class="btn btn-sm btn-ghost" :disabled="!jsonB">
                 清空
               </button>
-              <button 
-                @click="loadExampleB"
-                class="btn btn-sm btn-outline"
-              >
+              <button @click="loadExampleB" class="btn btn-sm btn-outline">
                 示例
               </button>
             </div>
           </div>
-          
+
           <div class="relative">
-            <textarea
-              v-model="jsonB"
-              @input="handleJsonBChange"
-              placeholder="请输入第二个JSON数据..."
+            <textarea v-model="jsonB" @input="handleJsonBChange" placeholder="请输入第二个JSON数据..."
               class="textarea textarea-bordered w-full h-[38rem] font-mono text-sm resize-none"
-              :class="{ 'textarea-error': hasErrorB }"
-            ></textarea>
-            
+              :class="{ 'textarea-error': hasErrorB }"></textarea>
+
             <div class="absolute bottom-2 right-2 text-xs text-base-content/50">
               {{ jsonB.length }} 字符
             </div>
           </div>
-          
+
           <!-- 错误提示 -->
           <div v-if="hasErrorB" class="mt-3 p-3 bg-error/10 border border-error/20 rounded-lg">
             <div class="flex items-start gap-2">
               <svg class="w-4 h-4 text-error flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
               </svg>
               <div>
                 <div class="text-sm font-medium text-error">JSON B 格式错误</div>
@@ -189,35 +143,29 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 对比结果显示区域 -->
       <div v-if="currentMode === 'diff'" class="mt-4 md:mt-6 bg-base-100 rounded-2xl p-4 md:p-6 shadow-lg">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold text-base-content">差异对比结果</h2>
           <div class="flex gap-2">
-            <button 
-              @click="compareJson"
-              class="btn btn-primary"
-              :disabled="!jsonA || !jsonB || hasErrorA || hasErrorB"
-            >
+            <button @click="compareJson" class="btn btn-primary" :disabled="!jsonA || !jsonB || hasErrorA || hasErrorB">
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
               开始对比
             </button>
-            <button 
-              @click="exportDiff"
-              class="btn btn-outline"
-              :disabled="!diffResult"
-            >
+            <button @click="exportDiff" class="btn btn-outline" :disabled="!diffResult">
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               导出差异
             </button>
           </div>
         </div>
-        
+
         <div class="bg-base-200 p-4 rounded-lg h-[20rem] overflow-auto">
           <div v-if="!diffResult" class="text-base-content/40 italic">
             对比结果将在此显示...
@@ -229,12 +177,12 @@
             <div class="text-sm font-medium text-base-content mb-3">
               发现 {{ diffResult.differences.length }} 处差异:
             </div>
-            <div v-for="(diff, index) in diffResult.differences" :key="index" class="border-l-4 pl-4 py-2 text-sm font-mono"
-                 :class="{
-                   'border-red-500 bg-red-50 dark:bg-red-900/20': diff.type === 'removed',
-                   'border-green-500 bg-green-50 dark:bg-green-900/20': diff.type === 'added',
-                   'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20': diff.type === 'changed'
-                 }">
+            <div v-for="(diff, index) in diffResult.differences" :key="index"
+              class="border-l-4 pl-4 py-2 text-sm font-mono" :class="{
+                'border-red-500 bg-red-50 dark:bg-red-900/20': diff.type === 'removed',
+                'border-green-500 bg-green-50 dark:bg-green-900/20': diff.type === 'added',
+                'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20': diff.type === 'changed'
+              }">
               <div class="font-semibold text-xs text-base-content/70 mb-1">
                 {{ diff.path }} - {{ diff.type === 'removed' ? '删除' : diff.type === 'added' ? '新增' : '修改' }}
               </div>
@@ -252,7 +200,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 格式化模式的原有内容区域 -->
       <div v-if="currentMode === 'format'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- 输入区域 -->
@@ -260,42 +208,32 @@
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-base-content">JSON输入</h2>
             <div class="flex gap-2">
-              <button 
-                @click="clearInput"
-                class="btn btn-sm btn-ghost"
-                :disabled="!inputJson"
-              >
+              <button @click="clearInput" class="btn btn-sm btn-ghost" :disabled="!inputJson">
                 清空
               </button>
-              <button 
-                @click="loadExample"
-                class="btn btn-sm btn-outline"
-              >
+              <button @click="loadExample" class="btn btn-sm btn-outline">
                 示例
               </button>
             </div>
           </div>
-          
+
           <div class="relative">
-            <textarea
-              v-model="inputJson"
-              @input="handleInputChange"
-              placeholder="请输入JSON数据..."
+            <textarea v-model="inputJson" @input="handleInputChange" placeholder="请输入JSON数据..."
               class="textarea textarea-bordered w-full h-[38rem] font-mono text-sm resize-none"
-              :class="{ 'textarea-error': hasError }"
-            ></textarea>
-            
+              :class="{ 'textarea-error': hasError }"></textarea>
+
             <!-- 字符计数 -->
             <div class="absolute bottom-2 right-2 text-xs text-base-content/50">
               {{ inputJson.length }} 字符
             </div>
           </div>
-          
+
           <!-- 错误提示 -->
           <div v-if="hasError" class="mt-3 p-3 bg-error/10 border border-error/20 rounded-lg">
             <div class="flex items-start gap-2">
               <svg class="w-4 h-4 text-error flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
               </svg>
               <div>
                 <div class="text-sm font-medium text-error">JSON格式错误</div>
@@ -310,29 +248,23 @@
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-base-content">格式化结果</h2>
             <div class="flex gap-2">
-              <button 
-                @click="copyResult"
-                class="btn btn-sm btn-primary"
-                :disabled="!formattedJson || hasError"
-              >
+              <button @click="copyResult" class="btn btn-sm btn-primary" :disabled="!formattedJson || hasError">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
                 复制
               </button>
-              <button 
-                @click="downloadJson"
-                class="btn btn-sm btn-outline"
-                :disabled="!formattedJson || hasError"
-              >
+              <button @click="downloadJson" class="btn btn-sm btn-outline" :disabled="!formattedJson || hasError">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 下载
               </button>
             </div>
           </div>
-          
+
           <div class="relative">
             <div class="bg-base-200 p-4 rounded-lg h-[38rem] overflow-auto custom-json-viewer">
               <template v-if="!hasError && formattedJson">
@@ -349,40 +281,29 @@
       <div class="mt-6 bg-base-100 rounded-2xl p-6 shadow-lg">
         <div class="flex flex-wrap gap-4 items-center justify-between">
           <div class="flex flex-wrap gap-2">
-            <button 
-              @click="formatJson"
-              class="btn btn-primary"
-              :disabled="!inputJson || hasError"
-            >
+            <button @click="formatJson" class="btn btn-primary" :disabled="!inputJson || hasError">
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
               格式化
             </button>
-            
-            <button 
-              @click="compressJson"
-              class="btn btn-outline"
-              :disabled="!inputJson || hasError"
-            >
+
+            <button @click="compressJson" class="btn btn-outline" :disabled="!inputJson || hasError">
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
               </svg>
               压缩
             </button>
-            
-            <button 
-              @click="validateJson"
-              class="btn btn-outline"
-              :disabled="!inputJson"
-            >
+
+            <button @click="validateJson" class="btn btn-outline" :disabled="!inputJson">
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               验证
             </button>
           </div>
-          
+
           <div class="flex items-center gap-4 text-sm text-base-content/60">
             <span>缩进:</span>
             <select v-model="indentSize" class="select select-sm select-bordered">
@@ -423,9 +344,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-// 移除json-viewer相关import
-// import { JsonViewer } from 'vue3-json-viewer'
-// import 'vue3-json-viewer/dist/vue3-json-viewer.css'
 
 const router = useRouter()
 
@@ -455,10 +373,10 @@ const setMobileTab = (tab: 'A' | 'B') => {
 const handleTouchStart = ref({ x: 0, y: 0 })
 const handleTouchMove = (event: TouchEvent) => {
   if (!handleTouchStart.value.x || !handleTouchStart.value.y) return
-  
+
   const deltaX = event.touches[0].clientX - handleTouchStart.value.x
   const deltaY = event.touches[0].clientY - handleTouchStart.value.y
-  
+
   // 只处理水平滑动，忽略垂直滑动
   if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
     if (deltaX > 0 && mobileTab.value === 'B') {
@@ -524,15 +442,6 @@ const exampleJson = `{
   }
 }`
 
-// 移除parsedJson和isDarkTheme相关内容
-// const parsedJson = computed(() => {
-//   if (hasError.value || !inputJson.value.trim()) return null
-//   try {
-//     return JSON.parse(inputJson.value)
-//   } catch {
-//     return null
-//   }
-// })
 
 // 返回上一页
 const goBack = () => {
@@ -548,7 +457,7 @@ const handleInputChange = () => {
     jsonStats.value = null
     return
   }
-  
+
   // 自动验证
   validateJson()
 }
@@ -560,15 +469,15 @@ const validateJson = () => {
     errorMessage.value = ''
     return
   }
-  
+
   try {
     const parsed = JSON.parse(inputJson.value)
     hasError.value = false
     errorMessage.value = ''
-    
+
     // 生成统计信息
     generateStats(parsed)
-    
+
     return parsed
   } catch (error) {
     hasError.value = true
@@ -599,18 +508,18 @@ const compressJson = () => {
 const generateStats = (data: any) => {
   const jsonString = JSON.stringify(data)
   const sizeInBytes = new Blob([jsonString]).size
-  
+
   // 格式化文件大小
   const formatSize = (bytes: number): string => {
     if (bytes < 1024) return bytes + ' B'
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
   }
-  
+
   // 计算键数量
   const countKeys = (obj: any): number => {
     if (typeof obj !== 'object' || obj === null) return 0
-    
+
     let count = 0
     if (Array.isArray(obj)) {
       obj.forEach(item => {
@@ -624,11 +533,11 @@ const generateStats = (data: any) => {
     }
     return count
   }
-  
+
   // 计算嵌套深度
   const calculateDepth = (obj: any): number => {
     if (typeof obj !== 'object' || obj === null) return 0
-    
+
     let maxDepth = 0
     if (Array.isArray(obj)) {
       obj.forEach(item => {
@@ -641,14 +550,14 @@ const generateStats = (data: any) => {
     }
     return maxDepth + 1
   }
-  
+
   // 确定数据类型
   const getDataType = (data: any): string => {
     if (Array.isArray(data)) return 'Array'
     if (typeof data === 'object' && data !== null) return 'Object'
     return typeof data
   }
-  
+
   jsonStats.value = {
     size: formatSize(sizeInBytes),
     keys: countKeys(data),
@@ -660,7 +569,7 @@ const generateStats = (data: any) => {
 // 复制结果
 const copyResult = async () => {
   if (!formattedJson.value) return
-  
+
   try {
     await navigator.clipboard.writeText(formattedJson.value)
     // 这里可以添加成功提示
@@ -672,7 +581,7 @@ const copyResult = async () => {
 // 下载JSON文件
 const downloadJson = () => {
   if (!formattedJson.value) return
-  
+
   const blob = new Blob([formattedJson.value], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
@@ -792,7 +701,7 @@ const loadExampleB = () => {
 // 深度对比两个对象
 const deepCompare = (obj1: any, obj2: any, path = ''): DiffItem[] => {
   const differences: DiffItem[] = []
-  
+
   // 处理基本类型
   if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null) {
     if (obj1 !== obj2) {
@@ -805,17 +714,17 @@ const deepCompare = (obj1: any, obj2: any, path = ''): DiffItem[] => {
     }
     return differences
   }
-  
+
   // 获取所有键
   const keys1 = Object.keys(obj1)
   const keys2 = Object.keys(obj2)
   const allKeys = new Set([...keys1, ...keys2])
-  
+
   for (const key of allKeys) {
     const currentPath = path ? `${path}.${key}` : key
     const hasKey1 = key in obj1
     const hasKey2 = key in obj2
-    
+
     if (!hasKey1 && hasKey2) {
       // 新增的键
       differences.push({
@@ -835,7 +744,7 @@ const deepCompare = (obj1: any, obj2: any, path = ''): DiffItem[] => {
       differences.push(...deepCompare(obj1[key], obj2[key], currentPath))
     }
   }
-  
+
   return differences
 }
 
@@ -844,9 +753,9 @@ const compareJson = () => {
   try {
     const parsedA = JSON.parse(jsonA.value)
     const parsedB = JSON.parse(jsonB.value)
-    
+
     const differences = deepCompare(parsedA, parsedB)
-    
+
     diffResult.value = {
       identical: differences.length === 0,
       differences
@@ -859,7 +768,7 @@ const compareJson = () => {
 // 导出差异结果
 const exportDiff = () => {
   if (!diffResult.value) return
-  
+
   const diffReport = {
     timestamp: new Date().toISOString(),
     identical: diffResult.value.identical,
@@ -871,7 +780,7 @@ const exportDiff = () => {
       changed: diffResult.value.differences.filter(d => d.type === 'changed').length
     }
   }
-  
+
   const blob = new Blob([JSON.stringify(diffReport, null, 2)], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
@@ -935,11 +844,11 @@ const highlightedJson = computed(() => {
     min-height: 16rem;
     font-size: 14px;
   }
-  
+
   pre {
     font-size: 14px;
   }
-  
+
   .btn {
     min-height: 2.5rem;
     height: 2.5rem;
@@ -947,7 +856,7 @@ const highlightedJson = computed(() => {
     padding-left: 1rem;
     padding-right: 1rem;
   }
-  
+
   .btn-sm {
     min-height: 2rem;
     height: 2rem;
@@ -956,7 +865,7 @@ const highlightedJson = computed(() => {
     padding-right: 0.75rem;
     font-size: 0.875rem;
   }
-  
+
   pre {
     height: 16rem;
   }
@@ -964,29 +873,40 @@ const highlightedJson = computed(() => {
 
 .custom-json-viewer {
   border: 1.5px solid #e5e7eb;
-  border-radius: 0.75rem; /* 与 rounded-lg 一致 */
-  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.06);
-  background: #fff; /* 与 textarea-bordered 默认一致 */
-  padding: 0; /* 移除容器内边距，由内部json-pre控制 */
+  border-radius: 0.75rem;
+  /* 与 rounded-lg 一致 */
+  box-shadow: 0 2px 16px 0 rgba(0, 0, 0, 0.06);
+  background: #fff;
+  /* 与 textarea-bordered 默认一致 */
+  padding: 0;
+  /* 移除容器内边距，由内部json-pre控制 */
   min-height: 20rem;
   font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Menlo', 'Courier', monospace;
 }
+
 .dark .custom-json-viewer {
   background: #23272e;
   border-color: #2a2e37;
 }
-.textarea, textarea {
+
+.textarea,
+textarea {
   font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Menlo', 'Courier', monospace;
   font-size: 15px;
   border: 1.5px solid #e5e7eb;
   border-radius: 0.75rem;
-  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.06);
+  box-shadow: 0 2px 16px 0 rgba(0, 0, 0, 0.06);
   background: #fff;
-  padding: 0.75rem !important; /* 统一内边距 */
-  line-height: 1.7; /* 与格式化结果保持一致 */
-  white-space: pre-wrap; /* 与格式化结果完全一致 */
-  word-break: break-all; /* 与格式化结果完全一致 */
+  padding: 0.75rem !important;
+  /* 统一内边距 */
+  line-height: 1.7;
+  /* 与格式化结果保持一致 */
+  white-space: pre-wrap;
+  /* 与格式化结果完全一致 */
+  word-break: break-all;
+  /* 与格式化结果完全一致 */
 }
+
 .json-pre {
   margin: 0;
   font-size: 15px;
@@ -996,16 +916,40 @@ const highlightedJson = computed(() => {
   line-height: 1.7;
   white-space: pre-wrap;
   word-break: break-all;
-  padding: 0.75rem; /* 统一内边距 */
+  padding: 0.75rem;
+  /* 统一内边距 */
 }
+
 .dark .json-pre {
   color: #e5e7eb;
 }
+
 /* VSCode风格的JSON语法高亮 */
-.json-key { color: #0ea5e9; font-weight: 500; } /* 蓝色键名 */
-.json-string { color: #dc2626; } /* 红色字符串值 */
-.json-number { color: #059669; } /* 绿色数字 */
-.json-boolean { color: #7c3aed; } /* 紫色布尔值 */
-.json-null { color: #6b7280; font-style: italic; } /* 灰色null值 */
-</style> 
- 
+.json-key {
+  color: #0ea5e9;
+  font-weight: 500;
+}
+
+/* 蓝色键名 */
+.json-string {
+  color: #dc2626;
+}
+
+/* 红色字符串值 */
+.json-number {
+  color: #059669;
+}
+
+/* 绿色数字 */
+.json-boolean {
+  color: #7c3aed;
+}
+
+/* 紫色布尔值 */
+.json-null {
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* 灰色null值 */
+</style>
