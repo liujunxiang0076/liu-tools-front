@@ -758,6 +758,15 @@ const startAddingTag = () => {
 }
 
 const addNewTag = () => {
+  // 检查是否在添加标签模式
+  if (!isAddingTag.value) {
+    return
+  }
+  // 检查输入内容是否为空
+  if (!newTagContent.value.trim()) {
+    console.log('请输入标签内容')
+    return
+  }
   if (newTagContent.value.trim()) {
     const trimmedContent = newTagContent.value.trim()
     
@@ -767,7 +776,8 @@ const addNewTag = () => {
     if (existingTag) {
       // 如果存在相同内容，聚焦到已存在的标签
       selectedTagId.value = existingTag.id
-      
+      // 并显示到末尾
+      textTags.value = [...textTags.value.filter(t => t.id !== existingTag.id), existingTag]
       // 可选：显示提示信息
       console.log(`💡 内容"${trimmedContent}"已存在，已自动选择现有标签并生成二维码`)
     } else {
