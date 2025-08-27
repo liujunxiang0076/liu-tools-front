@@ -234,19 +234,176 @@ export default {
     top: 0;
     left: 0;
     z-index: 40;
-    width: 16rem;
+    width: 18rem; /* 增加宽度 */
     transform: translateX(-100%);
     height: 100vh;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  [data-theme="dark"] .sidebar {
+    background: rgba(30, 41, 59, 0.95);
   }
   
   .sidebar.open {
     transform: translateX(0);
   }
   
+  /* 侧边栏头部移动端优化 */
+  .sidebar-header {
+    padding: 1.5rem 1.25rem 1rem;
+    border-bottom: 1px solid hsl(var(--b3) / 0.8);
+  }
+  
+  .sidebar-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* 分类菜单项移动端优化 */
+  .category-menu-item {
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.9375rem;
+    min-height: 3rem; /* 44px+ 触摸目标 */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .category-menu-item:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+  
+  /* 分类图标移动端优化 */
+  .category-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 1rem;
+    margin-right: 1rem;
+  }
+  
+  /* 收藏区域移动端优化 */
+  .favorite-tool-card {
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    margin-bottom: 0.5rem;
+    min-height: 3.5rem; /* 增加触摸区域 */
+    touch-action: manipulation;
+  }
+  
+  .favorite-tool-card:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+  
   /* 移动端收藏操作按钮始终显示 */
   .group .opacity-0 {
     opacity: 1;
+  }
+  
+  /* 收藏管理按钮移动端优化 */
+  .favorite-manage-btn {
+    min-height: 2rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    touch-action: manipulation;
+  }
+  
+  /* 收藏数量徽章优化 */
+  .badge-error {
+    min-width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+}
+
+/* 小屏幕进一步优化 */
+@media (max-width: 640px) {
+  .sidebar {
+    width: 16rem; /* 中等屏幕宽度 */
+  }
+  
+  .sidebar-header {
+    padding: 1.25rem 1rem 0.875rem;
+  }
+  
+  .sidebar-title {
+    font-size: 1.125rem;
+  }
+  
+  .category-menu-item {
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+    min-height: 2.75rem;
+  }
+  
+  .category-icon {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.875rem;
+    margin-right: 0.875rem;
+  }
+  
+  .favorite-tool-card {
+    padding: 0.625rem;
+    min-height: 3rem;
+  }
+  
+  .favorite-manage-btn {
+    min-height: 1.75rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.6875rem;
+  }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 480px) {
+  .sidebar {
+    width: 14rem; /* 小屏幕进一步缩小 */
+  }
+  
+  .sidebar-header {
+    padding: 1rem 0.875rem 0.75rem;
+  }
+  
+  .sidebar-title {
+    font-size: 1rem;
+  }
+  
+  .category-menu-item {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.8125rem;
+    min-height: 2.5rem;
+  }
+  
+  .category-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.8125rem;
+    margin-right: 0.75rem;
+  }
+  
+  .favorite-tool-card {
+    padding: 0.5rem;
+    min-height: 2.75rem;
+  }
+  
+  .favorite-manage-btn {
+    min-height: 1.5rem;
+    padding: 0.1875rem 0.375rem;
+    font-size: 0.625rem;
+    min-width: 1.5rem;
+  }
+  
+  /* 隐藏管理按钮文字，只显示图标 */
+  .favorite-manage-btn .hidden {
+    display: none !important;
   }
 }
 </style> 

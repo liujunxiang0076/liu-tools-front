@@ -440,16 +440,182 @@ export default {
 @media (max-width: 768px) {
   .tools-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0.5rem;
+  }
+  
+  /* 工作区头部移动端优化 */
+  .workspace-header {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .workspace-header-title {
+    font-size: 1.25rem;
+  }
+  
+  .workspace-header-subtitle {
+    font-size: 0.8125rem;
+  }
+  
+  /* 排序选择器移动端优化 */
+  .workspace-sort-select {
+    min-width: 100px;
+    max-width: 140px;
+  }
+  
+  /* 列表视图移动端优化 */
+  .tool-list-item {
+    padding: 1rem;
+    border-radius: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .tool-list-item .tool-content {
+    padding-right: 2.5rem;
+  }
+  
+  .tool-list-item .tool-title {
+    font-size: 1.125rem;
+    line-height: 1.4;
+  }
+  
+  .tool-list-item .tool-description {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+  }
+  
+  .tool-list-item .action-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+  
+  .tool-list-item .action-btn {
+    width: 100%;
+    min-height: 2.5rem;
+    justify-content: center;
+    font-size: 0.875rem;
+  }
+  
+  /* 收藏按钮移动端优化 */
+  .tool-list-item .favorite-btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    top: 1rem;
+    right: 1rem;
+  }
+  
+  /* 空状态移动端优化 */
+  .empty-state {
+    padding: 2rem 1rem;
+  }
+  
+  .empty-icon {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .empty-title {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .empty-description {
+    font-size: 0.875rem;
+    max-width: 24rem;
   }
 }
 
 @media (max-width: 640px) {
   .flex-1 {
-    padding: 1rem;
+    padding: 0.75rem;
   }
   
   .tools-grid {
-    gap: 1rem;
+    gap: 0.75rem;
+    padding: 0.25rem;
+  }
+  
+  /* 工作区头部小屏幕优化 */
+  .workspace-header {
+    padding: 0.75rem;
+  }
+  
+  .workspace-header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .workspace-header-right {
+    align-self: flex-end;
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .workspace-header-title {
+    font-size: 1.125rem;
+  }
+  
+  .workspace-header-subtitle {
+    font-size: 0.75rem;
+  }
+  
+  /* 列表视图小屏幕优化 */
+  .tool-list-item {
+    padding: 0.875rem;
+  }
+  
+  .tool-list-item .tool-content {
+    padding-right: 2.25rem;
+  }
+  
+  .tool-list-item .tool-title {
+    font-size: 1rem;
+  }
+  
+  .tool-list-item .tool-description {
+    font-size: 0.8125rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .tool-list-item .action-buttons {
+    margin-top: 0.5rem;
+  }
+  
+  .tool-list-item .action-btn {
+    min-height: 2.25rem;
+    font-size: 0.8125rem;
+  }
+  
+  .tool-list-item .favorite-btn {
+    width: 2rem;
+    height: 2rem;
+    top: 0.875rem;
+    right: 0.875rem;
+  }
+  
+  /* 空状态小屏幕优化 */
+  .empty-state {
+    padding: 1.5rem 0.75rem;
+  }
+  
+  .empty-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  
+  .empty-title {
+    font-size: 1rem;
+  }
+  
+  .empty-description {
+    font-size: 0.8125rem;
+    max-width: 20rem;
   }
 }
 </style> 

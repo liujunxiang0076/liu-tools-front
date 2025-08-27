@@ -45,39 +45,176 @@
 
       <!-- 主要内容区域 -->
       <div v-if="currentMode === 'format'" class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        <!-- 格式化模式的原有内容 -->
+        <!-- 输入区域 -->
+        <div class="bg-base-100 rounded-2xl p-4 md:p-6 shadow-lg">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-base-content">JSON输入</h2>
+            <div class="flex gap-2">
+              <button 
+                @click="clearInput"
+                class="btn btn-sm btn-ghost"
+                :disabled="!inputJson"
+              >
+                清空
+              </button>
+              <button 
+                @click="loadExample"
+                class="btn btn-sm btn-outline"
+              >
+                示例
+              </button>
+            </div>
+          </div>
+          
+          <div class="relative">
+            <textarea
+              v-model="inputJson"
+              @input="handleInputChange"
+              placeholder="请输入JSON数据..."
+              class="textarea textarea-bordered w-full h-[38rem] font-mono text-sm resize-none"
+              :class="{ 'textarea-error': hasError }"
+            ></textarea>
+            
+            <div class="absolute bottom-2 right-2 text-xs text-base-content/50">
+              {{ inputJson.length }} 字符
+            </div>
+          </div>
+          
+          <!-- 错误提示 -->
+          <div v-if="hasError" class="mt-3 p-3 bg-error/10 border border-error/20 rounded-lg">
+            <div class="flex items-start gap-2">
+              <svg class="w-4 h-4 text-error flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              <div>
+                <div class="text-sm font-medium text-error">JSON格式错误</div>
+                <div class="text-xs text-error/80 mt-1">{{ errorMessage }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 输出区域 -->
+        <div class="bg-base-100 rounded-2xl p-4 md:p-6 shadow-lg">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-base-content">格式化结果</h2>
+            <div class="flex gap-2">
+              <!-- 搜索功能 -->
+              <div class="relative">
+                <input
+                  v-model="searchQuery"
+                  type="text"
+                  placeholder="搜索..."
+                  class="input input-sm input-bordered w-32 pr-8"
+                  @input="performSearch"
+                />
+                <svg class="w-4 h-4 absolute right-2 top-1/2 transform -translate-y-1/2 text-base-content/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              </div>
+              
+              <!-- 折叠控制 -->
+              <button 
+                @click="toggleAllFolds"
+                class="btn btn-sm btn-ghost"
+                :disabled="!formattedJson || hasError"
+              >
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+                {{ allFolded ? '展开' : '折叠' }}
+              </button>
+              
+              <button 
+                @click="copyResult"
+                class="btn btn-sm btn-primary"
+                :disabled="!formattedJson || hasError"
+              >
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                复制
+              </button>
+            </div>
+          </div>
+          
+          <div class="relative">
+            <div class="bg-base-200 rounded-lg h-[38rem] overflow-auto custom-json-viewer">
+              <template v-if="!hasError && formattedJson">
+                <div class="json-editor-container" ref="jsonEditorRef">
+                  <div class="json-tree-view flex font-mono text-sm">
+                    <!-- 行号列 -->
+                    <div class="line-numbers bg-base-300/50 px-2 py-1 text-right text-base-content/40 select-none border-r border-base-300" style="min-width: 3rem;">
+                      <div 
+                        v-for="(line, index) in lineNumbers" 
+                        :key="index"
+                        class="line-number leading-6 text-xs"
+                        :class="{ 'bg-yellow-200 text-yellow-800': searchResults.some(result => result.includes(String(index + 1))) }"
+                      >
+                        {{ line }}
+                      </div>
+                    </div>
+                    
+                    <!-- JSON内容 -->
+                    <div class="json-content flex-1 p-2">
+                      <pre class="json-pre-enhanced"><code v-html="enhancedHighlightedJson"></code></pre>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <div v-else-if="hasError" class="text-error/60 italic p-4">JSON格式错误，请检查输入</div>
+              <div v-else class="text-base-content/40 italic p-4">格式化结果将在此显示...</div>
+            </div>
+          </div>
+        </div>
       </div>
       
       <!-- 对比模式的内容区域 -->
       <div v-else-if="currentMode === 'diff'" class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        <!-- 移动端工具栏 -->
-        <div class="lg:hidden flex items-center justify-between bg-base-100 rounded-xl p-4 shadow-lg">
-          <div class="flex items-center gap-2">
-            <span class="text-sm text-base-content/60">当前编辑:</span>
-            <div class="join">
+        <!-- 移动端工具栏 - 优化版 -->
+        <div class="lg:hidden bg-base-100 rounded-xl p-3 shadow-lg mb-4">
+          <!-- 标签页切换 -->
+          <div class="flex items-center justify-center mb-3">
+            <div class="join w-full max-w-sm">
               <button 
                 @click="setMobileTab('A')"
-                class="btn btn-sm join-item"
+                class="btn btn-sm join-item flex-1 touch-manipulation"
                 :class="{ 'btn-primary': mobileTab === 'A', 'btn-outline': mobileTab !== 'A' }"
               >
+                <span class="text-base mr-1">📄</span>
                 JSON A
               </button>
               <button 
                 @click="setMobileTab('B')"
-                class="btn btn-sm join-item"
+                class="btn btn-sm join-item flex-1 touch-manipulation"
                 :class="{ 'btn-primary': mobileTab === 'B', 'btn-outline': mobileTab !== 'B' }"
               >
+                <span class="text-base mr-1">📋</span>
                 JSON B
               </button>
             </div>
           </div>
+          
+          <!-- 滑动提示 -->
+          <div class="text-center mb-3">
+            <span class="text-xs text-base-content/50">
+              👆 点击切换 · 👈👉 左右滑动切换
+            </span>
+          </div>
+          
+          <!-- 对比按钮 -->
+          <div class="flex justify-center">
           <button 
             @click="compareJson"
-            class="btn btn-sm btn-primary"
+              class="btn btn-primary btn-sm touch-manipulation"
             :disabled="!jsonA || !jsonB || hasErrorA || hasErrorB"
           >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
             开始对比
           </button>
+          </div>
         </div>
                   <!-- 第一个JSON输入区域 -->
           <div 
@@ -85,7 +222,7 @@
             :class="{ 'lg:block': true, 'hidden': mobileTab === 'B', 'block': mobileTab === 'A' }"
             @touchstart="initTouchStart"
             @touchmove="handleTouchMove"
-            @touchend="handleTouchStart = { x: 0, y: 0 }"
+            @touchend="handleTouchStart = { x: 0, y: 0, time: 0 }"
           >
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-base-content">JSON A</h2>
@@ -140,7 +277,7 @@
             :class="{ 'lg:block': true, 'hidden': mobileTab === 'A', 'block': mobileTab === 'B' }"
             @touchstart="initTouchStart"
             @touchmove="handleTouchMove"
-            @touchend="handleTouchStart = { x: 0, y: 0 }"
+            @touchend="handleTouchStart = { x: 0, y: 0, time: 0 }"
           >
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-base-content">JSON B</h2>
@@ -226,128 +363,127 @@
             ✅ 两个JSON完全相同
           </div>
           <div v-else class="space-y-2">
-            <div class="text-sm font-medium text-base-content mb-3">
-              发现 {{ diffResult.differences.length }} 处差异:
+            <div class="flex items-center justify-between mb-3">
+              <div class="text-sm font-medium text-base-content">
+                发现 {{ diffResult.differences.length }} 处差异
+              </div>
+              <div class="flex gap-2 text-xs">
+                <span class="flex items-center gap-1">
+                  <div class="w-3 h-3 bg-green-500 rounded"></div>
+                  新增 {{ diffResult.differences.filter(d => d.type === 'added').length }}
+                </span>
+                <span class="flex items-center gap-1">
+                  <div class="w-3 h-3 bg-red-500 rounded"></div>
+                  删除 {{ diffResult.differences.filter(d => d.type === 'removed').length }}
+                </span>
+                <span class="flex items-center gap-1">
+                  <div class="w-3 h-3 bg-yellow-500 rounded"></div>
+                  修改 {{ diffResult.differences.filter(d => d.type === 'changed').length }}
+                </span>
+              </div>
             </div>
-            <div v-for="(diff, index) in diffResult.differences" :key="index" class="border-l-4 pl-4 py-2 text-sm font-mono"
-                 :class="{
-                   'border-red-500 bg-red-50 dark:bg-red-900/20': diff.type === 'removed',
-                   'border-green-500 bg-green-50 dark:bg-green-900/20': diff.type === 'added',
-                   'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20': diff.type === 'changed'
-                 }">
-              <div class="font-semibold text-xs text-base-content/70 mb-1">
-                {{ diff.path }} - {{ diff.type === 'removed' ? '删除' : diff.type === 'added' ? '新增' : '修改' }}
-              </div>
-              <div v-if="diff.type === 'removed'" class="text-red-600 dark:text-red-400">
-                - {{ diff.oldValue }}
-              </div>
-              <div v-else-if="diff.type === 'added'" class="text-green-600 dark:text-green-400">
-                + {{ diff.newValue }}
-              </div>
-              <div v-else-if="diff.type === 'changed'">
-                <div class="text-red-600 dark:text-red-400">- {{ diff.oldValue }}</div>
-                <div class="text-green-600 dark:text-green-400">+ {{ diff.newValue }}</div>
+            
+            <div class="max-h-96 overflow-y-auto space-y-1">
+              <div v-for="(diff, index) in diffResult.differences" :key="index" 
+                   class="border-l-4 pl-4 py-2 text-sm font-mono rounded-r-lg transition-all hover:shadow-sm"
+                   :class="{
+                     'border-red-500 bg-red-50/50 dark:bg-red-900/10 hover:bg-red-50 dark:hover:bg-red-900/20': diff.type === 'removed',
+                     'border-green-500 bg-green-50/50 dark:bg-green-900/10 hover:bg-green-50 dark:hover:bg-green-900/20': diff.type === 'added',
+                     'border-yellow-500 bg-yellow-50/50 dark:bg-yellow-900/10 hover:bg-yellow-50 dark:hover:bg-yellow-900/20': diff.type === 'changed'
+                   }">
+                <div class="flex items-center justify-between mb-2">
+                  <div class="font-semibold text-xs text-base-content/80 font-mono bg-base-200 px-2 py-1 rounded">
+                    {{ diff.path }}
+                  </div>
+                  <span class="text-xs px-2 py-1 rounded-full font-medium"
+                        :class="{
+                          'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300': diff.type === 'removed',
+                          'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300': diff.type === 'added',
+                          'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300': diff.type === 'changed'
+                        }">
+                    {{ diff.type === 'removed' ? '删除' : diff.type === 'added' ? '新增' : '修改' }}
+                  </span>
+                </div>
+                
+                <div class="space-y-1">
+                  <div v-if="diff.type === 'removed'" class="text-red-600 dark:text-red-400 bg-red-100/50 dark:bg-red-900/20 p-2 rounded">
+                    <span class="text-red-500 font-bold">-</span> {{ formatValue(diff.oldValue) }}
+                  </div>
+                  <div v-else-if="diff.type === 'added'" class="text-green-600 dark:text-green-400 bg-green-100/50 dark:bg-green-900/20 p-2 rounded">
+                    <span class="text-green-500 font-bold">+</span> {{ formatValue(diff.newValue) }}
+                  </div>
+                  <div v-else-if="diff.type === 'changed'" class="space-y-1">
+                    <div class="text-red-600 dark:text-red-400 bg-red-100/50 dark:bg-red-900/20 p-2 rounded">
+                      <span class="text-red-500 font-bold">-</span> {{ formatValue(diff.oldValue) }}
+                    </div>
+                    <div class="text-green-600 dark:text-green-400 bg-green-100/50 dark:bg-green-900/20 p-2 rounded">
+                      <span class="text-green-500 font-bold">+</span> {{ formatValue(diff.newValue) }}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
       
-      <!-- 格式化模式的原有内容区域 -->
-      <div v-if="currentMode === 'format'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- 输入区域 -->
-        <div class="bg-base-100 rounded-2xl p-6 shadow-lg">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-base-content">JSON输入</h2>
-            <div class="flex gap-2">
+
+
+      <!-- 工具栏 - 移动端优化版 -->
+      <div class="mt-4 md:mt-6 bg-base-100 rounded-2xl p-4 md:p-6 shadow-lg">
+        <!-- 移动端：垂直布局 -->
+        <div class="block md:hidden space-y-4">
+          <!-- 主要操作按钮 -->
+          <div class="grid grid-cols-1 gap-3">
+            <button 
+              @click="formatJson"
+              class="btn btn-primary touch-manipulation"
+              :disabled="!inputJson || hasError"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+              格式化 JSON
+            </button>
+            
+            <div class="grid grid-cols-2 gap-2">
               <button 
-                @click="clearInput"
-                class="btn btn-sm btn-ghost"
+                @click="compressJson"
+                class="btn btn-outline touch-manipulation"
+                :disabled="!inputJson || hasError"
+              >
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                </svg>
+                压缩
+              </button>
+              
+              <button 
+                @click="validateJson"
+                class="btn btn-outline touch-manipulation"
                 :disabled="!inputJson"
               >
-                清空
-              </button>
-              <button 
-                @click="loadExample"
-                class="btn btn-sm btn-outline"
-              >
-                示例
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                验证
               </button>
             </div>
           </div>
           
-          <div class="relative">
-            <textarea
-              v-model="inputJson"
-              @input="handleInputChange"
-              placeholder="请输入JSON数据..."
-              class="textarea textarea-bordered w-full h-[38rem] font-mono text-sm resize-none"
-              :class="{ 'textarea-error': hasError }"
-            ></textarea>
-            
-            <!-- 字符计数 -->
-            <div class="absolute bottom-2 right-2 text-xs text-base-content/50">
-              {{ inputJson.length }} 字符
-            </div>
-          </div>
-          
-          <!-- 错误提示 -->
-          <div v-if="hasError" class="mt-3 p-3 bg-error/10 border border-error/20 rounded-lg">
-            <div class="flex items-start gap-2">
-              <svg class="w-4 h-4 text-error flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-              </svg>
-              <div>
-                <div class="text-sm font-medium text-error">JSON格式错误</div>
-                <div class="text-xs text-error/80 mt-1">{{ errorMessage }}</div>
-              </div>
-            </div>
+          <!-- 设置区域 -->
+          <div class="flex items-center justify-center gap-3 p-3 bg-base-200 rounded-xl">
+            <span class="text-sm text-base-content/70 font-medium">缩进设置:</span>
+            <select v-model="indentSize" class="select select-sm select-bordered bg-base-100 min-w-0 flex-1 max-w-32">
+              <option value="2">2空格</option>
+              <option value="4">4空格</option>
+              <option value="tab">制表符</option>
+            </select>
           </div>
         </div>
-
-        <!-- 输出区域 -->
-        <div class="bg-base-100 rounded-2xl p-6 shadow-lg">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-base-content">格式化结果</h2>
-            <div class="flex gap-2">
-              <button 
-                @click="copyResult"
-                class="btn btn-sm btn-primary"
-                :disabled="!formattedJson || hasError"
-              >
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                </svg>
-                复制
-              </button>
-              <button 
-                @click="downloadJson"
-                class="btn btn-sm btn-outline"
-                :disabled="!formattedJson || hasError"
-              >
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-                下载
-              </button>
-            </div>
-          </div>
-          
-          <div class="relative">
-            <div class="bg-base-200 p-4 rounded-lg h-[38rem] overflow-auto custom-json-viewer">
-              <template v-if="!hasError && formattedJson">
-                <pre class="json-pre"><code v-html="highlightedJson"></code></pre>
-              </template>
-              <div v-else-if="hasError" class="text-error/60 italic">JSON格式错误，请检查输入</div>
-              <div v-else class="text-base-content/40 italic">格式化结果将在此显示...</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 工具栏 -->
-      <div class="mt-6 bg-base-100 rounded-2xl p-6 shadow-lg">
-        <div class="flex flex-wrap gap-4 items-center justify-between">
+        
+        <!-- 桌面端：水平布局 -->
+        <div class="hidden md:flex flex-wrap gap-4 items-center justify-between">
           <div class="flex flex-wrap gap-2">
             <button 
               @click="formatJson"
@@ -423,6 +559,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
+// import JsonTreeView from '@/components/JsonTreeView.vue'
 // 移除json-viewer相关import
 // import { JsonViewer } from 'vue3-json-viewer'
 // import 'vue3-json-viewer/dist/vue3-json-viewer.css'
@@ -451,29 +588,42 @@ const setMobileTab = (tab: 'A' | 'B') => {
   mobileTab.value = tab
 }
 
-// 移动端手势处理
-const handleTouchStart = ref({ x: 0, y: 0 })
+// 移动端手势处理 - 优化版
+const handleTouchStart = ref({ x: 0, y: 0, time: 0 })
 const handleTouchMove = (event: TouchEvent) => {
   if (!handleTouchStart.value.x || !handleTouchStart.value.y) return
   
   const deltaX = event.touches[0].clientX - handleTouchStart.value.x
   const deltaY = event.touches[0].clientY - handleTouchStart.value.y
+  const deltaTime = Date.now() - handleTouchStart.value.time
   
-  // 只处理水平滑动，忽略垂直滑动
-  if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+  // 只处理水平滑动，忽略垂直滑动，增加速度检测
+  if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 30 && deltaTime < 300) {
+    // 防止事件冒泡
+    event.preventDefault()
+    
     if (deltaX > 0 && mobileTab.value === 'B') {
       setMobileTab('A')
+      // 触觉反馈（如果支持）
+      if (navigator.vibrate) {
+        navigator.vibrate(10)
+      }
     } else if (deltaX < 0 && mobileTab.value === 'A') {
       setMobileTab('B')
+      // 触觉反馈（如果支持）
+      if (navigator.vibrate) {
+        navigator.vibrate(10)
     }
-    handleTouchStart.value = { x: 0, y: 0 }
+    }
+    handleTouchStart.value = { x: 0, y: 0, time: 0 }
   }
 }
 
 const initTouchStart = (event: TouchEvent) => {
   handleTouchStart.value = {
     x: event.touches[0].clientX,
-    y: event.touches[0].clientY
+    y: event.touches[0].clientY,
+    time: Date.now()
   }
 }
 
@@ -491,6 +641,14 @@ interface DiffResult {
 }
 
 const diffResult = ref<DiffResult | null>(null)
+
+// 新增功能状态
+const searchQuery = ref('')
+const searchResults = ref<string[]>([])
+const foldedPaths = ref<Set<string>>(new Set())
+const allFolded = ref(false)
+const jsonEditorRef = ref<HTMLElement>()
+const parsedJsonData = ref<any>(null)
 
 // JSON统计信息
 interface JsonStats {
@@ -546,11 +704,17 @@ const handleInputChange = () => {
     errorMessage.value = ''
     formattedJson.value = ''
     jsonStats.value = null
+    parsedJsonData.value = null
     return
   }
   
   // 自动验证
-  validateJson()
+  const parsed = validateJson()
+  if (parsed !== null) {
+    parsedJsonData.value = parsed
+    // 自动格式化
+    formatJson()
+  }
 }
 
 // 验证JSON
@@ -883,7 +1047,140 @@ const exportDiff = () => {
   URL.revokeObjectURL(url)
 }
 
-// 新增高亮方法
+// 格式化显示值
+const formatValue = (value: any): string => {
+  if (value === null) return 'null'
+  if (typeof value === 'string') return `"${value}"`
+  if (typeof value === 'object') {
+    return JSON.stringify(value, null, 2)
+  }
+  return String(value)
+}
+
+// 搜索功能
+const performSearch = () => {
+  if (!searchQuery.value.trim() || !parsedJsonData.value) {
+    searchResults.value = []
+    return
+  }
+  
+  const results: string[] = []
+  const searchTerm = searchQuery.value.toLowerCase()
+  
+  const searchInObject = (obj: any, path = '') => {
+    if (typeof obj === 'object' && obj !== null) {
+      if (Array.isArray(obj)) {
+        obj.forEach((item, index) => {
+          const currentPath = path ? `${path}[${index}]` : `[${index}]`
+          searchInObject(item, currentPath)
+        })
+      } else {
+        Object.entries(obj).forEach(([key, value]) => {
+          const currentPath = path ? `${path}.${key}` : key
+          
+          // 搜索键名
+          if (key.toLowerCase().includes(searchTerm)) {
+            results.push(currentPath)
+          }
+          
+          // 搜索值
+          if (typeof value === 'string' && value.toLowerCase().includes(searchTerm)) {
+            results.push(currentPath)
+          } else if (typeof value === 'number' && value.toString().includes(searchTerm)) {
+            results.push(currentPath)
+          }
+          
+          // 递归搜索
+          searchInObject(value, currentPath)
+        })
+      }
+    }
+  }
+  
+  searchInObject(parsedJsonData.value)
+  searchResults.value = results
+}
+
+// 折叠功能
+const toggleFold = (path: string) => {
+  if (foldedPaths.value.has(path)) {
+    foldedPaths.value.delete(path)
+  } else {
+    foldedPaths.value.add(path)
+  }
+}
+
+const toggleAllFolds = () => {
+  if (allFolded.value) {
+    foldedPaths.value.clear()
+  } else {
+    // 折叠所有对象和数组
+    const collectPaths = (obj: any, path = '') => {
+      if (typeof obj === 'object' && obj !== null) {
+        if (Array.isArray(obj)) {
+          if (obj.length > 0) {
+            foldedPaths.value.add(path || 'root')
+          }
+          obj.forEach((item, index) => {
+            const currentPath = path ? `${path}[${index}]` : `[${index}]`
+            collectPaths(item, currentPath)
+          })
+        } else {
+          const keys = Object.keys(obj)
+          if (keys.length > 0) {
+            foldedPaths.value.add(path || 'root')
+          }
+          keys.forEach(key => {
+            const currentPath = path ? `${path}.${key}` : key
+            collectPaths(obj[key], currentPath)
+          })
+        }
+      }
+    }
+    
+    if (parsedJsonData.value) {
+      collectPaths(parsedJsonData.value)
+    }
+  }
+  allFolded.value = !allFolded.value
+}
+
+// 计算行号
+const lineNumbers = computed(() => {
+  if (!formattedJson.value) return []
+  const lines = formattedJson.value.split('\n')
+  return lines.map((_, index) => index + 1)
+})
+
+// 增强的高亮方法，支持折叠和搜索
+const enhancedHighlightedJson = computed(() => {
+  if (!formattedJson.value) return ''
+  let json = formattedJson.value
+  
+  // HTML转义
+  json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  
+  // 搜索高亮
+  if (searchQuery.value.trim()) {
+    const searchTerm = searchQuery.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // 转义正则表达式特殊字符
+    const regex = new RegExp(`(${searchTerm})`, 'gi')
+    json = json.replace(regex, '<span class="search-highlight">$1</span>')
+  }
+  
+  // 语法高亮
+  json = json.replace(/("[^"]+")(?=\s*:)/g, '<span class="json-key">$1</span>') // 键名
+  json = json.replace(/(:\s*)"(.*?)"/g, '$1<span class="json-string">"$2"</span>') // 字符串值
+  json = json.replace(/(:\s*)(-?\d+(?:\.\d+)?)/g, '$1<span class="json-number">$2</span>') // 数字
+  json = json.replace(/(:\s*)(true|false)/g, '$1<span class="json-boolean">$2</span>') // 布尔值
+  json = json.replace(/(:\s*)(null)/g, '$1<span class="json-null">$2</span>') // null值
+  
+  // 添加折叠按钮（简化版本）
+  json = json.replace(/^(\s*)([{[])/gm, '$1<button class="fold-btn" onclick="toggleFoldAt(this)">▼</button>$2')
+  
+  return json
+})
+
+// 新增高亮方法（保留原有功能）
 const highlightedJson = computed(() => {
   if (!formattedJson.value) return ''
   let json = formattedJson.value
@@ -931,34 +1228,81 @@ const highlightedJson = computed(() => {
 /* 响应式调整 */
 @media (max-width: 768px) {
   .textarea {
-    height: calc(100vh - 20rem);
-    min-height: 16rem;
-    font-size: 14px;
+    height: calc(100vh - 28rem);
+    min-height: 20rem;
+    font-size: 16px; /* 防止iOS缩放 */
+    line-height: 1.6;
+    padding: 1rem !important;
   }
   
   pre {
-    font-size: 14px;
+    font-size: 16px; /* 防止iOS缩放 */
+    line-height: 1.6;
   }
   
   .btn {
-    min-height: 2.5rem;
-    height: 2.5rem;
-    min-width: 2.5rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    min-height: 2.75rem; /* 44px 最小触摸目标 */
+    height: 2.75rem;
+    min-width: 2.75rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    font-size: 0.875rem;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   
   .btn-sm {
-    min-height: 2rem;
-    height: 2rem;
-    min-width: 2rem;
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-    font-size: 0.875rem;
+    min-height: 2.25rem; /* 36px */
+    height: 2.25rem;
+    min-width: 2.25rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-size: 0.8125rem;
+    touch-action: manipulation;
   }
   
   pre {
-    height: 16rem;
+    height: 20rem;
+  }
+  
+  /* 输入输出区域优化 */
+  .bg-base-100 {
+    padding: 1rem !important;
+    margin-bottom: 1rem;
+  }
+  
+  /* 标题和描述优化 */
+  .text-xl {
+    font-size: 1.125rem;
+  }
+  
+  .text-2xl {
+    font-size: 1.25rem;
+  }
+  
+  .text-3xl {
+    font-size: 1.5rem;
+  }
+  
+  /* 工具栏优化 */
+  .flex-wrap {
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  /* 统计信息网格优化 */
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  /* 对比模式移动端优化 */
+  .lg\\:hidden {
+    display: block !important;
+  }
+  
+  .lg\\:block {
+    display: block !important;
   }
 }
 
@@ -1007,5 +1351,379 @@ const highlightedJson = computed(() => {
 .json-number { color: #059669; } /* 绿色数字 */
 .json-boolean { color: #7c3aed; } /* 紫色布尔值 */
 .json-null { color: #6b7280; font-style: italic; } /* 灰色null值 */
+
+/* 搜索高亮 */
+.search-highlight {
+  background: #fef08a;
+  color: #92400e;
+  font-weight: 600;
+  padding: 2px 4px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px #f59e0b;
+}
+
+.dark .search-highlight {
+  background: #451a03;
+  color: #fbbf24;
+  box-shadow: 0 0 0 1px #d97706;
+}
+
+/* 增强的JSON预览器 */
+.json-pre-enhanced {
+  margin: 0;
+  font-size: 15px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Menlo', 'Courier', monospace;
+  background: transparent;
+  color: #22292f;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+  padding: 0.75rem;
+}
+
+.dark .json-pre-enhanced {
+  color: #e5e7eb;
+}
+
+/* 折叠按钮 */
+.fold-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  font-size: 0.75rem;
+  background: hsl(var(--b3));
+  color: hsl(var(--bc) / 0.7);
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  margin-right: 0.25rem;
+  transition: all 0.2s;
+}
+
+.fold-btn:hover {
+  transform: scale(1.1);
+}
+
+.fold-btn.folded {
+  transform: rotate(-90deg);
+}
+
+/* 行号样式优化 */
+.line-number {
+  transition: all 0.2s ease;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.line-number:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+/* JSON树视图容器 */
+.json-tree-view {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.dark .json-tree-view {
+  border-color: #374151;
+  background: #1f2937;
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+  .line-numbers {
+    min-width: 2.5rem !important;
+    font-size: 12px;
+    padding: 0.5rem;
+  }
+  
+  .json-pre-enhanced {
+    font-size: 15px; /* 提高可读性 */
+    padding: 0.75rem;
+    line-height: 1.7;
+  }
+  
+  .fold-btn {
+    width: 1rem;
+    height: 1rem;
+    font-size: 0.875rem;
+  }
+  
+  /* 移动端特定优化 */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* 对比模式标签页优化 */
+  .join-item {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  /* 搜索框优化 */
+  .input-sm {
+    min-height: 2.5rem;
+    font-size: 0.875rem;
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+  }
+  
+  /* 移动端按钮组优化 */
+  .flex.gap-2 {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  /* 错误提示优化 */
+  .error-message {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* 小屏幕进一步优化 */
+@media (max-width: 640px) {
+  .textarea {
+    height: calc(100vh - 32rem);
+    min-height: 18rem;
+    font-size: 16px;
+    padding: 0.875rem !important;
+  }
+  
+  .custom-json-viewer,
+  pre {
+    height: 18rem;
+    font-size: 16px;
+  }
+  
+  /* 页面标题区域优化 */
+  .mb-6 {
+    margin-bottom: 1rem;
+  }
+  
+  .text-2xl {
+    font-size: 1.125rem;
+  }
+  
+  /* 按钮优化 */
+  .btn {
+    min-height: 2.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.8125rem;
+  }
+  
+  .btn-sm {
+    min-height: 2.25rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+  
+  /* 输入输出区域内边距 */
+  .bg-base-100 {
+    padding: 0.875rem !important;
+    border-radius: 1rem;
+  }
+  
+  /* 工具栏按钮组 */
+  .flex-wrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .flex-wrap .btn {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* 统计信息卡片 */
+  .grid-cols-4 {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  
+  /* 对比结果区域移动端优化 */
+  .diff-result-container {
+    height: 16rem;
+  }
+  
+  /* 字符计数显示移动端优化 */
+  .character-count {
+    bottom: 0.5rem;
+    right: 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  /* 模式切换器 */
+  .join {
+    width: 100%;
+  }
+  
+  .join-item {
+    flex: 1;
+    text-align: center;
+    padding: 0.625rem;
+  }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 480px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  .textarea {
+    height: calc(100vh - 36rem);
+    min-height: 16rem;
+    padding: 0.75rem !important;
+  }
+  
+  .custom-json-viewer,
+  pre {
+    height: 16rem;
+  }
+  
+  /* 极小屏幕按钮优化 */
+  .btn {
+    min-height: 2.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+  
+  .btn-sm {
+    min-height: 2rem;
+    padding: 0.375rem 0.5rem;
+    font-size: 0.6875rem;
+  }
+  
+  /* 统计信息单列显示 */
+  .grid-cols-4 {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  /* 标题进一步缩小 */
+  .text-xl {
+    font-size: 1rem;
+  }
+  
+  .text-2xl {
+    font-size: 1.125rem;
+  }
+  
+  /* 输入输出区域 */
+  .bg-base-100 {
+    padding: 0.75rem !important;
+  }
+  
+  /* 对比模式优化 */
+  .mobile-diff-container {
+    padding: 0.75rem !important;
+  }
+  
+  /* JSON内容区域 */
+  .json-content {
+    padding: 0.5rem;
+  }
+  
+  .line-numbers {
+    padding: 0.5rem 0.375rem;
+    min-width: 2rem !important;
+    font-size: 10px;
+  }
+}
+
+/* 移动端对比模式滑动动画 */
+@media (max-width: 1024px) {
+  .lg\\:block {
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .lg\\:block.hidden {
+    opacity: 0;
+    transform: translateX(-20px);
+    pointer-events: none;
+  }
+  
+  .lg\\:block.block {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+  
+  /* 移动端工具栏优化 */
+  .lg\\:hidden .join {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+  
+  .lg\\:hidden .join-item {
+    min-height: 2.75rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  
+  .lg\\:hidden .join-item.btn-primary {
+    transform: scale(1.02);
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  }
+  
+  /* 滑动提示样式 */
+  .lg\\:hidden .text-xs {
+    padding: 0.25rem 0.75rem;
+    background: hsl(var(--b2));
+    border-radius: 1rem;
+    display: inline-block;
+  }
+}
+
+/* 触摸反馈优化 */
+.touch-manipulation:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* 对比模式容器优化 */
+@media (max-width: 768px) {
+  .grid.grid-cols-1.lg\\:grid-cols-2 {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* JSON输入区域移动端优化 */
+  .bg-base-100.rounded-2xl {
+    margin-bottom: 0.5rem;
+  }
+  
+  .bg-base-100.rounded-2xl.hidden {
+    display: none !important;
+  }
+  
+  .bg-base-100.rounded-2xl.block {
+    display: block !important;
+    animation: slideInFromRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
 </style> 
  
