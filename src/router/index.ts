@@ -11,6 +11,7 @@ import MD5Tool from '@/views/MD5Tool.vue'
 import TimestampTool from '@/views/TimestampTool.vue'
 import RegexTool from '@/views/RegexTool.vue'
 import PasswordGenerator from '@/views/PasswordGenerator.vue'
+import SnowflakeGenerator from '@/views/SnowflakeGenerator.vue'
 
 // 定义路由
 const routes: RouteRecordRaw[] = [
@@ -73,6 +74,11 @@ const routes: RouteRecordRaw[] = [
         path: 'password-generator',
         name: 'ToolPasswordGenerator',
         component: PasswordGenerator
+      },
+      {
+        path: 'snowflake-generator',
+        name: 'ToolSnowflakeGenerator',
+        component: SnowflakeGenerator
       }
     ]
   },

@@ -180,6 +180,17 @@ export const tools: Tool[] = [
     icon: '📏',
     tags: ['单位', '转换', '长度', '重量', '温度', '面积'],
     path: '/tool/unit-converter'
+  },
+  
+  // 开发工具 - 雪花ID生成器
+  {
+    id: 13,
+    name: '雪花ID生成器',
+    description: '生成全局唯一的雪花ID，支持批量生成、自定义配置和ID解析，便于复制到数据库表中',
+    category: 'development',
+    icon: '❄️',
+    tags: ['雪花ID', 'Snowflake', 'ID生成', '唯一ID', '分布式', '数据库'],
+    path: '/tool/snowflake-generator'
   }
 ]
 
