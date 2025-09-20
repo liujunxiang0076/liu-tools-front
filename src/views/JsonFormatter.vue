@@ -139,38 +139,6 @@
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-base-content">格式化结果</h2>
             <div class="flex gap-2">
-              <!-- 搜索功能 - 增强版 -->
-              <div class="relative group">
-                <input
-                  v-model="searchQuery"
-                  type="text"
-                  placeholder="搜索键名或值..."
-                  class="input input-sm input-bordered w-40 pr-16 transition-all duration-200 focus:w-48"
-                  @input="performSearch"
-                  @keydown.enter="searchNext"
-                  @keydown.escape="clearSearch"
-                />
-                <div class="absolute right-1 top-1/2 transform -translate-y-1/2 flex gap-1">
-                  <button 
-                    v-if="searchQuery" 
-                    @click="clearSearch"
-                    class="btn btn-xs btn-ghost hover:btn-error"
-                  >
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                  </button>
-                  <div class="tooltip tooltip-bottom" data-tip="搜索 (Enter下一个, Esc清除)">
-                    <svg class="w-4 h-4 text-base-content/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                  </div>
-                </div>
-                <!-- 搜索结果计数 -->
-                <div v-if="searchQuery && searchResults.length > 0" class="absolute -bottom-6 left-0 text-xs text-base-content/60">
-                  找到 {{ searchResults.length }} 个结果
-                </div>
-              </div>
               
               <!-- 折叠控制 -->
               <div class="dropdown dropdown-end">
@@ -238,11 +206,7 @@
                       <div 
                         v-for="(line, index) in lineNumbers" 
                         :key="index"
-                        class="line-number leading-6 text-xs transition-all duration-200 hover:text-primary cursor-pointer rounded px-1"
-                        :class="{ 
-                          'bg-warning/20 text-warning-content font-semibold': searchResults.some(result => result.includes(String(index + 1))),
-                          'hover:bg-primary/10': !searchResults.some(result => result.includes(String(index + 1)))
-                        }"
+                        class="line-number leading-6 text-xs transition-all duration-200 hover:text-primary cursor-pointer rounded px-1 hover:bg-primary/10"
                         @click="scrollToLine(index + 1)"
                       >
                         {{ line }}
@@ -756,8 +720,6 @@ interface DiffResult {
 const diffResult = ref<DiffResult | null>(null)
 
 // 新增功能状态
-const searchQuery = ref('')
-const searchResults = ref<string[]>([])
 const foldedPaths = ref<Set<string>>(new Set())
 const allFolded = ref(false)
 const foldLevel = ref(0) // 折叠级别：0=展开全部，1=折叠1级，2=折叠2级，等等
@@ -1248,77 +1210,6 @@ const formatValue = (value: any): string => {
   return String(value)
 }
 
-// 搜索相关状态
-const currentSearchIndex = ref(0)
-
-// 搜索功能 - 增强版
-const performSearch = () => {
-  if (!searchQuery.value.trim() || !parsedJsonData.value) {
-    searchResults.value = []
-    currentSearchIndex.value = 0
-    return
-  }
-  
-  const results: string[] = []
-  const searchTerm = searchQuery.value.toLowerCase()
-  
-  const searchInObject = (obj: any, path = '') => {
-    if (typeof obj === 'object' && obj !== null) {
-      if (Array.isArray(obj)) {
-        obj.forEach((item, index) => {
-          const currentPath = path ? `${path}[${index}]` : `[${index}]`
-          searchInObject(item, currentPath)
-        })
-      } else {
-        Object.entries(obj).forEach(([key, value]) => {
-          const currentPath = path ? `${path}.${key}` : key
-          
-          // 搜索键名
-          if (key.toLowerCase().includes(searchTerm)) {
-            results.push(currentPath)
-          }
-          
-          // 搜索值
-          if (typeof value === 'string' && value.toLowerCase().includes(searchTerm)) {
-            results.push(currentPath)
-          } else if (typeof value === 'number' && value.toString().includes(searchTerm)) {
-            results.push(currentPath)
-          }
-          
-          // 递归搜索
-          searchInObject(value, currentPath)
-        })
-      }
-    }
-  }
-  
-  searchInObject(parsedJsonData.value)
-  searchResults.value = results
-  currentSearchIndex.value = 0
-}
-
-// 搜索下一个结果
-const searchNext = () => {
-  if (searchResults.value.length > 0) {
-    currentSearchIndex.value = (currentSearchIndex.value + 1) % searchResults.value.length
-    highlightSearchResult()
-  }
-}
-
-// 清除搜索
-const clearSearch = () => {
-  searchQuery.value = ''
-  searchResults.value = []
-  currentSearchIndex.value = 0
-}
-
-// 高亮搜索结果
-const highlightSearchResult = () => {
-  if (searchResults.value.length > 0) {
-    const currentResult = searchResults.value[currentSearchIndex.value]
-    console.log('当前搜索结果:', currentResult)
-  }
-}
 
 // 自动修复常见错误
 const fixCommonErrors = () => {
@@ -1420,12 +1311,6 @@ const enhancedHighlightedJson = computed(() => {
   // HTML转义
   json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   
-  // 搜索高亮
-  if (searchQuery.value.trim()) {
-    const searchTerm = searchQuery.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // 转义正则表达式特殊字符
-    const regex = new RegExp(`(${searchTerm})`, 'gi')
-    json = json.replace(regex, '<span class="search-highlight">$1</span>')
-  }
   
   // 1. 先高亮折叠的内容
   json = json.replace(/(\[\.\.\..*?\])/g, '<span class="json-folded">$1</span>')
@@ -1699,43 +1584,6 @@ const highlightedJson = computed(() => {
   border-color: rgba(156, 163, 175, 0.6);
 }
 
-/* 搜索高亮 - 增强版 */
-.search-highlight {
-  background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);
-  color: #92400e;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  box-shadow: 0 0 0 2px #f59e0b, 0 2px 4px rgba(245, 158, 11, 0.3);
-  animation: searchPulse 1.5s ease-in-out infinite;
-  position: relative;
-}
-
-.search-highlight::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  background: linear-gradient(45deg, transparent, rgba(245, 158, 11, 0.2), transparent);
-  border-radius: 6px;
-  animation: searchShimmer 2s linear infinite;
-  z-index: -1;
-}
-
-.dark .search-highlight {
-  background: linear-gradient(135deg, #451a03 0%, #92400e 100%);
-  color: #fbbf24;
-  box-shadow: 0 0 0 2px #d97706, 0 2px 4px rgba(217, 119, 6, 0.4);
-}
-
-@keyframes searchPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-}
-
-@keyframes searchShimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
 
 /* 增强的JSON预览器 */
 .json-pre-enhanced {
