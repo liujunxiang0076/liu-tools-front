@@ -32,30 +32,30 @@ export const categories: Category[] = [
     icon: 'Zap',
     color: '#f59e0b'
   },
-  {
-    id: 'calculation',
-    name: '计算工具',
-    icon: 'Calculator',
-    color: '#ef4444'
-  },
-  {
-    id: 'text',
-    name: '文本工具',
-    icon: 'FileText',
-    color: '#8b5cf6'
-  },
-  {
-    id: 'image',
-    name: '图像工具',
-    icon: 'Image',
-    color: '#84cc16'
-  },
-  {
-    id: 'network',
-    name: '网络工具',
-    icon: 'Globe',
-    color: '#06b6d4'
-  }
+  // {
+  //   id: 'calculation',
+  //   name: '计算工具',
+  //   icon: 'Calculator',
+  //   color: '#ef4444'
+  // },
+  // {
+  //   id: 'text',
+  //   name: '文本工具',
+  //   icon: 'FileText',
+  //   color: '#8b5cf6'
+  // },
+  // {
+  //   id: 'image',
+  //   name: '图像工具',
+  //   icon: 'Image',
+  //   color: '#84cc16'
+  // },
+  // {
+  //   id: 'network',
+  //   name: '网络工具',
+  //   icon: 'Globe',
+  //   color: '#06b6d4'
+  // }
 ]
 
 // 工具数据
