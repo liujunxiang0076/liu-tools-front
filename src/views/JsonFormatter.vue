@@ -1,12 +1,39 @@
 <template>
   <div class="min-h-screen bg-base-200 py-4 md:py-8">
     <div class="container mx-auto px-4 max-w-7xl">
+      <!-- 成功提示 Toast -->
+      <div 
+        v-if="showToast" 
+        class="toast toast-top toast-center z-50"
+        :class="{ 'toast-success': toastType === 'success', 'toast-error': toastType === 'error' }"
+      >
+        <div class="alert" :class="{ 'alert-success': toastType === 'success', 'alert-error': toastType === 'error' }">
+          <svg 
+            v-if="toastType === 'success'"
+            class="stroke-current shrink-0 h-6 w-6" 
+            fill="none" 
+            viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <svg 
+            v-else
+            class="stroke-current shrink-0 h-6 w-6" 
+            fill="none" 
+            viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{{ toastMessage }}</span>
+        </div>
+      </div>
+
       <!-- 页面标题 -->
       <div class="mb-6 md:mb-8">
         <div class="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
           <button 
             @click="goBack"
-            class="btn btn-ghost btn-circle touch-manipulation"
+            class="btn btn-ghost btn-circle touch-manipulation hover:bg-primary/10"
           >
             <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -23,19 +50,21 @@
           <!-- 模式切换器 -->
           <div class="flex items-center gap-2">
             <span class="text-sm text-base-content/60">模式:</span>
-            <div class="join">
+            <div class="join shadow-lg">
               <button 
                 @click="switchMode('format')"
-                class="btn btn-sm join-item"
+                class="btn btn-sm join-item transition-all duration-200"
                 :class="{ 'btn-primary': currentMode === 'format', 'btn-outline': currentMode !== 'format' }"
               >
+                <span class="mr-1">🔧</span>
                 格式化
               </button>
               <button 
                 @click="switchMode('diff')"
-                class="btn btn-sm join-item"
+                class="btn btn-sm join-item transition-all duration-200"
                 :class="{ 'btn-primary': currentMode === 'diff', 'btn-outline': currentMode !== 'diff' }"
               >
+                <span class="mr-1">🔍</span>
                 对比
               </button>
             </div>
@@ -80,16 +109,27 @@
             </div>
           </div>
           
-          <!-- 错误提示 -->
-          <div v-if="hasError" class="mt-3 p-3 bg-error/10 border border-error/20 rounded-lg">
-            <div class="flex items-start gap-2">
-              <svg class="w-4 h-4 text-error flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-              </svg>
-              <div>
-                <div class="text-sm font-medium text-error">JSON格式错误</div>
-                <div class="text-xs text-error/80 mt-1">{{ errorMessage }}</div>
+          <!-- 错误提示 - 增强版 -->
+          <div v-if="hasError" class="mt-3 p-4 bg-gradient-to-r from-error/10 to-error/5 border border-error/30 rounded-xl transition-all duration-300">
+            <div class="flex items-start gap-3">
+              <div class="p-1 bg-error/20 rounded-full">
+                <svg class="w-4 h-4 text-error" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
               </div>
+              <div class="flex-1">
+                <div class="text-sm font-semibold text-error mb-1">JSON格式错误</div>
+                <div class="text-xs text-error/80 mb-2 font-mono bg-error/5 p-2 rounded border-l-2 border-error/30">{{ errorMessage }}</div>
+                <div class="text-xs text-base-content/60">
+                  💡 提示：检查是否缺少引号、逗号或括号
+                </div>
+              </div>
+              <button @click="fixCommonErrors" class="btn btn-xs btn-outline btn-error">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                自动修复
+              </button>
             </div>
           </div>
         </div>
@@ -99,71 +139,137 @@
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-base-content">格式化结果</h2>
             <div class="flex gap-2">
-              <!-- 搜索功能 -->
-              <div class="relative">
+              <!-- 搜索功能 - 增强版 -->
+              <div class="relative group">
                 <input
                   v-model="searchQuery"
                   type="text"
-                  placeholder="搜索..."
-                  class="input input-sm input-bordered w-32 pr-8"
+                  placeholder="搜索键名或值..."
+                  class="input input-sm input-bordered w-40 pr-16 transition-all duration-200 focus:w-48"
                   @input="performSearch"
+                  @keydown.enter="searchNext"
+                  @keydown.escape="clearSearch"
                 />
-                <svg class="w-4 h-4 absolute right-2 top-1/2 transform -translate-y-1/2 text-base-content/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
+                <div class="absolute right-1 top-1/2 transform -translate-y-1/2 flex gap-1">
+                  <button 
+                    v-if="searchQuery" 
+                    @click="clearSearch"
+                    class="btn btn-xs btn-ghost hover:btn-error"
+                  >
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                  <div class="tooltip tooltip-bottom" data-tip="搜索 (Enter下一个, Esc清除)">
+                    <svg class="w-4 h-4 text-base-content/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                  </div>
+                </div>
+                <!-- 搜索结果计数 -->
+                <div v-if="searchQuery && searchResults.length > 0" class="absolute -bottom-6 left-0 text-xs text-base-content/60">
+                  找到 {{ searchResults.length }} 个结果
+                </div>
               </div>
               
               <!-- 折叠控制 -->
-              <button 
-                @click="toggleAllFolds"
-                class="btn btn-sm btn-ghost"
-                :disabled="!formattedJson || hasError"
-              >
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                </svg>
-                {{ allFolded ? '展开' : '折叠' }}
-              </button>
+              <div class="dropdown dropdown-end">
+                <button 
+                  tabindex="0" 
+                  class="btn btn-sm btn-ghost"
+                  :disabled="!formattedJson || hasError"
+                >
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                  </svg>
+                  {{ foldLevel === 0 ? '全部展开' : `折叠${foldLevel}级` }}
+                </button>
+                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32">
+                  <li><a @click="setFoldLevel(0)" :class="{ 'active': foldLevel === 0 }">展开全部</a></li>
+                  <li><a @click="setFoldLevel(1)" :class="{ 'active': foldLevel === 1 }">折叠1级</a></li>
+                  <li><a @click="setFoldLevel(2)" :class="{ 'active': foldLevel === 2 }">折叠2级</a></li>
+                  <li><a @click="setFoldLevel(3)" :class="{ 'active': foldLevel === 3 }">折叠3级</a></li>
+                </ul>
+              </div>
               
               <button 
                 @click="copyResult"
-                class="btn btn-sm btn-primary"
+                class="btn btn-sm btn-primary transition-all duration-200"
+                :disabled="!formattedJson || hasError"
+                :class="{ 'btn-success': copySuccess }"
+              >
+                <svg v-if="!copySuccess" class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                <svg v-else class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                {{ copySuccess ? '已复制' : '复制' }}
+              </button>
+              
+              <button 
+                @click="downloadJson"
+                class="btn btn-sm btn-outline transition-all duration-200 hover:btn-primary"
                 :disabled="!formattedJson || hasError"
               >
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
-                复制
+                下载
               </button>
             </div>
           </div>
           
           <div class="relative">
+            <!-- 加载状态 -->
+            <div v-if="isProcessing" class="absolute inset-0 bg-base-200/80 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
+              <div class="flex flex-col items-center gap-3">
+                <span class="loading loading-spinner loading-lg text-primary"></span>
+                <span class="text-sm text-base-content/70">处理中...</span>
+              </div>
+            </div>
+            
             <div class="bg-base-200 rounded-lg h-[38rem] overflow-auto custom-json-viewer">
               <template v-if="!hasError && formattedJson">
                 <div class="json-editor-container" ref="jsonEditorRef">
                   <div class="json-tree-view flex font-mono text-sm">
                     <!-- 行号列 -->
-                    <div class="line-numbers bg-base-300/50 px-2 py-1 text-right text-base-content/40 select-none border-r border-base-300" style="min-width: 3rem;">
+                    <div class="line-numbers bg-gradient-to-r from-base-300/50 to-base-300/30 px-3 py-2 text-right text-base-content/50 select-none border-r border-base-300/50" style="min-width: 3.5rem;">
                       <div 
                         v-for="(line, index) in lineNumbers" 
                         :key="index"
-                        class="line-number leading-6 text-xs"
-                        :class="{ 'bg-yellow-200 text-yellow-800': searchResults.some(result => result.includes(String(index + 1))) }"
+                        class="line-number leading-6 text-xs transition-all duration-200 hover:text-primary cursor-pointer rounded px-1"
+                        :class="{ 
+                          'bg-warning/20 text-warning-content font-semibold': searchResults.some(result => result.includes(String(index + 1))),
+                          'hover:bg-primary/10': !searchResults.some(result => result.includes(String(index + 1)))
+                        }"
+                        @click="scrollToLine(index + 1)"
                       >
                         {{ line }}
                       </div>
                     </div>
                     
                     <!-- JSON内容 -->
-                    <div class="json-content flex-1 p-2">
+                    <div class="json-content flex-1 p-3">
                       <pre class="json-pre-enhanced"><code v-html="enhancedHighlightedJson"></code></pre>
                     </div>
                   </div>
                 </div>
               </template>
-              <div v-else-if="hasError" class="text-error/60 italic p-4">JSON格式错误，请检查输入</div>
-              <div v-else class="text-base-content/40 italic p-4">格式化结果将在此显示...</div>
+              <div v-else-if="hasError" class="flex items-center justify-center h-full p-6">
+                <div class="text-center">
+                  <div class="text-6xl mb-4">⚠️</div>
+                  <div class="text-lg font-semibold text-error mb-2">JSON格式错误</div>
+                  <div class="text-sm text-base-content/60">请检查您的JSON语法</div>
+                </div>
+              </div>
+              <div v-else class="flex items-center justify-center h-full p-6">
+                <div class="text-center">
+                  <div class="text-6xl mb-4">📝</div>
+                  <div class="text-lg font-semibold text-base-content/70 mb-2">开始格式化</div>
+                  <div class="text-sm text-base-content/50">在左侧输入JSON数据，格式化结果将在此显示</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -437,13 +543,14 @@
           <div class="grid grid-cols-1 gap-3">
             <button 
               @click="formatJson"
-              class="btn btn-primary touch-manipulation"
-              :disabled="!inputJson || hasError"
+              class="btn btn-primary touch-manipulation transition-all duration-200 hover:scale-105"
+              :disabled="!inputJson || hasError || isProcessing"
             >
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <span v-if="isProcessing" class="loading loading-spinner loading-sm mr-2"></span>
+              <svg v-else class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
               </svg>
-              格式化 JSON
+              {{ isProcessing ? '处理中...' : '格式化 JSON' }}
             </button>
             
             <div class="grid grid-cols-2 gap-2">
@@ -487,13 +594,14 @@
           <div class="flex flex-wrap gap-2">
             <button 
               @click="formatJson"
-              class="btn btn-primary"
-              :disabled="!inputJson || hasError"
+              class="btn btn-primary transition-all duration-200 hover:scale-105"
+              :disabled="!inputJson || hasError || isProcessing"
             >
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <span v-if="isProcessing" class="loading loading-spinner loading-sm mr-2"></span>
+              <svg v-else class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
               </svg>
-              格式化
+              {{ isProcessing ? '处理中...' : '格式化' }}
             </button>
             
             <button 
@@ -572,6 +680,11 @@ const formattedJson = ref('')
 const hasError = ref(false)
 const errorMessage = ref('')
 const indentSize = ref('2')
+const isProcessing = ref(false)
+const copySuccess = ref(false)
+const showToast = ref(false)
+const toastMessage = ref('')
+const toastType = ref<'success' | 'error'>('success')
 
 // 对比模式相关状态
 const currentMode = ref<'format' | 'diff'>('format')
@@ -647,6 +760,7 @@ const searchQuery = ref('')
 const searchResults = ref<string[]>([])
 const foldedPaths = ref<Set<string>>(new Set())
 const allFolded = ref(false)
+const foldLevel = ref(0) // 折叠级别：0=展开全部，1=折叠1级，2=折叠2级，等等
 const jsonEditorRef = ref<HTMLElement>()
 const parsedJsonData = ref<any>(null)
 
@@ -697,24 +811,42 @@ const goBack = () => {
   router.back()
 }
 
-// 处理输入变化
+// 防抖处理输入变化
+let inputTimeout: NodeJS.Timeout | null = null
+
 const handleInputChange = () => {
-  if (!inputJson.value.trim()) {
-    hasError.value = false
-    errorMessage.value = ''
-    formattedJson.value = ''
-    jsonStats.value = null
-    parsedJsonData.value = null
-    return
+  // 清除之前的定时器
+  if (inputTimeout) {
+    clearTimeout(inputTimeout)
   }
   
-  // 自动验证
-  const parsed = validateJson()
-  if (parsed !== null) {
-    parsedJsonData.value = parsed
-    // 自动格式化
-    formatJson()
-  }
+  // 设置新的定时器，避免频繁处理
+  inputTimeout = setTimeout(() => {
+    if (!inputJson.value.trim()) {
+      hasError.value = false
+      errorMessage.value = ''
+      formattedJson.value = ''
+      jsonStats.value = null
+      parsedJsonData.value = null
+      return
+    }
+    
+    // 自动验证
+    const parsed = validateJson()
+    if (parsed !== null) {
+      parsedJsonData.value = parsed
+      // 自动格式化（仅当没有错误时）
+      if (!hasError.value) {
+        // 根据当前折叠级别格式化
+        if (foldLevel.value === 0) {
+          const indent = indentSize.value === 'tab' ? '\t' : parseInt(indentSize.value)
+          formattedJson.value = JSON.stringify(parsed, null, indent)
+        } else {
+          formattedJson.value = formatJsonWithFolding(parsed, 0)
+        }
+      }
+    }
+  }, 300) // 300ms 防抖
 }
 
 // 验证JSON
@@ -743,19 +875,47 @@ const validateJson = () => {
 }
 
 // 格式化JSON
-const formatJson = () => {
+const formatJson = async () => {
   const parsed = validateJson()
   if (parsed !== null) {
-    const indent = indentSize.value === 'tab' ? '\t' : parseInt(indentSize.value)
-    formattedJson.value = JSON.stringify(parsed, null, indent)
+    isProcessing.value = true
+    
+    // 对于大文件，使用异步处理
+    await new Promise(resolve => setTimeout(resolve, 10))
+    
+    try {
+      if (foldLevel.value === 0) {
+        // 标准格式化
+        const indent = indentSize.value === 'tab' ? '\t' : parseInt(indentSize.value)
+        formattedJson.value = JSON.stringify(parsed, null, indent)
+      } else {
+        // 应用当前折叠级别
+        formattedJson.value = formatJsonWithFolding(parsed, 0)
+      }
+      showToastMessage('格式化成功！', 'success')
+    } catch (error) {
+      showToastMessage('格式化失败', 'error')
+    } finally {
+      isProcessing.value = false
+    }
   }
 }
 
 // 压缩JSON
-const compressJson = () => {
+const compressJson = async () => {
   const parsed = validateJson()
   if (parsed !== null) {
-    formattedJson.value = JSON.stringify(parsed)
+    isProcessing.value = true
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 10))
+      formattedJson.value = JSON.stringify(parsed)
+      showToastMessage('压缩成功！', 'success')
+    } catch (error) {
+      showToastMessage('压缩失败', 'error')
+    } finally {
+      isProcessing.value = false
+    }
   }
 }
 
@@ -821,15 +981,41 @@ const generateStats = (data: any) => {
   }
 }
 
+// 显示 Toast 提示
+const showToastMessage = (message: string, type: 'success' | 'error' = 'success') => {
+  toastMessage.value = message
+  toastType.value = type
+  showToast.value = true
+  
+  setTimeout(() => {
+    showToast.value = false
+  }, 3000)
+}
+
 // 复制结果
 const copyResult = async () => {
   if (!formattedJson.value) return
   
   try {
     await navigator.clipboard.writeText(formattedJson.value)
-    // 这里可以添加成功提示
+    copySuccess.value = true
+    showToastMessage('复制成功！', 'success')
+    
+    // 2秒后重置按钮状态
+    setTimeout(() => {
+      copySuccess.value = false
+    }, 2000)
   } catch (error) {
     console.error('复制失败:', error)
+    showToastMessage('复制失败，请手动复制', 'error')
+  }
+}
+
+// 滚动到指定行
+const scrollToLine = (lineNumber: number) => {
+  const lineElement = document.querySelector(`.line-number:nth-child(${lineNumber})`)
+  if (lineElement) {
+    lineElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 }
 
@@ -837,15 +1023,20 @@ const copyResult = async () => {
 const downloadJson = () => {
   if (!formattedJson.value) return
   
-  const blob = new Blob([formattedJson.value], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = 'formatted.json'
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
+  try {
+    const blob = new Blob([formattedJson.value], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `formatted-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    showToastMessage('下载成功！', 'success')
+  } catch (error) {
+    showToastMessage('下载失败', 'error')
+  }
 }
 
 // 加载示例
@@ -1057,10 +1248,14 @@ const formatValue = (value: any): string => {
   return String(value)
 }
 
-// 搜索功能
+// 搜索相关状态
+const currentSearchIndex = ref(0)
+
+// 搜索功能 - 增强版
 const performSearch = () => {
   if (!searchQuery.value.trim() || !parsedJsonData.value) {
     searchResults.value = []
+    currentSearchIndex.value = 0
     return
   }
   
@@ -1099,50 +1294,115 @@ const performSearch = () => {
   
   searchInObject(parsedJsonData.value)
   searchResults.value = results
+  currentSearchIndex.value = 0
 }
 
-// 折叠功能
-const toggleFold = (path: string) => {
-  if (foldedPaths.value.has(path)) {
-    foldedPaths.value.delete(path)
-  } else {
-    foldedPaths.value.add(path)
+// 搜索下一个结果
+const searchNext = () => {
+  if (searchResults.value.length > 0) {
+    currentSearchIndex.value = (currentSearchIndex.value + 1) % searchResults.value.length
+    highlightSearchResult()
   }
 }
 
-const toggleAllFolds = () => {
-  if (allFolded.value) {
-    foldedPaths.value.clear()
-  } else {
-    // 折叠所有对象和数组
-    const collectPaths = (obj: any, path = '') => {
-      if (typeof obj === 'object' && obj !== null) {
-        if (Array.isArray(obj)) {
-          if (obj.length > 0) {
-            foldedPaths.value.add(path || 'root')
-          }
-          obj.forEach((item, index) => {
-            const currentPath = path ? `${path}[${index}]` : `[${index}]`
-            collectPaths(item, currentPath)
-          })
-        } else {
-          const keys = Object.keys(obj)
-          if (keys.length > 0) {
-            foldedPaths.value.add(path || 'root')
-          }
-          keys.forEach(key => {
-            const currentPath = path ? `${path}.${key}` : key
-            collectPaths(obj[key], currentPath)
-          })
-        }
+// 清除搜索
+const clearSearch = () => {
+  searchQuery.value = ''
+  searchResults.value = []
+  currentSearchIndex.value = 0
+}
+
+// 高亮搜索结果
+const highlightSearchResult = () => {
+  if (searchResults.value.length > 0) {
+    const currentResult = searchResults.value[currentSearchIndex.value]
+    console.log('当前搜索结果:', currentResult)
+  }
+}
+
+// 自动修复常见错误
+const fixCommonErrors = () => {
+  let fixed = inputJson.value
+  
+  // 修复单引号为双引号
+  fixed = fixed.replace(/'/g, '"')
+  
+  // 修复末尾多余的逗号
+  fixed = fixed.replace(/,\s*([}\]])/g, '$1')
+  
+  // 修复未加引号的键名
+  fixed = fixed.replace(/([{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":')
+  
+  // 尝试添加缺失的引号
+  try {
+    JSON.parse(fixed)
+    inputJson.value = fixed
+    showToastMessage('已尝试自动修复，请检查结果', 'success')
+    handleInputChange()
+  } catch (error) {
+    showToastMessage('自动修复失败，请手动检查', 'error')
+  }
+}
+
+// 新的折叠功能 - 基于级别
+const setFoldLevel = (level: number) => {
+  foldLevel.value = level
+  allFolded.value = level > 0
+  
+  // 重新格式化JSON以应用折叠
+  if (parsedJsonData.value) {
+    try {
+      if (level === 0) {
+        // 如果不折叠，使用标准JSON格式化
+        const indent = indentSize.value === 'tab' ? '\t' : parseInt(indentSize.value)
+        formattedJson.value = JSON.stringify(parsedJsonData.value, null, indent)
+      } else {
+        // 应用折叠
+        const foldedJson = formatJsonWithFolding(parsedJsonData.value, 0)
+        formattedJson.value = foldedJson
       }
-    }
-    
-    if (parsedJsonData.value) {
-      collectPaths(parsedJsonData.value)
+    } catch (error) {
+      console.error('折叠处理失败:', error)
     }
   }
-  allFolded.value = !allFolded.value
+}
+
+// 根据折叠级别格式化JSON - 修复版，与JSON.stringify格式一致
+const formatJsonWithFolding = (obj: any, currentLevel = 0): string => {
+  const indentStr = indentSize.value === 'tab' ? '\t' : ' '.repeat(parseInt(indentSize.value))
+  
+  // 如果当前级别大于等于设定的折叠级别，则折叠显示
+  if (foldLevel.value > 0 && currentLevel >= foldLevel.value) {
+    if (Array.isArray(obj)) {
+      return `[...${obj.length} items]`
+    } else if (typeof obj === 'object' && obj !== null) {
+      const keys = Object.keys(obj)
+      return `{...${keys.length} keys}`
+    }
+  }
+  
+  if (typeof obj === 'object' && obj !== null) {
+    if (Array.isArray(obj)) {
+      if (obj.length === 0) return '[]'
+      
+      const items = obj.map(item => {
+        const formatted = formatJsonWithFolding(item, currentLevel + 1)
+        return indentStr.repeat(currentLevel + 1) + formatted
+      })
+      return '[\n' + items.join(',\n') + '\n' + indentStr.repeat(currentLevel) + ']'
+    } else {
+      const keys = Object.keys(obj)
+      if (keys.length === 0) return '{}'
+      
+      const pairs = keys.map(key => {
+        const value = formatJsonWithFolding(obj[key], currentLevel + 1)
+        return indentStr.repeat(currentLevel + 1) + `"${key}": ${value}`
+      })
+      return '{\n' + pairs.join(',\n') + '\n' + indentStr.repeat(currentLevel) + '}'
+    }
+  }
+  
+  return JSON.stringify(obj)
 }
 
 // 计算行号
@@ -1167,15 +1427,23 @@ const enhancedHighlightedJson = computed(() => {
     json = json.replace(regex, '<span class="search-highlight">$1</span>')
   }
   
-  // 语法高亮
-  json = json.replace(/("[^"]+")(?=\s*:)/g, '<span class="json-key">$1</span>') // 键名
+  // 1. 先高亮折叠的内容
+  json = json.replace(/(\[\.\.\..*?\])/g, '<span class="json-folded">$1</span>')
+  json = json.replace(/(\{\.\.\..*?\})/g, '<span class="json-folded">$1</span>')
+  
+  // 2. 语法高亮
+  json = json.replace(/("[^"]*")(?=\s*:)/g, '<span class="json-key">$1</span>') // 键名
   json = json.replace(/(:\s*)"(.*?)"/g, '$1<span class="json-string">"$2"</span>') // 字符串值
   json = json.replace(/(:\s*)(-?\d+(?:\.\d+)?)/g, '$1<span class="json-number">$2</span>') // 数字
   json = json.replace(/(:\s*)(true|false)/g, '$1<span class="json-boolean">$2</span>') // 布尔值
   json = json.replace(/(:\s*)(null)/g, '$1<span class="json-null">$2</span>') // null值
   
-  // 添加折叠按钮（简化版本）
-  json = json.replace(/^(\s*)([{[])/gm, '$1<button class="fold-btn" onclick="toggleFoldAt(this)">▼</button>$2')
+  // 3. 括号和符号高亮
+  json = json.replace(/([{}[\]])/g, '<span class="json-bracket">$1</span>')
+  json = json.replace(/([,:])/g, '<span class="json-punctuation">$1</span>')
+  
+  // 暂时移除折叠按钮，避免全局函数错误
+  // json = json.replace(/^(\s*)([{[])/gm, '$1<button class="fold-btn" onclick="toggleFoldAt(this)">▼</button>$2')
   
   return json
 })
@@ -1345,27 +1613,128 @@ const highlightedJson = computed(() => {
 .dark .json-pre {
   color: #e5e7eb;
 }
-/* VSCode风格的JSON语法高亮 */
-.json-key { color: #0ea5e9; font-weight: 500; } /* 蓝色键名 */
-.json-string { color: #dc2626; } /* 红色字符串值 */
-.json-number { color: #059669; } /* 绿色数字 */
-.json-boolean { color: #7c3aed; } /* 紫色布尔值 */
-.json-null { color: #6b7280; font-style: italic; } /* 灰色null值 */
+/* 增强的JSON语法高亮 */
+.json-key { 
+  color: #0ea5e9; 
+  font-weight: 600; 
+  text-shadow: 0 0 2px rgba(14, 165, 233, 0.3);
+} /* 蓝色键名 */
 
-/* 搜索高亮 */
-.search-highlight {
-  background: #fef08a;
-  color: #92400e;
+.json-string { 
+  color: #059669; 
+  background: rgba(5, 150, 105, 0.05);
+  padding: 1px 2px;
+  border-radius: 2px;
+} /* 绿色字符串值 */
+
+.json-number { 
+  color: #ea580c; 
+  font-weight: 500;
+  background: rgba(234, 88, 12, 0.1);
+  padding: 1px 3px;
+  border-radius: 2px;
+} /* 橙色数字 */
+
+.json-boolean { 
+  color: #7c3aed; 
   font-weight: 600;
-  padding: 2px 4px;
-  border-radius: 3px;
-  box-shadow: 0 0 0 1px #f59e0b;
+  background: rgba(124, 58, 237, 0.1);
+  padding: 1px 3px;
+  border-radius: 2px;
+} /* 紫色布尔值 */
+
+.json-null { 
+  color: #6b7280; 
+  font-style: italic; 
+  opacity: 0.8;
+  background: rgba(107, 114, 128, 0.1);
+  padding: 1px 3px;
+  border-radius: 2px;
+} /* 灰色null值 */
+
+.json-bracket {
+  color: #1f2937;
+  font-weight: 700;
+}
+
+.json-punctuation {
+  color: #374151;
+  font-weight: 500;
+}
+
+.dark .json-bracket {
+  color: #f3f4f6;
+}
+
+.dark .json-punctuation {
+  color: #d1d5db;
+}
+
+/* 折叠内容样式 */
+.json-folded {
+  color: #6b7280;
+  font-style: italic;
+  background: rgba(156, 163, 175, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px dashed rgba(156, 163, 175, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.json-folded:hover {
+  background: rgba(156, 163, 175, 0.2);
+  border-color: rgba(156, 163, 175, 0.5);
+  transform: scale(1.02);
+}
+
+.dark .json-folded {
+  color: #9ca3af;
+  background: rgba(156, 163, 175, 0.15);
+  border-color: rgba(156, 163, 175, 0.4);
+}
+
+.dark .json-folded:hover {
+  background: rgba(156, 163, 175, 0.25);
+  border-color: rgba(156, 163, 175, 0.6);
+}
+
+/* 搜索高亮 - 增强版 */
+.search-highlight {
+  background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);
+  color: #92400e;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px #f59e0b, 0 2px 4px rgba(245, 158, 11, 0.3);
+  animation: searchPulse 1.5s ease-in-out infinite;
+  position: relative;
+}
+
+.search-highlight::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, transparent, rgba(245, 158, 11, 0.2), transparent);
+  border-radius: 6px;
+  animation: searchShimmer 2s linear infinite;
+  z-index: -1;
 }
 
 .dark .search-highlight {
-  background: #451a03;
+  background: linear-gradient(135deg, #451a03 0%, #92400e 100%);
   color: #fbbf24;
-  box-shadow: 0 0 0 1px #d97706;
+  box-shadow: 0 0 0 2px #d97706, 0 2px 4px rgba(217, 119, 6, 0.4);
+}
+
+@keyframes searchPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes searchShimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 /* 增强的JSON预览器 */
@@ -1691,6 +2060,74 @@ const highlightedJson = computed(() => {
 .touch-manipulation:active {
   transform: scale(0.98);
   transition: transform 0.1s ease;
+}
+
+/* Toast 提示样式 */
+.toast {
+  z-index: 9999;
+}
+
+.alert {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(8px);
+}
+
+.alert-success {
+  background: rgba(34, 197, 94, 0.9);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.alert-error {
+  background: rgba(239, 68, 68, 0.9);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* 加载动画优化 */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 按钮悬停效果优化 */
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 行号优化 */
+.line-number {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.line-number:hover {
+  background: rgba(59, 130, 246, 0.1) !important;
+  color: #3b82f6 !important;
+  transform: scale(1.05);
+}
+
+/* JSON内容区域优化 */
+.json-pre-enhanced {
+  transition: all 0.3s ease;
+}
+
+.json-pre-enhanced:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.dark .json-pre-enhanced:hover {
+  background: rgba(0, 0, 0, 0.02);
 }
 
 /* 对比模式容器优化 */
