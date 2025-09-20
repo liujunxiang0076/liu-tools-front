@@ -72,15 +72,15 @@ export const tools: Tool[] = [
   },
   
   // 图像工具
-  {
-    id: 2,
-    name: '图片压缩',
-    description: '在线图片压缩和优化工具，支持JPG、PNG等多种格式',
-    category: 'image',
-    icon: '🖼️',
-    tags: ['图片', '压缩', '优化', 'JPG', 'PNG', '文件大小'],
-    path: '/tool/image-compress'
-  },
+  // {
+  //   id: 2,
+  //   name: '图片压缩',
+  //   description: '在线图片压缩和优化工具，支持JPG、PNG等多种格式',
+  //   category: 'image',
+  //   icon: '🖼️',
+  //   tags: ['图片', '压缩', '优化', 'JPG', 'PNG', '文件大小'],
+  //   path: '/tool/image-compress'
+  // },
   
   // 开发工具
   {
@@ -150,37 +150,37 @@ export const tools: Tool[] = [
   },
   
   // 文本工具
-  {
-    id: 10,
-    name: '文本差异对比',
-    description: '比较两段文本的差异，高亮显示不同之处，支持逐行对比',
-    category: 'text',
-    icon: '📝',
-    tags: ['文本', '对比', '差异', '比较', '高亮显示'],
-    path: '/tool/text-diff'
-  },
+  // {
+  //   id: 10,
+  //   name: '文本差异对比',
+  //   description: '比较两段文本的差异，高亮显示不同之处，支持逐行对比',
+  //   category: 'text',
+  //   icon: '📝',
+  //   tags: ['文本', '对比', '差异', '比较', '高亮显示'],
+  //   path: '/tool/text-diff'
+  // },
   
   // 网络工具
-  {
-    id: 11,
-    name: 'URL编码解码',
-    description: 'URL编码和解码工具，处理特殊字符，确保网络传输安全',
-    category: 'network',
-    icon: '🌐',
-    tags: ['URL', '编码', '解码', '网络', '特殊字符'],
-    path: '/tool/url-encode'
-  },
+  // {
+  //   id: 11,
+  //   name: 'URL编码解码',
+  //   description: 'URL编码和解码工具，处理特殊字符，确保网络传输安全',
+  //   category: 'network',
+  //   icon: '🌐',
+  //   tags: ['URL', '编码', '解码', '网络', '特殊字符'],
+  //   path: '/tool/url-encode'
+  // },
   
   // 计算工具
-  {
-    id: 12,
-    name: '单位转换器',
-    description: '各种单位之间的转换工具，支持长度、重量、温度、面积等多种单位',
-    category: 'calculation',
-    icon: '📏',
-    tags: ['单位', '转换', '长度', '重量', '温度', '面积'],
-    path: '/tool/unit-converter'
-  },
+  // {
+  //   id: 12,
+  //   name: '单位转换器',
+  //   description: '各种单位之间的转换工具，支持长度、重量、温度、面积等多种单位',
+  //   category: 'calculation',
+  //   icon: '📏',
+  //   tags: ['单位', '转换', '长度', '重量', '温度', '面积'],
+  //   path: '/tool/unit-converter'
+  // },
   
   // 开发工具 - 雪花ID生成器
   {
