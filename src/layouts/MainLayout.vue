@@ -92,13 +92,9 @@ const handleCategorySelect = (categoryId: string) => {
 }
 
 const handleToolSelect = (tool: Tool) => {
-  console.log('Selected tool:', tool)
-  
   if (tool.path) {
     // 使用路由跳转
     router.push(tool.path)
-  } else {
-    console.log(`${tool.name} 工具页面还在开发中`)
   }
 }
 

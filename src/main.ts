@@ -12,8 +12,6 @@ window.addEventListener('unhandledrejection', (e) => {
   console.error('未处理的Promise拒绝:', e.reason)
 })
 
-console.log('应用开始初始化...')
-
 const app = createApp(App)
 
 app.use(router)
@@ -23,7 +21,4 @@ router.onError((error) => {
   console.error('路由错误:', error)
 })
 
-console.log('挂载应用到DOM...')
 app.mount('#app') 
-
-console.log('应用挂载完成') 
