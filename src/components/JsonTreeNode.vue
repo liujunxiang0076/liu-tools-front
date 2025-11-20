@@ -6,7 +6,7 @@
       <div class="line-number-col">{{ node.line }}</div>
       
       <!-- 内容列 -->
-      <div class="code-content" :style="{ paddingLeft: `${node.depth * 1.5}em` }">
+      <div class="code-content" :style="{ paddingLeft: indentPadding }">
         <!-- 折叠图标/占位 -->
         <div class="expand-control">
           <span 
@@ -63,7 +63,7 @@
     <!-- 容器结束行 (仅展开且有子节点时显示) -->
     <div v-if="isContainer && isExpanded && hasChildren" class="json-line">
       <div class="line-number-col">{{ node.closeLine }}</div>
-      <div class="code-content" :style="{ paddingLeft: `${node.depth * 1.5}em` }">
+      <div class="code-content" :style="{ paddingLeft: indentPadding }">
         <div class="expand-control"></div> <!-- 占位 -->
         <span class="json-bracket">{{ node.type === 'array' ? ']' : '}' }}</span>
         <span v-if="!node.isLast" class="json-comma">,</span>
@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, defineProps } from 'vue'
 import type { VisualNode } from './jsonTreeTypes'
 
 const props = defineProps<{
@@ -89,6 +89,26 @@ if (props.node.depth >= 2 || props.node.itemCount > 500) {
 
 const isContainer = computed(() => props.node.type === 'object' || props.node.type === 'array')
 const hasChildren = computed(() => props.node.children && props.node.children.length > 0)
+
+// 计算缩进层级：如果父节点是数组下标(0,1,2...)
+const indentLevel = computed(() => {
+  const depth = props.node.depth ?? 0
+  const path = props.node.path ?? ''
+  const key = String(props.node.key ?? '')
+
+  if (!path) return depth
+  const parts = path.split('.')
+  if (parts.length < 2) return depth
+
+  const last = parts[parts.length - 1]
+  const parentKey = last === key ? parts[parts.length - 2] : parts[parts.length - 1]
+  const parentIsIndex = parentKey !== undefined && /^\d+$/.test(parentKey)
+
+  return parentIsIndex ? Math.max(0, depth - 1) : depth
+})
+
+const INDENT_EM = 2
+const indentPadding = computed(() => `${indentLevel.value * INDENT_EM}em`)
 
 const valueClass = computed(() => {
   switch (props.node.type) {
