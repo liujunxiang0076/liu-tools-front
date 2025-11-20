@@ -140,24 +140,30 @@
             <h2 class="text-lg font-semibold text-base-content">格式化结果</h2>
             <div class="flex gap-2">
               
-              <!-- 折叠控制 -->
-              <div class="dropdown dropdown-end">
+              <!-- 视图模式切换 -->
+              <div class="join">
                 <button 
-                  tabindex="0" 
-                  class="btn btn-sm btn-ghost"
+                  @click="viewMode = 'tree'"
+                  class="btn btn-sm join-item"
+                  :class="{ 'btn-primary': viewMode === 'tree', 'btn-ghost': viewMode !== 'tree' }"
                   :disabled="!formattedJson || hasError"
                 >
                   <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
                   </svg>
-                  {{ foldLevel === 0 ? '全部展开' : `折叠${foldLevel}级` }}
+                  树形
                 </button>
-                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32">
-                  <li><a @click="setFoldLevel(0)" :class="{ 'active': foldLevel === 0 }">展开全部</a></li>
-                  <li><a @click="setFoldLevel(1)" :class="{ 'active': foldLevel === 1 }">折叠1级</a></li>
-                  <li><a @click="setFoldLevel(2)" :class="{ 'active': foldLevel === 2 }">折叠2级</a></li>
-                  <li><a @click="setFoldLevel(3)" :class="{ 'active': foldLevel === 3 }">折叠3级</a></li>
-                </ul>
+                <button 
+                  @click="viewMode = 'code'"
+                  class="btn btn-sm join-item"
+                  :class="{ 'btn-primary': viewMode === 'code', 'btn-ghost': viewMode !== 'code' }"
+                  :disabled="!formattedJson || hasError"
+                >
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                  </svg>
+                  代码
+                </button>
               </div>
               
               <button 
@@ -198,8 +204,14 @@
             </div>
             
             <div class="bg-base-200 rounded-lg h-[38rem] overflow-auto custom-json-viewer">
-              <template v-if="!hasError && formattedJson">
-                <div class="json-editor-container" ref="jsonEditorRef">
+              <template v-if="!hasError && formattedJson && parsedJsonData">
+                <!-- 树形视图 -->
+                <div v-if="viewMode === 'tree'" class="json-tree-container p-4">
+                  <JsonTreeView :data="parsedJsonData" />
+                </div>
+                
+                <!-- 代码视图 -->
+                <div v-else class="json-editor-container" ref="jsonEditorRef">
                   <div class="json-tree-view flex font-mono text-sm">
                     <!-- 行号列 -->
                     <div class="line-numbers bg-gradient-to-r from-base-300/50 to-base-300/30 px-3 py-2 text-right text-base-content/50 select-none border-r border-base-300/50" style="min-width: 3.5rem;">
@@ -631,10 +643,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-// import JsonTreeView from '@/components/JsonTreeView.vue'
-// 移除json-viewer相关import
-// import { JsonViewer } from 'vue3-json-viewer'
-// import 'vue3-json-viewer/dist/vue3-json-viewer.css'
+import JsonTreeView from '@/components/JsonTreeView.vue'
 
 const router = useRouter()
 
@@ -649,6 +658,7 @@ const copySuccess = ref(false)
 const showToast = ref(false)
 const toastMessage = ref('')
 const toastType = ref<'success' | 'error'>('success')
+const viewMode = ref<'tree' | 'code'>('tree') // 新增：视图模式
 
 // 对比模式相关状态
 const currentMode = ref<'format' | 'diff'>('format')
@@ -1637,6 +1647,16 @@ const highlightedJson = computed(() => {
 .line-number:hover {
   background: rgba(59, 130, 246, 0.1);
   color: #3b82f6;
+}
+
+/* JSON树形容器样式 */
+.json-tree-container {
+  min-height: 36rem;
+  background: #fff;
+}
+
+.dark .json-tree-container {
+  background: #1f2937;
 }
 
 /* JSON树视图容器 */
