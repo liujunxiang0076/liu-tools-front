@@ -149,10 +149,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, reactive } from 'vue'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 const input = ref('')
 const stats = reactive({
@@ -179,9 +179,6 @@ const readingTime = computed(() => {
   }
 })
 
-const goBack = () => {
-  router.push('/')
-}
 
 const analyze = () => {
   if (!input.value) {

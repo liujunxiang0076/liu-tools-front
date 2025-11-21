@@ -393,9 +393,9 @@
 
 <script setup lang="ts">
 import { ref, computed, reactive, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 // 响应式数据
 const passwordLength = ref(12)
@@ -486,11 +486,6 @@ const passwordStrength = computed(() => {
     suggestions
   }
 })
-
-// 返回上一页
-const goBack = () => {
-  router.back()
-}
 
 // 获取字符集
 const getCharacterSet = (): string => {

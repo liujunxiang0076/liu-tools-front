@@ -375,9 +375,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 // 响应式数据
 const currentMode = ref<'generator' | 'parser'>('generator')
@@ -405,11 +405,6 @@ let lastTimestamp = -1
 
 // 统计信息
 const generateStats = ref<any>(null)
-
-// 返回上一页
-const goBack = () => {
-  router.back()
-}
 
 // 模式切换
 const switchMode = (mode: 'generator' | 'parser') => {

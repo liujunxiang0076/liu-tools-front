@@ -180,9 +180,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 const mode = ref<'text' | 'file'>('text')
 const textInput = ref('')
@@ -192,9 +192,6 @@ const fileResults = ref<Record<string, string> | null>(null)
 const isCalculating = ref(false)
 const fileInput = ref<HTMLInputElement | null>(null)
 
-const goBack = () => {
-  router.push('/')
-}
 
 // 简化的哈希函数（仅用于演示，实际应使用 crypto-js 等库）
 const simpleHash = async (text: string, algorithm: string): Promise<string> => {

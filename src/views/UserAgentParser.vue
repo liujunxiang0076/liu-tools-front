@@ -164,9 +164,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 const currentUA = ref('')
 const userAgent = ref('')
@@ -180,9 +180,6 @@ interface ParsedUA {
 
 const parsed = ref<ParsedUA | null>(null)
 
-const goBack = () => {
-  router.push('/')
-}
 
 // 简化的 UA 解析（实际项目建议使用 ua-parser-js 等库）
 const parseUA = () => {

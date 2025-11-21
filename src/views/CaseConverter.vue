@@ -197,9 +197,9 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 const input = ref('')
 const results = reactive({
@@ -213,9 +213,6 @@ const results = reactive({
   kebabCase: ''
 })
 
-const goBack = () => {
-  router.push('/')
-}
 
 const handleConvert = () => {
   if (!input.value.trim()) {

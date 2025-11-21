@@ -172,10 +172,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 const version = ref<'v1' | 'v4'>('v4')
 const count = ref(1)
@@ -183,9 +183,6 @@ const uppercase = ref(false)
 const withHyphens = ref(true)
 const results = ref<string[]>([])
 
-const goBack = () => {
-  router.push('/')
-}
 
 // 生成 UUID v4
 const generateUuidV4 = (): string => {

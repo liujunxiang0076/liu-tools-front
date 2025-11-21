@@ -282,9 +282,9 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 // 响应式数据
 const currentMode = ref<'text' | 'file'>('text')
@@ -305,11 +305,6 @@ const fileInput = ref<HTMLInputElement>()
 const exampleTexts = {
   encode: 'Hello, World! 你好，世界！',
   decode: 'SGVsbG8sIFdvcmxkISDkvaDlpb3vvIzkuJbnlYzvvIE='
-}
-
-// 返回上一页
-const goBack = () => {
-  router.back()
 }
 
 // 处理文本输入变化

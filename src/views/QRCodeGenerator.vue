@@ -507,10 +507,9 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, nextTick, watch, getCurrentInstance } from 'vue'
 import * as QRCode from 'qrcode'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-// 使用路由
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 // 内容类型定义
 interface ContentType {
@@ -1159,8 +1158,7 @@ onMounted(() => {
 
 // 返回主页方法
 const goBackToMain = () => {
-  // 使用路由跳转回主页
-  router.push('/')
+  goBack()
 }
 
 // 打开全屏模态框

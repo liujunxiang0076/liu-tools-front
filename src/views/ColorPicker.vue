@@ -289,10 +289,9 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, getCurrentInstance } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-// 使用路由
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 // 响应式状态
 const selectedColor = ref('#FF5733')
@@ -460,11 +459,6 @@ const copyToClipboard = async (text: string) => {
   } catch (err) {
     console.error('复制失败:', err)
   }
-}
-
-const goBack = () => {
-  // 使用路由跳转回主页
-  router.push('/')
 }
 
 // 初始化

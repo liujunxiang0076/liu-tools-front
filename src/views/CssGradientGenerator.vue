@@ -209,9 +209,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 const gradientType = ref<'linear' | 'radial' | 'conic'>('linear')
 const angle = ref(90)
@@ -268,9 +268,6 @@ const presets = [
   }
 ]
 
-const goBack = () => {
-  router.push('/')
-}
 
 const gradientCSS = computed(() => {
   const stops = colorStops.value

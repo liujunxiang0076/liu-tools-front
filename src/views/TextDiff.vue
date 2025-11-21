@@ -190,9 +190,9 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 const textA = ref('')
 const textB = ref('')
@@ -217,9 +217,6 @@ interface DiffResult {
 
 const diffResult = ref<DiffResult | null>(null)
 
-const goBack = () => {
-  router.push('/')
-}
 
 const processLine = (line: string): string => {
   let processed = line

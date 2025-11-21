@@ -302,9 +302,9 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 // 响应式数据
 const regexPattern = ref('')
@@ -317,11 +317,6 @@ const matchResults = ref<Array<{
   groups: string[]
 }>>([])
 const showLineNumbers = ref(false)
-
-// 返回上一页
-const goBack = () => {
-  router.back()
-}
 
 // 正则表达式示例
 const regexExamples = {

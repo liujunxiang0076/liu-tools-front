@@ -147,17 +147,14 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 const token = ref('')
 const error = ref('')
 const decoded = ref<any>(null)
 
-const goBack = () => {
-  router.push('/')
-}
 
 const base64UrlDecode = (str: string): string => {
   let base64 = str.replace(/-/g, '+').replace(/_/g, '/')

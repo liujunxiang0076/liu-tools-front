@@ -209,9 +209,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 const second = ref('0')
 const minute = ref('0')
@@ -233,9 +233,6 @@ const presets = [
   { name: '工作日上午9点', cron: '0 0 9 * * 1-5', values: ['0', '0', '9', '*', '*', '1-5'] }
 ]
 
-const goBack = () => {
-  router.push('/')
-}
 
 const cronExpression = computed(() => {
   return `${second.value} ${minute.value} ${hour.value} ${day.value} ${month.value} ${week.value}`

@@ -196,9 +196,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 const inset = ref(false)
 const offsetX = ref(0)
@@ -271,9 +271,6 @@ const presets = [
   }
 ]
 
-const goBack = () => {
-  router.push('/')
-}
 
 const shadowCSS = computed(() => {
   const hexToRgba = (hex: string, alpha: number) => {

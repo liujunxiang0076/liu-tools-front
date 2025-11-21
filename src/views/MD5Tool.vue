@@ -294,9 +294,9 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 // 响应式数据
 const currentMode = ref<'text' | 'file'>('text')
@@ -322,11 +322,6 @@ const isVerifyMatch = computed(() => {
   const currentResult = currentMode.value === 'text' ? textMD5Result.value : fileMD5Result.value
   return currentResult && verifyMD5.value.toLowerCase() === currentResult.toLowerCase()
 })
-
-// 返回上一页
-const goBack = () => {
-  router.back()
-}
 
 // 处理文本输入变化
 const handleTextInputChange = () => {

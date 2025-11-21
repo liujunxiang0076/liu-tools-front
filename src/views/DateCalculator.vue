@@ -234,9 +234,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 const mode = ref<'diff' | 'add' | 'age' | 'workday'>('diff')
 
@@ -260,9 +260,6 @@ const workStartDate = ref('')
 const workEndDate = ref('')
 const workdayResult = ref<any>(null)
 
-const goBack = () => {
-  router.push('/')
-}
 
 const calculateDiff = () => {
   if (!startDate.value || !endDate.value) return

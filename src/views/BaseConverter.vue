@@ -147,9 +147,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 const binary = ref('')
 const octal = ref('')
@@ -163,9 +163,6 @@ const errors = ref({
   hexadecimal: ''
 })
 
-const goBack = () => {
-  router.push('/')
-}
 
 const clearAll = () => {
   binary.value = ''

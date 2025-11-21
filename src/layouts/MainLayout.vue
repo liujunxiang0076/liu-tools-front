@@ -32,16 +32,33 @@
         @click="sidebarOpen = false"
       ></div>
 
-      <!-- 主工作区 -->
-      <MainWorkspace
-        :selected-category="selectedCategory"
-        :search-query="searchQuery"
-        :view-mode="viewMode"
-        :favorite-ids="favoriteIds"
-        @update:favorite-ids="favoriteIds = $event"
-        @update:search-query="searchQuery = $event"
-        @tool-select="handleToolSelect"
-      />
+      <!-- 主工作区容器 -->
+      <div class="flex-1 flex flex-col min-w-0">
+        <!-- 标签栏 -->
+        <TabBar />
+        
+        <!-- 工具内容区 -->
+        <div class="flex-1 overflow-auto">
+          <!-- 如果有激活的标签，显示工具页面 -->
+          <component
+            v-if="activeTool"
+            :is="getToolComponent(activeTool)"
+            :key="activeTabId"
+          />
+          
+          <!-- 如果没有激活的标签，显示主工作区 -->
+          <MainWorkspace
+            v-else
+            :selected-category="selectedCategory"
+            :search-query="searchQuery"
+            :view-mode="viewMode"
+            :favorite-ids="favoriteIds"
+            @update:favorite-ids="favoriteIds = $event"
+            @update:search-query="searchQuery = $event"
+            @tool-select="handleToolSelect"
+          />
+        </div>
+      </div>
     </div>
 
     <!-- Toast 提示 -->
@@ -67,6 +84,34 @@ import { useRouter } from 'vue-router'
 import { categories, tools, getToolsByCategory } from '@/store/data'
 import type { Tool } from '@/types'
 import ToastContainer from '@/components/ToastContainer.vue'
+import TabBar from '@/components/TabBar.vue'
+import { useTabs } from '@/composables/useTabs'
+import { markRaw } from 'vue'
+
+// 导入所有工具组件
+import ColorPicker from '@/views/ColorPicker.vue'
+import QRCodeGenerator from '@/views/QRCodeGenerator.vue'
+import JsonFormatter from '@/views/JsonFormatter.vue'
+import SnowflakeGenerator from '@/views/SnowflakeGenerator.vue'
+import Base64Tool from '@/views/Base64Tool.vue'
+import MD5Tool from '@/views/MD5Tool.vue'
+import TimestampTool from '@/views/TimestampTool.vue'
+import RegexTool from '@/views/RegexTool.vue'
+import PasswordGenerator from '@/views/PasswordGenerator.vue'
+import UrlEncodeTool from '@/views/UrlEncodeTool.vue'
+import BaseConverter from '@/views/BaseConverter.vue'
+import UuidGenerator from '@/views/UuidGenerator.vue'
+import CaseConverter from '@/views/CaseConverter.vue'
+import TextStatistics from '@/views/TextStatistics.vue'
+import TextDiff from '@/views/TextDiff.vue'
+import UnitConverter from '@/views/UnitConverter.vue'
+import DateCalculator from '@/views/DateCalculator.vue'
+import JwtDecoder from '@/views/JwtDecoder.vue'
+import CssGradientGenerator from '@/views/CssGradientGenerator.vue'
+import HashCalculator from '@/views/HashCalculator.vue'
+import UserAgentParser from '@/views/UserAgentParser.vue'
+import CssShadowGenerator from '@/views/CssShadowGenerator.vue'
+import CronGenerator from '@/views/CronGenerator.vue'
 
 // 使用路由
 const router = useRouter()
@@ -78,6 +123,41 @@ const viewMode = ref<'grid' | 'list'>('grid')
 const favoriteIds = ref<number[]>([])
 const sidebarOpen = ref(false)
 const showFavoritesModal = ref(false)
+
+// 使用标签页系统
+const { openTab, activeTool, activeTabId } = useTabs()
+
+// 工具组件映射
+const toolComponentMap: Record<string, any> = {
+  '/tool/color-picker': markRaw(ColorPicker),
+  '/tool/qrcode-generator': markRaw(QRCodeGenerator),
+  '/tool/json-formatter': markRaw(JsonFormatter),
+  '/tool/snowflake-generator': markRaw(SnowflakeGenerator),
+  '/tool/base64': markRaw(Base64Tool),
+  '/tool/md5': markRaw(MD5Tool),
+  '/tool/timestamp': markRaw(TimestampTool),
+  '/tool/regex': markRaw(RegexTool),
+  '/tool/password-generator': markRaw(PasswordGenerator),
+  '/tool/url-encode': markRaw(UrlEncodeTool),
+  '/tool/base-converter': markRaw(BaseConverter),
+  '/tool/uuid-generator': markRaw(UuidGenerator),
+  '/tool/case-converter': markRaw(CaseConverter),
+  '/tool/text-statistics': markRaw(TextStatistics),
+  '/tool/text-diff': markRaw(TextDiff),
+  '/tool/unit-converter': markRaw(UnitConverter),
+  '/tool/date-calculator': markRaw(DateCalculator),
+  '/tool/jwt-decoder': markRaw(JwtDecoder),
+  '/tool/css-gradient': markRaw(CssGradientGenerator),
+  '/tool/hash-calculator': markRaw(HashCalculator),
+  '/tool/user-agent-parser': markRaw(UserAgentParser),
+  '/tool/css-shadow': markRaw(CssShadowGenerator),
+  '/tool/cron-generator': markRaw(CronGenerator)
+}
+
+// 获取工具组件
+const getToolComponent = (tool: Tool) => {
+  return toolComponentMap[tool.path] || null
+}
 
 // 计算属性
 const totalTools = computed(() => tools.length)
@@ -96,9 +176,12 @@ const handleCategorySelect = (categoryId: string) => {
 }
 
 const handleToolSelect = (tool: Tool) => {
-  if (tool.path) {
-    // 使用路由跳转
-    router.push(tool.path)
+  // 打开新标签页
+  openTab(tool)
+  
+  // 移动端选择工具后关闭侧边栏
+  if (window.innerWidth < 1024) {
+    sidebarOpen.value = false
   }
 }
 

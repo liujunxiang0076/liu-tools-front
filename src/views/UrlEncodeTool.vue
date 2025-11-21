@@ -237,9 +237,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 const operation = ref<'encode' | 'decode' | 'parse'>('encode')
 const input = ref('')
@@ -257,9 +257,6 @@ interface ParsedUrl {
 
 const parsedUrl = ref<ParsedUrl | null>(null)
 
-const goBack = () => {
-  router.push('/')
-}
 
 const handleProcess = () => {
   hasError.value = false

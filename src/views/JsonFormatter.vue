@@ -672,10 +672,10 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 import JsonTreeView from '@/components/JsonTreeView.vue'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 // 响应式数据
 const inputJson = ref(localStorage.getItem('json-formatter-input') || '')
@@ -816,10 +816,6 @@ const exampleJson = `{
 //   }
 // })
 
-// 返回上一页
-const goBack = () => {
-  router.back()
-}
 
 // 防抖处理输入变化
 let inputTimeout: NodeJS.Timeout | null = null

@@ -281,9 +281,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 // 响应式数据
 const currentTimestamp = ref(0)
@@ -364,11 +364,6 @@ const commonTimestamps = computed(() => {
     }
   ]
 })
-
-// 返回上一页
-const goBack = () => {
-  router.back()
-}
 
 // 更新当前时间
 const updateCurrentTime = () => {

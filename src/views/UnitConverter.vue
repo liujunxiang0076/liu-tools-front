@@ -117,9 +117,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToolNavigation } from '@/composables/useToolNavigation'
 
-const router = useRouter()
+const { goBack } = useToolNavigation()
 
 const category = ref('length')
 const fromUnit = ref('meter')
@@ -219,9 +219,6 @@ const currentCategory = computed(() => categories.find(c => c.id === category.va
 const currentUnits = computed(() => currentCategory.value.units)
 const currentPresets = computed(() => currentCategory.value.presets)
 
-const goBack = () => {
-  router.push('/')
-}
 
 const convertTemperature = (value: number, from: string, to: string): number => {
   let celsius: number
