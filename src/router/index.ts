@@ -19,6 +19,8 @@ import CaseConverter from '@/views/CaseConverter.vue'
 import TextStatistics from '@/views/TextStatistics.vue'
 import TextDiff from '@/views/TextDiff.vue'
 import UnitConverter from '@/views/UnitConverter.vue'
+import DateCalculator from '@/views/DateCalculator.vue'
+import JwtDecoder from '@/views/JwtDecoder.vue'
 
 // 定义路由
 const routes: RouteRecordRaw[] = [
@@ -121,6 +123,16 @@ const routes: RouteRecordRaw[] = [
         path: 'unit-converter',
         name: 'ToolUnitConverter',
         component: UnitConverter
+      },
+      {
+        path: 'date-calculator',
+        name: 'ToolDateCalculator',
+        component: DateCalculator
+      },
+      {
+        path: 'jwt-decoder',
+        name: 'ToolJwtDecoder',
+        component: JwtDecoder
       }
     ]
   },

@@ -262,6 +262,24 @@ export const tools: Tool[] = [
     icon: '📏',
     tags: ['单位', '转换', '长度', '重量', '温度', '数据大小'],
     path: '/tool/unit-converter'
+  },
+  {
+    id: 21,
+    name: '日期计算器',
+    description: '日期相关计算工具，支持日期加减、日期差计算、年龄计算和工作日统计',
+    category: 'efficiency',
+    icon: '📅',
+    tags: ['日期', '计算', '年龄', '工作日', '日期差'],
+    path: '/tool/date-calculator'
+  },
+  {
+    id: 22,
+    name: 'JWT 解析器',
+    description: 'JWT Token 解析和验证工具，查看 Header、Payload 和签名信息',
+    category: 'development',
+    icon: '🔐',
+    tags: ['JWT', 'Token', '解析', '验证', '认证'],
+    path: '/tool/jwt-decoder'
   }
 ]
 
