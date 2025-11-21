@@ -14,6 +14,9 @@ import PasswordGenerator from '@/views/PasswordGenerator.vue'
 import SnowflakeGenerator from '@/views/SnowflakeGenerator.vue'
 import UrlEncodeTool from '@/views/UrlEncodeTool.vue'
 import BaseConverter from '@/views/BaseConverter.vue'
+import UuidGenerator from '@/views/UuidGenerator.vue'
+import CaseConverter from '@/views/CaseConverter.vue'
+import TextStatistics from '@/views/TextStatistics.vue'
 
 // 定义路由
 const routes: RouteRecordRaw[] = [
@@ -91,6 +94,21 @@ const routes: RouteRecordRaw[] = [
         path: 'base-converter',
         name: 'ToolBaseConverter',
         component: BaseConverter
+      },
+      {
+        path: 'uuid-generator',
+        name: 'ToolUuidGenerator',
+        component: UuidGenerator
+      },
+      {
+        path: 'case-converter',
+        name: 'ToolCaseConverter',
+        component: CaseConverter
+      },
+      {
+        path: 'text-statistics',
+        name: 'ToolTextStatistics',
+        component: TextStatistics
       }
     ]
   },

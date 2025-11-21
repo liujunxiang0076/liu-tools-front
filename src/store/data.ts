@@ -213,6 +213,37 @@ export const tools: Tool[] = [
     icon: '🔢',
     tags: ['进制', '转换', '二进制', '十六进制', '八进制', '计算'],
     path: '/tool/base-converter'
+  },
+  
+  // 效率工具
+  {
+    id: 16,
+    name: 'UUID生成器',
+    description: '生成全局唯一标识符（UUID/GUID），支持多种版本和格式',
+    category: 'efficiency',
+    icon: '🆔',
+    tags: ['UUID', 'GUID', '唯一ID', '标识符', '生成器'],
+    path: '/tool/uuid-generator'
+  },
+  
+  // 文本工具
+  {
+    id: 17,
+    name: '大小写转换',
+    description: '文本大小写格式转换工具，支持驼峰、蛇形、短横线等多种命名规范',
+    category: 'efficiency',
+    icon: '🔤',
+    tags: ['大小写', '转换', 'camelCase', 'snake_case', 'kebab-case', '命名规范'],
+    path: '/tool/case-converter'
+  },
+  {
+    id: 18,
+    name: '文本统计分析',
+    description: '统计文本的字数、词数、字符等信息，支持中英文分析和阅读时间估算',
+    category: 'efficiency',
+    icon: '📊',
+    tags: ['文本', '统计', '字数', '词数', '分析', '阅读时间'],
+    path: '/tool/text-statistics'
   }
 ]
 
