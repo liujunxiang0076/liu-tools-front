@@ -39,15 +39,14 @@
           
           <!-- 折叠状态结束括号 -->
           <span v-if="!isExpanded" class="json-bracket">{{ node.type === 'array' ? ']' : '}' }}</span>
+          <span v-if="!isExpanded && !node.isLast" class="json-comma">,</span>
         </template>
 
         <!-- 基本值 -->
         <template v-else>
           <span :class="valueClass">{{ formattedValue }}</span>
+          <span v-if="!node.isLast" class="json-comma">,</span>
         </template>
-
-        <!-- 逗号 (非最后一项且 (非容器 或 容器折叠)) -->
-        <span v-if="!node.isLast && (!isContainer || !isExpanded)" class="json-comma">,</span>
       </div>
     </div>
 
@@ -90,25 +89,10 @@ if (props.node.depth >= 2 || props.node.itemCount > 500) {
 const isContainer = computed(() => props.node.type === 'object' || props.node.type === 'array')
 const hasChildren = computed(() => props.node.children && props.node.children.length > 0)
 
-// 计算缩进层级：如果父节点是数组下标(0,1,2...)
-const indentLevel = computed(() => {
-  const depth = props.node.depth ?? 0
-  const path = props.node.path ?? ''
-  const key = String(props.node.key ?? '')
-
-  if (!path) return depth
-  const parts = path.split('.')
-  if (parts.length < 2) return depth
-
-  const last = parts[parts.length - 1]
-  const parentKey = last === key ? parts[parts.length - 2] : parts[parts.length - 1]
-  const parentIsIndex = parentKey !== undefined && /^\d+$/.test(parentKey)
-
-  return parentIsIndex ? Math.max(0, depth - 1) : depth
-})
-
-const INDENT_EM = 2
-const indentPadding = computed(() => `${indentLevel.value * INDENT_EM}em`)
+// 标准 JSON 缩进：每层缩进 2 个字符（约 1.2em）
+// 2 个字符 ≈ 1.2em（等宽字体）
+const INDENT_PER_LEVEL = 1.2 // em
+const indentPadding = computed(() => `${(props.node.depth ?? 0) * INDENT_PER_LEVEL}em`)
 
 const valueClass = computed(() => {
   switch (props.node.type) {
@@ -213,6 +197,13 @@ const toggle = () => {
 .json-colon { margin-right: 6px; color: #444; }
 .json-bracket { font-weight: bold; color: #444; }
 .json-comma { color: #444; }
+
+/* 键名占位符 - 不可见但占据空间，用于对齐括号 */
+.key-placeholder {
+  visibility: hidden;
+  font-weight: 500;
+  margin-right: 2px;
+}
 
 /* Dark Mode */
 .dark .json-key { color: #79b8ff; }

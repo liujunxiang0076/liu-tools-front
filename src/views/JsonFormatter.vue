@@ -966,10 +966,27 @@ const showToastMessage = (message: string, type: 'success' | 'error' = 'success'
 
 // 复制结果
 const copyResult = async () => {
-  if (!formattedJson.value) return
+  let textToCopy = formattedJson.value
+  
+  // 如果在树视图模式下，formattedJson 可能为空，从 parsedJsonData 生成
+  if (!textToCopy && parsedJsonData.value) {
+    try {
+      const indent = indentSize.value === 'tab' ? '\t' : parseInt(indentSize.value)
+      textToCopy = JSON.stringify(parsedJsonData.value, null, indent)
+    } catch (error) {
+      console.error('生成 JSON 字符串失败:', error)
+      showToastMessage('复制失败，数据格式错误', 'error')
+      return
+    }
+  }
+  
+  if (!textToCopy) {
+    showToastMessage('没有可复制的内容', 'warning')
+    return
+  }
   
   try {
-    await navigator.clipboard.writeText(formattedJson.value)
+    await navigator.clipboard.writeText(textToCopy)
     copySuccess.value = true
     showToastMessage('复制成功！', 'success')
     

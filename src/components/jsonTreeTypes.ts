@@ -54,9 +54,11 @@ export function buildVisualTree(
     if (keys.length > 0) {
       keys.forEach((k, index) => {
         const isLastChild = index === keys.length - 1
+        // 如果当前节点是数组，子节点的 key 设为空字符串（不显示下标）
+        const childKey = Array.isArray(data) ? '' : k
         const childNode = buildVisualTree(
           data[k],
-          k,
+          childKey,
           depth + 1,
           `${path}.${k}`,
           isLastChild,
