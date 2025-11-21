@@ -657,7 +657,7 @@ const isProcessing = ref(false)
 const copySuccess = ref(false)
 const showToast = ref(false)
 const toastMessage = ref('')
-const toastType = ref<'success' | 'error'>('success')
+const toastType = ref<'success' | 'error' | 'warning'>('success')
 const viewMode = ref<'tree' | 'code'>('tree') // 新增：视图模式
 
 // 对比模式相关状态
@@ -954,7 +954,7 @@ const generateStats = (data: any) => {
 }
 
 // 显示 Toast 提示
-const showToastMessage = (message: string, type: 'success' | 'error' = 'success') => {
+const showToastMessage = (message: string, type: 'success' | 'error' | 'warning' = 'success') => {
   toastMessage.value = message
   toastType.value = type
   showToast.value = true
@@ -968,10 +968,10 @@ const showToastMessage = (message: string, type: 'success' | 'error' = 'success'
 const copyResult = async () => {
   let textToCopy = formattedJson.value
   
-  // 如果在树视图模式下，formattedJson 可能为空，从 parsedJsonData 生成
+  // 如果在树视图模式下，formattedJson 可能为空，从 parsedJsonData 生成标准 JSON
   if (!textToCopy && parsedJsonData.value) {
     try {
-      const indent = indentSize.value === 'tab' ? '\t' : parseInt(indentSize.value)
+      const indent = indentSize.value === 'tab' ? '\t' : parseInt(indentSize.value) || 2
       textToCopy = JSON.stringify(parsedJsonData.value, null, indent)
     } catch (error) {
       console.error('生成 JSON 字符串失败:', error)
