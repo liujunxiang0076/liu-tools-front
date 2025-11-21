@@ -44,6 +44,9 @@
       />
     </div>
 
+    <!-- Toast 提示 -->
+    <ToastContainer />
+
     <!-- 收藏管理弹窗 -->
     <FavoritesModal
       :is-open="showFavoritesModal"
@@ -63,6 +66,7 @@ import { useRouter } from 'vue-router'
 
 import { categories, tools, getToolsByCategory } from '@/store/data'
 import type { Tool } from '@/types'
+import ToastContainer from '@/components/ToastContainer.vue'
 
 // 使用路由
 const router = useRouter()
