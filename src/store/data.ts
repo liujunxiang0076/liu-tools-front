@@ -244,6 +244,24 @@ export const tools: Tool[] = [
     icon: '📊',
     tags: ['文本', '统计', '字数', '词数', '分析', '阅读时间'],
     path: '/tool/text-statistics'
+  },
+  {
+    id: 19,
+    name: '文本差异对比',
+    description: '比较两段文本的差异，高亮显示不同之处，支持逐行对比和多种对比选项',
+    category: 'efficiency',
+    icon: '📝',
+    tags: ['文本', '对比', '差异', '比较', '高亮', 'diff'],
+    path: '/tool/text-diff'
+  },
+  {
+    id: 20,
+    name: '单位转换器',
+    description: '各种单位之间的转换工具，支持长度、重量、温度、数据大小等多种单位',
+    category: 'efficiency',
+    icon: '📏',
+    tags: ['单位', '转换', '长度', '重量', '温度', '数据大小'],
+    path: '/tool/unit-converter'
   }
 ]
 

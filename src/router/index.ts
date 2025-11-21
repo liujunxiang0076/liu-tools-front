@@ -17,6 +17,8 @@ import BaseConverter from '@/views/BaseConverter.vue'
 import UuidGenerator from '@/views/UuidGenerator.vue'
 import CaseConverter from '@/views/CaseConverter.vue'
 import TextStatistics from '@/views/TextStatistics.vue'
+import TextDiff from '@/views/TextDiff.vue'
+import UnitConverter from '@/views/UnitConverter.vue'
 
 // 定义路由
 const routes: RouteRecordRaw[] = [
@@ -109,6 +111,16 @@ const routes: RouteRecordRaw[] = [
         path: 'text-statistics',
         name: 'ToolTextStatistics',
         component: TextStatistics
+      },
+      {
+        path: 'text-diff',
+        name: 'ToolTextDiff',
+        component: TextDiff
+      },
+      {
+        path: 'unit-converter',
+        name: 'ToolUnitConverter',
+        component: UnitConverter
       }
     ]
   },
