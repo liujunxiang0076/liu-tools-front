@@ -100,6 +100,14 @@ export function useTabs() {
     return activeTab.value?.tool || null
   })
 
+  // 显示主页（取消所有标签的激活状态，但不关闭标签）
+  const showHome = () => {
+    tabs.value.forEach(tab => {
+      tab.isActive = false
+    })
+    activeTabId.value = null
+  }
+
   return {
     tabs,
     activeTabId,
@@ -110,6 +118,7 @@ export function useTabs() {
     closeTab,
     closeOtherTabs,
     closeAllTabs,
-    closeRightTabs
+    closeRightTabs,
+    showHome
   }
 }

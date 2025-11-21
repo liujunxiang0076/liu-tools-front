@@ -125,7 +125,7 @@ const sidebarOpen = ref(false)
 const showFavoritesModal = ref(false)
 
 // 使用标签页系统
-const { openTab, activeTool, activeTabId } = useTabs()
+const { openTab, activeTool, activeTabId, showHome } = useTabs()
 
 // 工具组件映射
 const toolComponentMap: Record<string, any> = {
@@ -169,6 +169,8 @@ const favoriteTools = computed(() => {
 // 事件处理函数
 const handleCategorySelect = (categoryId: string) => {
   selectedCategory.value = categoryId
+  // 显示主页（保留标签）
+  showHome()
   // 移动端选择分类后关闭侧边栏
   if (window.innerWidth < 1024) {
     sidebarOpen.value = false
