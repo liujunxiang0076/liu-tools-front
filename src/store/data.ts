@@ -280,6 +280,15 @@ export const tools: Tool[] = [
     icon: '🔐',
     tags: ['JWT', 'Token', '解析', '验证', '认证'],
     path: '/tool/jwt-decoder'
+  },
+  {
+    id: 23,
+    name: 'CSS 渐变生成器',
+    description: '可视化生成 CSS 渐变，支持线性、径向、圆锥渐变，一键复制代码',
+    category: 'design',
+    icon: '🎨',
+    tags: ['CSS', '渐变', 'gradient', '设计', '前端'],
+    path: '/tool/css-gradient'
   }
 ]
 

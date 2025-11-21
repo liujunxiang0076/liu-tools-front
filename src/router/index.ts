@@ -21,6 +21,7 @@ import TextDiff from '@/views/TextDiff.vue'
 import UnitConverter from '@/views/UnitConverter.vue'
 import DateCalculator from '@/views/DateCalculator.vue'
 import JwtDecoder from '@/views/JwtDecoder.vue'
+import CssGradientGenerator from '@/views/CssGradientGenerator.vue'
 
 // 定义路由
 const routes: RouteRecordRaw[] = [
@@ -133,6 +134,11 @@ const routes: RouteRecordRaw[] = [
         path: 'jwt-decoder',
         name: 'ToolJwtDecoder',
         component: JwtDecoder
+      },
+      {
+        path: 'css-gradient',
+        name: 'ToolCssGradient',
+        component: CssGradientGenerator
       }
     ]
   },
