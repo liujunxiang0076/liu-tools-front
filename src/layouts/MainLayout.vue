@@ -155,8 +155,9 @@ const toolComponentMap: Record<string, any> = {
 }
 
 // 获取工具组件
-const getToolComponent = (tool: Tool) => {
-  return toolComponentMap[tool.path] || null
+const getToolComponent = (tool: Tool | null) => {
+  if (!tool || !tool.path) return null
+  return toolComponentMap[tool.path as keyof typeof toolComponentMap] || null
 }
 
 // 计算属性
