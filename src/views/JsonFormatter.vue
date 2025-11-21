@@ -310,6 +310,21 @@
             <h2 class="text-lg font-semibold text-base-content">JSON A</h2>
             <div class="flex gap-2">
               <button 
+                @click="toggleFormatJsonA"
+                class="btn btn-sm"
+                :class="jsonAFormatted ? 'btn-warning' : 'btn-info'"
+                :disabled="!jsonA || hasErrorA"
+                title="格式化为树形结构或还原为原始格式"
+              >
+                <svg v-if="!jsonAFormatted" class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+                <svg v-else class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                </svg>
+                {{ jsonAFormatted ? '还原' : '格式化' }}
+              </button>
+              <button 
                 @click="clearJsonA"
                 class="btn btn-sm btn-ghost"
                 :disabled="!jsonA"
@@ -364,6 +379,21 @@
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-base-content">JSON B</h2>
             <div class="flex gap-2">
+              <button 
+                @click="toggleFormatJsonB"
+                class="btn btn-sm"
+                :class="jsonBFormatted ? 'btn-warning' : 'btn-info'"
+                :disabled="!jsonB || hasErrorB"
+                title="格式化为树形结构或还原为原始格式"
+              >
+                <svg v-if="!jsonBFormatted" class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+                <svg v-else class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                </svg>
+                {{ jsonBFormatted ? '还原' : '格式化' }}
+              </button>
               <button 
                 @click="clearJsonB"
                 class="btn btn-sm btn-ghost"
@@ -668,6 +698,14 @@ const hasErrorA = ref(false)
 const hasErrorB = ref(false)
 const errorMessageA = ref('')
 const errorMessageB = ref('')
+
+// JSON A/B 格式化状态
+const jsonAFormatted = ref(false) // JSON A 是否已格式化
+const jsonBFormatted = ref(false) // JSON B 是否已格式化
+const jsonAOriginal = ref('') // JSON A 原始数据备份
+const jsonBOriginal = ref('') // JSON B 原始数据备份
+const parsedJsonA = ref<any>(null) // JSON A 解析后的数据
+const parsedJsonB = ref<any>(null) // JSON B 解析后的数据
 
 // 移动端相关状态
 const mobileTab = ref<'A' | 'B'>('A')
@@ -1080,6 +1118,9 @@ const clearJsonA = () => {
   hasErrorA.value = false
   errorMessageA.value = ''
   diffResult.value = null
+  jsonAFormatted.value = false
+  jsonAOriginal.value = ''
+  parsedJsonA.value = null
 }
 
 const loadExampleA = () => {
@@ -1106,6 +1147,9 @@ const clearJsonB = () => {
   hasErrorB.value = false
   errorMessageB.value = ''
   diffResult.value = null
+  jsonBFormatted.value = false
+  jsonBOriginal.value = ''
+  parsedJsonB.value = null
 }
 
 const loadExampleB = () => {
@@ -1133,12 +1177,81 @@ const loadExampleB = () => {
   handleJsonBChange()
 }
 
-// 深度对比两个对象
+// JSON A 格式化/还原方法
+const toggleFormatJsonA = () => {
+  if (jsonAFormatted.value) {
+    // 还原
+    jsonA.value = jsonAOriginal.value
+    jsonAFormatted.value = false
+    parsedJsonA.value = null
+  } else {
+    // 格式化
+    try {
+      const parsed = JSON.parse(jsonA.value)
+      jsonAOriginal.value = jsonA.value // 备份原始数据
+      jsonA.value = JSON.stringify(parsed, null, 2)
+      parsedJsonA.value = parsed
+      jsonAFormatted.value = true
+      hasErrorA.value = false
+      errorMessageA.value = ''
+    } catch (error) {
+      hasErrorA.value = true
+      errorMessageA.value = error instanceof Error ? error.message : '格式化失败'
+    }
+  }
+}
+
+// JSON B 格式化/还原方法
+const toggleFormatJsonB = () => {
+  if (jsonBFormatted.value) {
+    // 还原
+    jsonB.value = jsonBOriginal.value
+    jsonBFormatted.value = false
+    parsedJsonB.value = null
+  } else {
+    // 格式化
+    try {
+      const parsed = JSON.parse(jsonB.value)
+      jsonBOriginal.value = jsonB.value // 备份原始数据
+      jsonB.value = JSON.stringify(parsed, null, 2)
+      parsedJsonB.value = parsed
+      jsonBFormatted.value = true
+      hasErrorB.value = false
+      errorMessageB.value = ''
+    } catch (error) {
+      hasErrorB.value = true
+      errorMessageB.value = error instanceof Error ? error.message : '格式化失败'
+    }
+  }
+}
+
+// 优化后的深度对比算法
 const deepCompare = (obj1: any, obj2: any, path = ''): DiffItem[] => {
   const differences: DiffItem[] = []
   
-  // 处理基本类型
-  if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null) {
+  // 类型检测辅助函数
+  const getType = (val: any): string => {
+    if (val === null) return 'null'
+    if (Array.isArray(val)) return 'array'
+    return typeof val
+  }
+  
+  const type1 = getType(obj1)
+  const type2 = getType(obj2)
+  
+  // 类型不同，直接标记为变更
+  if (type1 !== type2) {
+    differences.push({
+      path: path || 'root',
+      type: 'changed',
+      oldValue: obj1,
+      newValue: obj2
+    })
+    return differences
+  }
+  
+  // 处理基本类型（包括 null）
+  if (type1 !== 'object' && type1 !== 'array') {
     if (obj1 !== obj2) {
       differences.push({
         path: path || 'root',
@@ -1150,7 +1263,50 @@ const deepCompare = (obj1: any, obj2: any, path = ''): DiffItem[] => {
     return differences
   }
   
-  // 获取所有键
+  // 处理数组
+  if (type1 === 'array') {
+    const arr1 = obj1 as any[]
+    const arr2 = obj2 as any[]
+    const maxLen = Math.max(arr1.length, arr2.length)
+    
+    // 数组长度变化
+    if (arr1.length !== arr2.length) {
+      differences.push({
+        path: `${path || 'root'}[length]`,
+        type: 'changed',
+        oldValue: arr1.length,
+        newValue: arr2.length
+      })
+    }
+    
+    // 逐个比较数组元素
+    for (let i = 0; i < maxLen; i++) {
+      const currentPath = `${path || 'root'}[${i}]`
+      
+      if (i >= arr1.length) {
+        // 新增的元素
+        differences.push({
+          path: currentPath,
+          type: 'added',
+          newValue: arr2[i]
+        })
+      } else if (i >= arr2.length) {
+        // 删除的元素
+        differences.push({
+          path: currentPath,
+          type: 'removed',
+          oldValue: arr1[i]
+        })
+      } else {
+        // 递归比较元素
+        differences.push(...deepCompare(arr1[i], arr2[i], currentPath))
+      }
+    }
+    
+    return differences
+  }
+  
+  // 处理对象
   const keys1 = Object.keys(obj1)
   const keys2 = Object.keys(obj2)
   const allKeys = new Set([...keys1, ...keys2])
@@ -1183,20 +1339,41 @@ const deepCompare = (obj1: any, obj2: any, path = ''): DiffItem[] => {
   return differences
 }
 
-// JSON对比方法
+// 优化后的 JSON 对比方法
 const compareJson = () => {
   try {
-    const parsedA = JSON.parse(jsonA.value)
-    const parsedB = JSON.parse(jsonB.value)
+    // 优先使用已解析的数据，避免重复解析
+    let parsedA = parsedJsonA.value
+    let parsedB = parsedJsonB.value
     
+    // 如果没有已解析的数据，则重新解析
+    if (!parsedA) {
+      parsedA = JSON.parse(jsonA.value)
+      parsedJsonA.value = parsedA
+    }
+    
+    if (!parsedB) {
+      parsedB = JSON.parse(jsonB.value)
+      parsedJsonB.value = parsedB
+    }
+    
+    // 执行深度对比
     const differences = deepCompare(parsedA, parsedB)
     
     diffResult.value = {
       identical: differences.length === 0,
       differences
     }
+    
+    // 显示对比结果提示
+    if (differences.length === 0) {
+      showToastMessage('两个 JSON 完全相同', 'success')
+    } else {
+      showToastMessage(`发现 ${differences.length} 处差异`, 'warning')
+    }
   } catch (error) {
     console.error('JSON对比失败:', error)
+    showToastMessage('对比失败，请检查 JSON 格式', 'error')
   }
 }
 
