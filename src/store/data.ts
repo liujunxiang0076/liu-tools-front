@@ -289,6 +289,33 @@ export const tools: Tool[] = [
     icon: '🎨',
     tags: ['CSS', '渐变', 'gradient', '设计', '前端'],
     path: '/tool/css-gradient'
+  },
+  {
+    id: 24,
+    name: '哈希计算器',
+    description: '多种哈希算法计算工具，支持 MD5、SHA-1、SHA-256、SHA-512，文本和文件哈希',
+    category: 'development',
+    icon: '🔐',
+    tags: ['哈希', 'Hash', 'MD5', 'SHA', '加密', '校验'],
+    path: '/tool/hash-calculator'
+  },
+  {
+    id: 25,
+    name: 'User Agent 解析器',
+    description: '解析 User Agent 字符串，识别浏览器、操作系统、设备类型等信息',
+    category: 'development',
+    icon: '🌐',
+    tags: ['User Agent', 'UA', '浏览器', '设备', '解析'],
+    path: '/tool/user-agent-parser'
+  },
+  {
+    id: 26,
+    name: 'CSS 阴影生成器',
+    description: '可视化生成 CSS box-shadow，支持多层阴影和内阴影，一键复制代码',
+    category: 'design',
+    icon: '🎨',
+    tags: ['CSS', '阴影', 'box-shadow', '设计', '前端'],
+    path: '/tool/css-shadow'
   }
 ]
 

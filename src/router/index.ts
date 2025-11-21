@@ -22,6 +22,9 @@ import UnitConverter from '@/views/UnitConverter.vue'
 import DateCalculator from '@/views/DateCalculator.vue'
 import JwtDecoder from '@/views/JwtDecoder.vue'
 import CssGradientGenerator from '@/views/CssGradientGenerator.vue'
+import HashCalculator from '@/views/HashCalculator.vue'
+import UserAgentParser from '@/views/UserAgentParser.vue'
+import CssShadowGenerator from '@/views/CssShadowGenerator.vue'
 
 // 定义路由
 const routes: RouteRecordRaw[] = [
@@ -139,6 +142,21 @@ const routes: RouteRecordRaw[] = [
         path: 'css-gradient',
         name: 'ToolCssGradient',
         component: CssGradientGenerator
+      },
+      {
+        path: 'hash-calculator',
+        name: 'ToolHashCalculator',
+        component: HashCalculator
+      },
+      {
+        path: 'user-agent-parser',
+        name: 'ToolUserAgentParser',
+        component: UserAgentParser
+      },
+      {
+        path: 'css-shadow',
+        name: 'ToolCssShadow',
+        component: CssShadowGenerator
       }
     ]
   },
