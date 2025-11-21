@@ -316,6 +316,15 @@ export const tools: Tool[] = [
     icon: '🎨',
     tags: ['CSS', '阴影', 'box-shadow', '设计', '前端'],
     path: '/tool/css-shadow'
+  },
+  {
+    id: 27,
+    name: 'Cron 表达式生成器',
+    description: '可视化生成 Cron 表达式，支持常用定时任务配置和执行时间预览',
+    category: 'development',
+    icon: '⏰',
+    tags: ['Cron', '定时任务', '表达式', '调度', '运维'],
+    path: '/tool/cron-generator'
   }
 ]
 

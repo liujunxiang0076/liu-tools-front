@@ -25,6 +25,7 @@ import CssGradientGenerator from '@/views/CssGradientGenerator.vue'
 import HashCalculator from '@/views/HashCalculator.vue'
 import UserAgentParser from '@/views/UserAgentParser.vue'
 import CssShadowGenerator from '@/views/CssShadowGenerator.vue'
+import CronGenerator from '@/views/CronGenerator.vue'
 
 // 定义路由
 const routes: RouteRecordRaw[] = [
@@ -157,6 +158,11 @@ const routes: RouteRecordRaw[] = [
         path: 'css-shadow',
         name: 'ToolCssShadow',
         component: CssShadowGenerator
+      },
+      {
+        path: 'cron-generator',
+        name: 'ToolCronGenerator',
+        component: CronGenerator
       }
     ]
   },
