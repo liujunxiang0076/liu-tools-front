@@ -671,7 +671,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import JsonTreeView from '@/components/JsonTreeView.vue'
 
@@ -1096,6 +1096,11 @@ const switchMode = (mode: 'format' | 'diff') => {
   currentMode.value = mode
   if (mode === 'diff') {
     diffResult.value = null
+  } else if (mode === 'format') {
+    // 切换回格式化模式时，重新格式化当前输入
+    if (inputJson.value.trim()) {
+      formatJson()
+    }
   }
 }
 
@@ -1553,6 +1558,14 @@ const highlightedJson = computed(() => {
   // null
   json = json.replace(/(:\s*)(null)/g, '$1<span class="json-null">$2</span>')
   return json
+})
+
+// 页面加载时初始化
+onMounted(() => {
+  // 如果有缓存的 JSON 数据，自动格式化
+  if (inputJson.value.trim()) {
+    formatJson()
+  }
 })
 </script>
 
