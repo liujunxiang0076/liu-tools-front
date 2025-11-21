@@ -191,6 +191,28 @@ export const tools: Tool[] = [
     icon: '❄️',
     tags: ['雪花ID', 'Snowflake', 'ID生成', '唯一ID', '分布式', '数据库'],
     path: '/tool/snowflake-generator'
+  },
+  
+  // 网络工具
+  {
+    id: 14,
+    name: 'URL编码解码',
+    description: 'URL编码和解码工具，支持URL参数解析和查询字符串构建',
+    category: 'development',
+    icon: '🌐',
+    tags: ['URL', '编码', '解码', '网络', '参数解析', 'URI'],
+    path: '/tool/url-encode'
+  },
+  
+  // 计算工具
+  {
+    id: 15,
+    name: '进制转换器',
+    description: '数字进制转换工具，支持二进制、八进制、十进制、十六进制互转',
+    category: 'development',
+    icon: '🔢',
+    tags: ['进制', '转换', '二进制', '十六进制', '八进制', '计算'],
+    path: '/tool/base-converter'
   }
 ]
 

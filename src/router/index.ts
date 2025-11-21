@@ -12,6 +12,8 @@ import TimestampTool from '@/views/TimestampTool.vue'
 import RegexTool from '@/views/RegexTool.vue'
 import PasswordGenerator from '@/views/PasswordGenerator.vue'
 import SnowflakeGenerator from '@/views/SnowflakeGenerator.vue'
+import UrlEncodeTool from '@/views/UrlEncodeTool.vue'
+import BaseConverter from '@/views/BaseConverter.vue'
 
 // 定义路由
 const routes: RouteRecordRaw[] = [
@@ -79,6 +81,16 @@ const routes: RouteRecordRaw[] = [
         path: 'snowflake-generator',
         name: 'ToolSnowflakeGenerator',
         component: SnowflakeGenerator
+      },
+      {
+        path: 'url-encode',
+        name: 'ToolUrlEncode',
+        component: UrlEncodeTool
+      },
+      {
+        path: 'base-converter',
+        name: 'ToolBaseConverter',
+        component: BaseConverter
       }
     ]
   },
