@@ -137,7 +137,7 @@ const toolComponentMap: Record<string, any> = {
   '/tool/base64': markRaw(Base64Tool),
   '/tool/md5': markRaw(MD5Tool),
   '/tool/timestamp': markRaw(TimestampTool),
-  '/tool/regex': markRaw(RegexTool),
+  '/tool/regex-test': markRaw(RegexTool),
   '/tool/password-generator': markRaw(PasswordGenerator),
   '/tool/url-encode': markRaw(UrlEncodeTool),
   '/tool/base-converter': markRaw(BaseConverter),
