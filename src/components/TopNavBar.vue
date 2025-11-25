@@ -3,19 +3,19 @@
     <!-- Logo 品牌区域 -->
     <div class="navbar-start">
       <div class="flex items-center gap-4">
-        <!-- 移动端菜单按钮 -->
-        <div class="dropdown lg:hidden">
-          <div 
-            @click="handleMobileMenuToggle"
-            tabindex="0" 
-            role="button" 
-            class="btn btn-ghost btn-circle"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
-            </svg>
-          </div>
-        </div>
+        <!-- 菜单按钮（所有屏幕都显示） -->
+        <button 
+          @click.stop="handleMobileMenuToggle"
+          @mousedown="() => console.log('按钮被按下')"
+          class="btn btn-ghost btn-circle"
+          type="button"
+          aria-label="打开菜单"
+          style="z-index: 50; pointer-events: auto; position: relative;"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="pointer-events: none;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+          </svg>
+        </button>
         
         <!-- Logo 容器 -->
         <div class="logo-container">
@@ -460,7 +460,9 @@ const handleClearSearch = () => {
 
 // 处理移动端菜单切换
 const handleMobileMenuToggle = () => {
+  console.log('汉堡菜单被点击了！')
   emit('toggle-sidebar')
+  console.log('已触发 toggle-sidebar 事件')
 }
 
 // 监听点击外部隐藏建议

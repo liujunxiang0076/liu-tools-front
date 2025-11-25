@@ -130,7 +130,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { Category, Tool } from '@/types'
 import { getCategoryCount } from '@/store/data'
 
@@ -142,6 +142,11 @@ const props = defineProps<{
   totalTools: number
   isOpen?: boolean
 }>()
+
+// 调试：监听 isOpen 变化
+watch(() => props.isOpen, (newVal) => {
+  console.log('Sidebar isOpen changed:', newVal)
+}, { immediate: true })
 
 // Emits
 const emit = defineEmits<{
@@ -228,7 +233,7 @@ export default {
   transition: transform 0.3s ease;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .sidebar {
     position: fixed;
     top: 0;
