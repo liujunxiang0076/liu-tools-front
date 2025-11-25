@@ -131,7 +131,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
 
 /* 网格视图下的响应式调整 */

@@ -407,76 +407,28 @@ watch(() => props.isOpen, (isOpen) => {
 })
 </script>
 
-<style scoped>
-/* 收藏项卡片样式 */
-.favorite-item-card {
-  background: 
-    linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.97) 100%),
-    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.02) 0%, transparent 50%);
-  border: 1px solid hsl(var(--b3) / 0.8);
-  border-radius: 1rem;
-  padding: 1.25rem;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  box-shadow: 
-    0 2px 6px rgba(0, 0, 0, 0.06),
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 hsl(var(--b1) / 0.5);
-}
-
-/* 深色模式收藏项卡片 */
-[data-theme="dark"] .favorite-item-card {
-  background: 
-    linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.87) 100%),
-    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.03) 0%, transparent 50%);
-  border: 1px solid rgba(71, 85, 105, 0.5);
-  box-shadow: 
-    0 2px 6px rgba(0, 0, 0, 0.2),
-    0 1px 2px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(30, 41, 59, 0.8);
-}
-
-.favorite-item-card:hover {
-  border-color: #93c5fd; /* blue-300 浅色模式 */
-  background: 
-    linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.95) 100%),
-    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.04) 0%, transparent 50%);
-  transform: translateY(-2px);
-  box-shadow: 
-    0 8px 20px rgba(0, 0, 0, 0.1),
-    0 3px 8px rgba(59, 130, 246, 0.15),
-    inset 0 1px 0 hsl(var(--b1)),
-    0 0 0 1px rgba(147, 197, 253, 0.15);
-}
-
-[data-theme="dark"] .favorite-item-card:hover {
-  border-color: #2563eb; /* blue-600 深色模式 */
-  background: 
-    linear-gradient(145deg, rgba(30, 41, 59, 0.95) 0%, rgba(30, 41, 59, 0.92) 100%),
-    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.05) 0%, transparent 50%);
-  box-shadow: 
-    0 8px 20px rgba(0, 0, 0, 0.3),
-    0 3px 8px rgba(37, 99, 235, 0.25),
-    inset 0 1px 0 rgba(30, 41, 59, 0.9),
-    0 0 0 1px rgba(37, 99, 235, 0.2);
-}
-
-/* 文本截断 */
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* 响应式优化 */
-@media (max-width: 768px) {
+<style lang="scss" scoped>
+  // 收藏项卡片样式
   .favorite-item-card {
-    padding: 1rem;
+    background: linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.97) 100%), radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.02) 0%, transparent 50%);
+    border: 1px solid hsl(var(--b3) / 0.8);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04), inset 0 1px 0 hsl(var(--b1) / 0.5);
+
+    // 深色模式收藏项卡片
+    [data-theme="dark"] & {
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.87) 100%), radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.03) 0%, transparent 50%);
+      border: 1px solid rgba(71, 85, 105, 0.5);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(30, 41, 59, 0.8);
+    }
+
+    &:hover {
+      border-color: #93c5fd; // blue-300 浅色模式
+      background: linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.95) 100%), radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.04) 0%, transparent 50%);
+      transform: translateY(-2px);
+    }
   }
-  
-  .group .opacity-0 {
-    opacity: 1; /* 移动端始终显示操作按钮 */
-  }
-}
 </style> 

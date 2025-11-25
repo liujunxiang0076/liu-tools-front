@@ -314,7 +314,7 @@ const copyCSS = async () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /* 移动端优化 */
 @media (max-width: 640px) {
   .container {

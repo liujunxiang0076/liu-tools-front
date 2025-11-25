@@ -497,6 +497,6 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /* 组件特定样式可以在这里添加 */
 </style>

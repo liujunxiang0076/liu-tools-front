@@ -471,7 +471,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /* 颜色选择器样式优化 */
 input[type="color"] {
   appearance: none;

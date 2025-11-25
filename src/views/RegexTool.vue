@@ -591,7 +591,7 @@ watch(testText, () => {
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /* 高亮样式 */
 :deep(mark) {
   background-color: rgb(254 240 138);

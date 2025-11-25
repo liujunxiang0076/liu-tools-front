@@ -29,7 +29,7 @@ const rootNode = computed<VisualNode | null>(() => {
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .json-tree-root {
   font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
   font-size: 12px;

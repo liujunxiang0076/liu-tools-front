@@ -1257,7 +1257,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .qrcode-generator-container {
   min-height: 100vh;
 }

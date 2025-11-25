@@ -134,7 +134,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /* 简化的收藏卡片样式 */
 .favorite-simple-card {
   background: 
@@ -168,7 +168,7 @@ export default {
   border-color: #93c5fd; /* blue-300 浅色模式 */
   background: 
     linear-gradient(145deg, hsl(var(--b1)) 0%, hsl(var(--b1)/0.96) 100%),
-    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.03) 0%, transparent 50%);
+    radial-gradient(circle at 100% 0%, hsl(var(--p) / 0.03) 0%, transparent 50%); 
   transform: translateY(-1px);
   box-shadow: 
     0 4px 12px rgba(0, 0, 0, 0.08),
@@ -267,6 +267,7 @@ export default {
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

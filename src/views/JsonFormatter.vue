@@ -1565,7 +1565,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .json-highlight {
   color: hsl(var(--bc));
 }

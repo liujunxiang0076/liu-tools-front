@@ -115,7 +115,7 @@ const toggle = () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .json-node-wrapper {
   display: flex;
   flex-direction: column;

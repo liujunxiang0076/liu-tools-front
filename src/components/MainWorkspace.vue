@@ -426,7 +426,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /* 列表视图的行裁剪 */
 .line-clamp-2 {
   display: -webkit-box;

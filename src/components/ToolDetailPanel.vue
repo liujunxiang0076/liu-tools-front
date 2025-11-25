@@ -242,7 +242,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .tool-detail-panel {
   width: 540px;
   max-width: 100vw;

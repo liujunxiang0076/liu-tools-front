@@ -643,7 +643,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /* 响应式调整 */
 @media (max-width: 768px) {
   .textarea {

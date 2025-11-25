@@ -278,7 +278,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /* 侧边栏默认隐藏（所有屏幕） */
 .sidebar {
   position: fixed;

@@ -92,7 +92,7 @@ const goHome = () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 pre {
   white-space: pre-wrap;
   word-break: break-word;

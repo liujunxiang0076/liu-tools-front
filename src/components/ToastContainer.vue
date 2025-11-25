@@ -80,7 +80,7 @@ import { useToast } from '@/composables/useToast'
 const { toasts } = useToast()
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .toast-enter-active,
 .toast-leave-active {
   transition: all 0.3s ease;

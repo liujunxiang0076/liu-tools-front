@@ -163,7 +163,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .scrollbar-thin::-webkit-scrollbar {
   height: 4px;
 }
