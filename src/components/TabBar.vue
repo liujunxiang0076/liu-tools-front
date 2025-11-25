@@ -50,7 +50,7 @@
           </button>
           <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-lg bg-base-100 rounded-box w-52 border border-base-300">
             <li>
-              <a @click="closeOtherTabs(activeTabId!)">
+              <a @click="activeTabId && closeOtherTabs(activeTabId)">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -78,7 +78,7 @@
       @click="contextMenu.show = false"
     >
       <li>
-        <a @click="closeTab(contextMenu.tab!.id)">
+        <a @click="contextMenu.tab && closeTab(contextMenu.tab.id)">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -86,7 +86,7 @@
         </a>
       </li>
       <li>
-        <a @click="closeOtherTabs(contextMenu.tab!.id)">
+        <a @click="contextMenu.tab && closeOtherTabs(contextMenu.tab.id)">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -94,7 +94,7 @@
         </a>
       </li>
       <li>
-        <a @click="closeRightTabs(contextMenu.tab!.id)">
+        <a @click="contextMenu.tab && closeRightTabs(contextMenu.tab.id)">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
           </svg>
