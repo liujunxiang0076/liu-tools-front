@@ -28,8 +28,9 @@
       <!-- 移动端侧边栏遮罩 -->
       <div 
         v-if="sidebarOpen" 
-        class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+        class="fixed inset-0 bg-black bg-opacity-50 z-30"
         @click="sidebarOpen = false"
+        style="transition: opacity 0.3s ease;"
       ></div>
 
       <!-- 主工作区容器 -->
