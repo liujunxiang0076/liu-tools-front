@@ -209,13 +209,12 @@ const handleClearAllFavorites = () => {
 // 切换侧边栏（移动端）
 const toggleSidebar = () => {
   sidebarOpen.value = !sidebarOpen.value
+  console.log('toggleSidebar called, sidebarOpen:', sidebarOpen.value)
 }
 
-// 监听窗口大小变化
+// 监听窗口大小变化（保留函数但不自动关闭侧边栏）
 const handleResize = () => {
-  if (window.innerWidth >= 1024) {
-    sidebarOpen.value = false
-  }
+  // 不再自动关闭侧边栏，让用户手动控制
 }
 
 // 生命周期钩子
@@ -279,39 +278,37 @@ export default {
 </script>
 
 <style scoped>
-/* 确保移动端侧边栏正确显示 */
-@media (max-width: 1024px) {
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 40;
-    height: 100vh;
-    width: 18rem; /* 增大移动端侧边栏宽度 */
-    transform: translateX(-100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.95);
-  }
-  
-  [data-theme="dark"] .sidebar {
-    background: rgba(30, 41, 59, 0.95);
-  }
-  
-  .sidebar.open {
-    transform: translateX(0);
-  }
-  
-  /* 移动端侧边栏遮罩优化 */
-  .sidebar-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 30;
-    transition: opacity 0.3s ease;
-    backdrop-filter: blur(4px);
-  }
+/* 侧边栏默认隐藏（所有屏幕） */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  height: 100vh;
+  width: 18rem;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+[data-theme="dark"] .sidebar {
+  background: rgba(30, 41, 59, 0.95);
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+/* 移动端侧边栏遮罩优化 */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 30;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(4px);
 }
 
 /* 移动端导航优化 */
