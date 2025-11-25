@@ -130,7 +130,7 @@ const { openTab, activeTool, activeTabId, showHome } = useTabs()
 // 工具组件映射
 const toolComponentMap: Record<string, any> = {
   '/tool/color-picker': markRaw(ColorPicker),
-  '/tool/qrcode-generator': markRaw(QRCodeGenerator),
+  '/tool/qrcode': markRaw(QRCodeGenerator),
   '/tool/json-formatter': markRaw(JsonFormatter),
   '/tool/snowflake-generator': markRaw(SnowflakeGenerator),
   '/tool/base64': markRaw(Base64Tool),

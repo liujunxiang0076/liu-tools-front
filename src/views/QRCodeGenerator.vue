@@ -1144,14 +1144,19 @@ watch(fullscreenQRSize, () => {
 
 // 生命周期
 onMounted(() => {
+  console.log('QRCodeGenerator mounted')
   loadTagsFromLocal()
   
-  // 如果没有选中标签但有标签存在，自动选中最新的标签
+  // 不需要默认标签，直接注释
+  
+  // 确保选中一个标签
+  if (!selectedTagId.value && textTags.value.length > 0) {
+    selectedTagId.value = textTags.value[textTags.value.length - 1].id
+  }
+  
+  // 延迟生成二维码，确保 DOM 已渲染
   nextTick(() => {
-    if (!selectedTagId.value && textTags.value.length > 0) {
-      selectedTagId.value = textTags.value[textTags.value.length - 1].id // 选中最新添加的标签
-    }
-    // 初始生成二维码
+    console.log('Initial QR generation')
     generateQRCode()
   })
 })
