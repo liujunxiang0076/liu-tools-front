@@ -113,6 +113,7 @@ import HashCalculator from '@/views/HashCalculator.vue'
 import UserAgentParser from '@/views/UserAgentParser.vue'
 import CssShadowGenerator from '@/views/CssShadowGenerator.vue'
 import CronGenerator from '@/views/CronGenerator.vue'
+import NumberToChinese from '@/views/NumberToChinese.vue'
 
 // 使用路由
 const router = useRouter()
@@ -152,7 +153,8 @@ const toolComponentMap: Record<string, any> = {
   '/tool/hash-calculator': markRaw(HashCalculator),
   '/tool/user-agent-parser': markRaw(UserAgentParser),
   '/tool/css-shadow': markRaw(CssShadowGenerator),
-  '/tool/cron-generator': markRaw(CronGenerator)
+  '/tool/cron-generator': markRaw(CronGenerator),
+  '/tool/number-to-chinese': markRaw(NumberToChinese)
 }
 
 // 获取工具组件
