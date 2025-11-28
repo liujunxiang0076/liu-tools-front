@@ -886,6 +886,9 @@ const formatJson = async () => {
   if (parsed !== null) {
     isProcessing.value = true
     
+    // 设置解析后的数据，供树形视图使用
+    parsedJsonData.value = parsed
+    
     // 对于大文件，使用异步处理
     await new Promise(resolve => setTimeout(resolve, 10))
     
@@ -912,6 +915,9 @@ const compressJson = async () => {
   const parsed = validateJson()
   if (parsed !== null) {
     isProcessing.value = true
+    
+    // 设置解析后的数据，供树形视图使用
+    parsedJsonData.value = parsed
     
     try {
       await new Promise(resolve => setTimeout(resolve, 10))
