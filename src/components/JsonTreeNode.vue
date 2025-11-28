@@ -10,7 +10,7 @@
         <!-- 折叠图标/占位 -->
         <div class="expand-control">
           <span 
-            v-if="hasChildren" 
+            v-if="isCollapsible" 
             class="expand-icon" 
             :class="{ expanded: isExpanded }"
             @click="toggle"
@@ -29,17 +29,29 @@
 
         <!-- 容器开始 -->
         <template v-if="isContainer">
-          <span class="json-bracket">{{ node.type === 'array' ? '[' : '{' }}</span>
+          <!-- 空容器：直接显示 [] 或 {} 在同一行 -->
+          <template v-if="isEmptyContainer">
+            <span class="json-bracket">{{ node.type === 'array' ? '[' : '{' }}</span>
+            <span class="json-bracket">{{ node.type === 'array' ? ']' : '}' }}</span>
+            <span v-if="!node.isLast" class="json-comma">,</span>
+          </template>
           
-          <!-- 折叠状态预览 -->
-          <span v-if="!isExpanded" class="collapsed-preview" @click="toggle">
-            <span class="preview-dots">...</span>
-            <span class="preview-count">{{ node.itemCount }} {{ node.type === 'array' ? 'items' : 'keys' }}</span>
-          </span>
-          
-          <!-- 折叠状态结束括号 -->
-          <span v-if="!isExpanded" class="json-bracket">{{ node.type === 'array' ? ']' : '}' }}</span>
-          <span v-if="!isExpanded && !node.isLast" class="json-comma">,</span>
+          <!-- 非空容器 -->
+          <template v-else>
+            <span class="json-bracket">{{ node.type === 'array' ? '[' : '{' }}</span>
+            
+            <!-- 折叠状态预览（仅可折叠容器） -->
+            <span v-if="isCollapsible && !isExpanded" class="collapsed-preview" @click="toggle">
+              <span class="preview-dots">...</span>
+              <span class="preview-count">{{ node.itemCount }} {{ node.type === 'array' ? 'items' : 'keys' }}</span>
+            </span>
+            
+            <!-- 折叠状态结束括号（仅可折叠容器） -->
+            <template v-if="isCollapsible && !isExpanded">
+              <span class="json-bracket">{{ node.type === 'array' ? ']' : '}' }}</span>
+              <span v-if="!node.isLast" class="json-comma">,</span>
+            </template>
+          </template>
         </template>
 
         <!-- 基本值 -->
@@ -50,8 +62,8 @@
       </div>
     </div>
 
-    <!-- 子节点区域 -->
-    <div v-if="isContainer && isExpanded" class="children-container">
+    <!-- 子节点区域（非空容器且展开时显示） -->
+    <div v-if="!isEmptyContainer && isContainer && isExpanded" class="children-container">
       <JsonTreeNode 
         v-for="child in node.children" 
         :key="child.id" 
@@ -59,8 +71,8 @@
       />
     </div>
 
-    <!-- 容器结束行 (仅展开且有子节点时显示) -->
-    <div v-if="isContainer && isExpanded && hasChildren" class="json-line">
+    <!-- 容器结束行（非空容器且展开时显示） -->
+    <div v-if="!isEmptyContainer && isContainer && isExpanded" class="json-line">
       <div class="line-number-col">{{ node.closeLine }}</div>
       <div class="code-content" :style="{ paddingLeft: indentPadding }">
         <div class="expand-control"></div> <!-- 占位 -->
@@ -79,15 +91,26 @@ const props = defineProps<{
   node: VisualNode
 }>()
 
-const isExpanded = ref(true)
-
-// 超过500项默认折叠，或者深度超过2级默认折叠
-if (props.node.depth >= 2 || props.node.itemCount > 500) {
-  isExpanded.value = false
-}
-
 const isContainer = computed(() => props.node.type === 'object' || props.node.type === 'array')
 const hasChildren = computed(() => props.node.children && props.node.children.length > 0)
+
+// 判断是否为空容器（0个元素）
+const isEmptyContainer = computed(() => isContainer.value && props.node.itemCount === 0)
+
+// 判断是否可折叠（2个及以上元素才可折叠，空容器和单元素不可折叠）
+const isCollapsible = computed(() => isContainer.value && props.node.itemCount >= 2)
+
+// 初始展开状态
+const isExpanded = ref(true)
+
+// 折叠逻辑：
+// 1. 如果父容器只有1个item，该节点默认展开
+// 2. 否则，可折叠容器在深度>=3或元素数>500时默认折叠
+if (isCollapsible.value && !props.node.parentHasOnlyOneItem) {
+  if (props.node.depth >= 3 || props.node.itemCount > 500) {
+    isExpanded.value = false
+  }
+}
 
 // 标准 JSON 缩进：每层缩进 2 个字符（约 1.2em）
 // 2 个字符 ≈ 1.2em（等宽字体）

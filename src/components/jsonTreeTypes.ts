@@ -10,6 +10,7 @@ export interface VisualNode {
   isLast: boolean
   children: VisualNode[]
   itemCount: number
+  parentHasOnlyOneItem?: boolean // 父容器是否只有1个元素
 }
 
 export class LineCounter {
@@ -28,7 +29,8 @@ export function buildVisualTree(
   depth: number = 0,
   path: string = 'root',
   isLast: boolean = true,
-  counter: LineCounter = new LineCounter()
+  counter: LineCounter = new LineCounter(),
+  parentHasOnlyOneItem: boolean = false
 ): VisualNode {
   const currentLine = counter.next()
   const type = getType(data)
@@ -44,7 +46,8 @@ export function buildVisualTree(
     path,
     isLast,
     children: [],
-    itemCount: 0
+    itemCount: 0,
+    parentHasOnlyOneItem
   }
 
   if (isContainer && data !== null) {
@@ -62,7 +65,8 @@ export function buildVisualTree(
           depth + 1,
           `${path}.${k}`,
           isLastChild,
-          counter
+          counter,
+          keys.length === 1 // 如果当前容器只有1个元素，传递给子节点
         )
         node.children.push(childNode)
       })
