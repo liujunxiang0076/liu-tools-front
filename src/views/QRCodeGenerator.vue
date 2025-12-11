@@ -54,7 +54,7 @@
               <!-- 内容输入表单 -->
               <div class="space-y-3 md:space-y-4">
                 <!-- 文本类型 - 移动端优化 -->
-                <div v-show="currentType === 'text'">
+                <div v-if="currentType === 'text'">
                   <div class="flex items-center justify-between mb-2">
                     <label class="label p-0">
                       <span class="label-text font-medium text-sm md:text-base">文本内容</span>
@@ -175,7 +175,7 @@
                 </div>
 
                 <!-- URL类型 -->
-                <div v-show="currentType === 'url'">
+                <div v-if="currentType === 'url'">
                   <label class="label">
                     <span class="label-text font-medium text-sm md:text-base">网址链接</span>
                   </label>
@@ -192,7 +192,7 @@
                 </div>
 
                 <!-- WiFi类型 -->
-                <div v-show="currentType === 'wifi'" class="space-y-3 md:space-y-4">
+                <div v-if="currentType === 'wifi'" class="space-y-3 md:space-y-4">
                   <div>
                     <label class="label">
                       <span class="label-text font-medium text-sm md:text-base">网络名称 (SSID)</span>
@@ -234,7 +234,7 @@
                 </div>
 
                 <!-- 联系人类型 -->
-                <div v-show="currentType === 'contact'" class="space-y-3 md:space-y-4">
+                <div v-if="currentType === 'contact'" class="space-y-3 md:space-y-4">
                   <div>
                     <label class="label">
                       <span class="label-text font-medium text-sm md:text-base">姓名</span>
@@ -274,7 +274,7 @@
                 </div>
 
                 <!-- 电话类型 -->
-                <div v-show="currentType === 'phone'">
+                <div v-if="currentType === 'phone'">
                   <label class="label">
                     <span class="label-text font-medium text-sm md:text-base">电话号码</span>
                   </label>
@@ -291,7 +291,7 @@
                 </div>
 
                 <!-- 短信类型 -->
-                <div v-show="currentType === 'sms'" class="space-y-3 md:space-y-4">
+                <div v-if="currentType === 'sms'" class="space-y-3 md:space-y-4">
                   <div>
                     <label class="label">
                       <span class="label-text font-medium text-sm md:text-base">收件人号码</span>
