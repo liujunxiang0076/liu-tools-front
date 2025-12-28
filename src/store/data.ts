@@ -334,15 +334,6 @@ export const tools: Tool[] = [
     icon: '🔢',
     tags: ['数字', '中文', '大写', '金额', '财务', '转换'],
     path: '/tool/number-to-chinese'
-  },
-  {
-    id: 29,
-    name: '115链接解析器',
-    description: '解析115://协议链接，提取文件信息和SHA1哈希值，支持链接验证和格式转换',
-    category: 'development',
-    icon: '🔗',
-    tags: ['115', '链接', '解析', 'SHA1', '哈希', '文件信息', '协议'],
-    path: '/tool/link115'
   }
 ]
 

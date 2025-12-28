@@ -26,7 +26,6 @@ import HashCalculator from '@/views/HashCalculator.vue'
 import UserAgentParser from '@/views/UserAgentParser.vue'
 import CssShadowGenerator from '@/views/CssShadowGenerator.vue'
 import CronGenerator from '@/views/CronGenerator.vue'
-import Link115Tool from '@/views/Link115Tool.vue'
 
 // 定义路由
 const routes: RouteRecordRaw[] = [
@@ -164,11 +163,6 @@ const routes: RouteRecordRaw[] = [
         path: 'cron-generator',
         name: 'ToolCronGenerator',
         component: CronGenerator
-      },
-      {
-        path: 'link115',
-        name: 'ToolLink115',
-        component: Link115Tool
       }
     ]
   },

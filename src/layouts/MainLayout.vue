@@ -114,7 +114,6 @@ import UserAgentParser from '@/views/UserAgentParser.vue'
 import CssShadowGenerator from '@/views/CssShadowGenerator.vue'
 import CronGenerator from '@/views/CronGenerator.vue'
 import NumberToChinese from '@/views/NumberToChinese.vue'
-import Link115Tool from '@/views/Link115Tool.vue'
 
 // 使用路由
 const router = useRouter()
@@ -155,8 +154,7 @@ const toolComponentMap: Record<string, any> = {
   '/tool/user-agent-parser': markRaw(UserAgentParser),
   '/tool/css-shadow': markRaw(CssShadowGenerator),
   '/tool/cron-generator': markRaw(CronGenerator),
-  '/tool/number-to-chinese': markRaw(NumberToChinese),
-  '/tool/link115': markRaw(Link115Tool)
+  '/tool/number-to-chinese': markRaw(NumberToChinese)
 }
 
 // 获取工具组件
