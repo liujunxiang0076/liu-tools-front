@@ -166,7 +166,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
-              在浏览器中打开
+              打开115应用
             </button>
 
             <button @click="copyOriginalLink" class="btn btn-outline btn-lg">
@@ -446,16 +446,73 @@ const copyOriginalLink = async () => {
   await copyToClipboard(parsedData.value.originalLink)
 }
 
-// 在浏览器中打开
+// 打开115应用
 const openInBrowser = () => {
   if (!parsedData.value) return
 
   try {
-    window.open(parsedData.value.originalLink, '_blank')
+    // 创建一个隐藏的iframe来尝试打开协议链接
+    const iframe = document.createElement('iframe')
+    iframe.style.display = 'none'
+    iframe.src = parsedData.value.originalLink
+    document.body.appendChild(iframe)
+    
+    // 清理iframe
+    setTimeout(() => {
+      document.body.removeChild(iframe)
+    }, 1000)
+    
+    // 给用户一个提示
+    setTimeout(() => {
+      const userConfirm = confirm(
+        '已尝试调用115应用。\n\n' +
+        '如果115应用没有自动打开，可能的原因：\n' +
+        '• 未安装115网盘客户端\n' +
+        '• 浏览器阻止了协议调用\n' +
+        '• 115客户端未正确注册协议处理\n\n' +
+        '点击"确定"复制链接，然后手动粘贴到115客户端中'
+      )
+      
+      if (userConfirm) {
+        copyOriginalLink()
+      }
+    }, 1500)
+    
   } catch (error) {
     console.error('打开链接失败:', error)
-    // 如果直接打开失败，复制到剪贴板
-    copyOriginalLink()
+    
+    // 备用方法：创建隐藏链接
+    try {
+      const link = document.createElement('a')
+      link.href = parsedData.value.originalLink
+      link.target = '_blank'
+      link.style.display = 'none'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      setTimeout(() => {
+        const userConfirm = confirm(
+          '已尝试调用115应用。如果没有打开，请：\n' +
+          '• 确保已安装115网盘客户端\n' +
+          '• 检查浏览器是否允许打开外部应用\n\n' +
+          '点击"确定"复制链接到剪贴板'
+        )
+        
+        if (userConfirm) {
+          copyOriginalLink()
+        }
+      }, 1000)
+      
+    } catch (fallbackError) {
+      console.error('备用方法也失败:', fallbackError)
+      alert(
+        '无法自动打开115链接。\n\n' +
+        '请手动复制链接并粘贴到115客户端中。\n' +
+        '链接已自动复制到剪贴板。'
+      )
+      copyOriginalLink()
+    }
   }
 }
 
