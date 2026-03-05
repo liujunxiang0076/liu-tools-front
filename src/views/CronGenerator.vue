@@ -168,16 +168,19 @@
           <div class="bg-base-100 rounded-2xl p-6 shadow-lg">
             <div class="flex items-center justify-between mb-4">
               <h3 class="font-semibold text-base-content">Cron 表达式</h3>
-              <button 
-                @click="copyCron"
-                class="btn btn-sm btn-primary"
-                :disabled="isCronInvalid"
-              >
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                </svg>
-                复制
-              </button>
+              <div class="flex flex-col items-end gap-1">
+                <button 
+                  @click="copyCron"
+                  class="btn btn-sm btn-primary"
+                  :disabled="isCronInvalid"
+                >
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                  </svg>
+                  复制
+                </button>
+                <span class="text-xs text-base-content/60">已按当前时区计算</span>
+              </div>
             </div>
             <div class="p-4 bg-base-200 rounded-lg">
               <code class="text-lg font-mono" :class="isCronInvalid ? 'text-error' : 'text-primary'">{{ cronExpression }}</code>
@@ -224,10 +227,22 @@
 
           <!-- 下次执行时间预览 -->
           <div class="bg-success/10 rounded-2xl p-4">
-            <h4 class="font-semibold text-base-content mb-2">💡 提示</h4>
-            <p class="text-sm text-base-content/70">
-              Cron 表达式格式：秒 分 时 日 月 周
+            <h4 class="font-semibold text-base-content mb-3">🕒 真实预览（本地时区）</h4>
+            <p v-if="previewError" class="text-sm text-error">
+              {{ previewError }}
             </p>
+            <div v-else class="space-y-3 text-sm text-base-content/80">
+              <div>
+                <p class="text-base-content/70 mb-1">下一次执行时间</p>
+                <p class="font-medium">{{ nextRunText }}</p>
+              </div>
+              <div>
+                <p class="text-base-content/70 mb-1">接下来 5 次执行时间</p>
+                <ul class="space-y-1 list-decimal pl-5">
+                  <li v-for="run in nextRuns" :key="run">{{ run }}</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -282,7 +297,6 @@ const cronExpression = computed(() => {
   return `${second.value} ${minute.value} ${hour.value} ${day.value} ${month.value} ${week.value}`
 })
 
-<<<<<<< HEAD
 const validateCronField = (fieldName: FieldName, value: string): string => {
   const config = FIELD_RANGES[fieldName]
   const text = value.trim()
@@ -432,6 +446,132 @@ const fieldDescriptions = computed(() => {
 const description = computed(() => {
   return describeCronExpression(fieldValues.value)
 })
+
+const parseField = (field: string, min: number, max: number) => {
+  const allowed = new Set<number>()
+  const segments = field.split(',').map(item => item.trim()).filter(Boolean)
+
+  if (segments.length === 0) {
+    throw new Error(`字段 "${field}" 为空`)
+  }
+
+  const addRange = (start: number, end: number, step = 1) => {
+    if (start < min || end > max || start > end || step <= 0) {
+      throw new Error(`字段 "${field}" 超出范围 ${min}-${max}`)
+    }
+    for (let i = start; i <= end; i += step) {
+      allowed.add(i)
+    }
+  }
+
+  for (const segment of segments) {
+    if (segment === '*') {
+      addRange(min, max)
+      continue
+    }
+
+    if (segment.includes('/')) {
+      const [base, stepStr] = segment.split('/')
+      const step = Number(stepStr)
+      if (!Number.isInteger(step) || step <= 0) {
+        throw new Error(`字段 "${field}" 的步长无效`)
+      }
+
+      if (base === '*') {
+        addRange(min, max, step)
+        continue
+      }
+
+      if (base.includes('-')) {
+        const [startStr, endStr] = base.split('-')
+        addRange(Number(startStr), Number(endStr), step)
+        continue
+      }
+
+      const start = Number(base)
+      addRange(start, max, step)
+      continue
+    }
+
+    if (segment.includes('-')) {
+      const [startStr, endStr] = segment.split('-')
+      addRange(Number(startStr), Number(endStr))
+      continue
+    }
+
+    const value = Number(segment)
+    if (!Number.isInteger(value) || value < min || value > max) {
+      throw new Error(`字段 "${field}" 的值无效`)
+    }
+    allowed.add(value)
+  }
+
+  return allowed
+}
+
+const getNextRuns = (expression: string, count: number) => {
+  const [sec, min, hr, dayOfMonth, mon, dayOfWeek] = expression.trim().split(/\s+/)
+  if (!dayOfWeek) {
+    throw new Error('Cron 表达式必须为 6 段：秒 分 时 日 月 周')
+  }
+
+  const secSet = parseField(sec, 0, 59)
+  const minSet = parseField(min, 0, 59)
+  const hrSet = parseField(hr, 0, 23)
+  const daySet = parseField(dayOfMonth, 1, 31)
+  const monSet = parseField(mon, 1, 12)
+  const weekSet = parseField(dayOfWeek, 0, 7)
+
+  const weekMatches = (weekDay: number) => weekSet.has(weekDay) || (weekDay === 0 && weekSet.has(7))
+  const result: Date[] = []
+  const cursor = new Date()
+  cursor.setMilliseconds(0)
+
+  // 最多向未来搜索 2 年，避免死循环
+  const maxIterations = 2 * 366 * 24 * 60 * 60
+
+  for (let i = 0; i < maxIterations && result.length < count; i += 1) {
+    cursor.setSeconds(cursor.getSeconds() + 1)
+    const currentWeekDay = cursor.getDay()
+
+    const matched = secSet.has(cursor.getSeconds())
+      && minSet.has(cursor.getMinutes())
+      && hrSet.has(cursor.getHours())
+      && daySet.has(cursor.getDate())
+      && monSet.has(cursor.getMonth() + 1)
+      && weekMatches(currentWeekDay)
+
+    if (matched) {
+      result.push(new Date(cursor))
+    }
+  }
+
+  if (result.length < count) {
+    throw new Error('未能在合理时间范围内计算到可执行时间，请检查表达式')
+  }
+
+  return result
+}
+
+const formattedNextRuns = computed(() => {
+  try {
+    return getNextRuns(cronExpression.value, 5).map(run => run.toLocaleString())
+  } catch {
+    return []
+  }
+})
+
+const previewError = computed(() => {
+  try {
+    getNextRuns(cronExpression.value, 1)
+    return ''
+  } catch (error) {
+    return error instanceof Error ? error.message : '表达式无效，请检查配置项'
+  }
+})
+
+const nextRuns = computed(() => formattedNextRuns.value)
+const nextRunText = computed(() => nextRuns.value[0] ?? '暂无')
 
 const applyPreset = (preset: any) => {
   [second.value, minute.value, hour.value, day.value, month.value, week.value] = preset.values
