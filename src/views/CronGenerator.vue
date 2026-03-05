@@ -54,7 +54,9 @@
                   type="text"
                   placeholder="* 或 0-59"
                   class="input input-bordered input-sm"
+                  :class="{ 'input-error': fieldErrors.second }"
                 />
+                <p v-if="fieldErrors.second" class="mt-1 text-xs text-error">{{ fieldErrors.second }}</p>
               </div>
 
               <!-- 分钟 -->
@@ -67,7 +69,9 @@
                   type="text"
                   placeholder="* 或 0-59"
                   class="input input-bordered input-sm"
+                  :class="{ 'input-error': fieldErrors.minute }"
                 />
+                <p v-if="fieldErrors.minute" class="mt-1 text-xs text-error">{{ fieldErrors.minute }}</p>
               </div>
 
               <!-- 小时 -->
@@ -80,7 +84,9 @@
                   type="text"
                   placeholder="* 或 0-23"
                   class="input input-bordered input-sm"
+                  :class="{ 'input-error': fieldErrors.hour }"
                 />
+                <p v-if="fieldErrors.hour" class="mt-1 text-xs text-error">{{ fieldErrors.hour }}</p>
               </div>
 
               <!-- 日 -->
@@ -93,7 +99,9 @@
                   type="text"
                   placeholder="* 或 1-31"
                   class="input input-bordered input-sm"
+                  :class="{ 'input-error': fieldErrors.day }"
                 />
+                <p v-if="fieldErrors.day" class="mt-1 text-xs text-error">{{ fieldErrors.day }}</p>
               </div>
 
               <!-- 月 -->
@@ -106,7 +114,9 @@
                   type="text"
                   placeholder="* 或 1-12"
                   class="input input-bordered input-sm"
+                  :class="{ 'input-error': fieldErrors.month }"
                 />
+                <p v-if="fieldErrors.month" class="mt-1 text-xs text-error">{{ fieldErrors.month }}</p>
               </div>
 
               <!-- 星期 -->
@@ -119,7 +129,9 @@
                   type="text"
                   placeholder="* 或 0-7"
                   class="input input-bordered input-sm"
+                  :class="{ 'input-error': fieldErrors.week }"
                 />
+                <p v-if="fieldErrors.week" class="mt-1 text-xs text-error">{{ fieldErrors.week }}</p>
               </div>
             </div>
           </div>
@@ -145,6 +157,7 @@
               <button 
                 @click="copyCron"
                 class="btn btn-sm btn-primary"
+                :disabled="isCronInvalid"
               >
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
@@ -153,8 +166,9 @@
               </button>
             </div>
             <div class="p-4 bg-base-200 rounded-lg">
-              <code class="text-lg font-mono text-primary">{{ cronExpression }}</code>
+              <code class="text-lg font-mono" :class="isCronInvalid ? 'text-error' : 'text-primary'">{{ cronExpression }}</code>
             </div>
+            <p v-if="isCronInvalid" class="mt-2 text-sm text-error">表达式无效</p>
           </div>
 
           <!-- 表达式解释 -->
@@ -220,6 +234,17 @@ const day = ref('*')
 const month = ref('*')
 const week = ref('*')
 
+const FIELD_RANGES = {
+  second: { label: '秒', min: 0, max: 59 },
+  minute: { label: '分钟', min: 0, max: 59 },
+  hour: { label: '小时', min: 0, max: 23 },
+  day: { label: '日', min: 1, max: 31 },
+  month: { label: '月', min: 1, max: 12 },
+  week: { label: '星期', min: 0, max: 7 }
+} as const
+
+type FieldName = keyof typeof FIELD_RANGES
+
 const presets = [
   { name: '每秒执行', cron: '* * * * * *', values: ['*', '*', '*', '*', '*', '*'] },
   { name: '每分钟执行', cron: '0 * * * * *', values: ['0', '*', '*', '*', '*', '*'] },
@@ -237,6 +262,89 @@ const presets = [
 const cronExpression = computed(() => {
   return `${second.value} ${minute.value} ${hour.value} ${day.value} ${month.value} ${week.value}`
 })
+
+const validateCronField = (fieldName: FieldName, value: string): string => {
+  const config = FIELD_RANGES[fieldName]
+  const text = value.trim()
+
+  if (!text) {
+    return `${config.label}不能为空`
+  }
+
+  const isInRange = (numText: string): boolean => {
+    if (!/^\d+$/.test(numText)) {
+      return false
+    }
+    const num = Number(numText)
+    return num >= config.min && num <= config.max
+  }
+
+  if (text === '*') {
+    return ''
+  }
+
+  if (text.includes(',')) {
+    const items = text.split(',').map(item => item.trim())
+    if (items.some(item => !item || !isInRange(item))) {
+      return `${config.label}取值必须在 ${config.min}-${config.max}`
+    }
+    return ''
+  }
+
+  const stepMatch = text.match(/^((\*)|(\d+-\d+))\/(\d+)$/)
+  if (stepMatch) {
+    const base = stepMatch[1]
+    const step = Number(stepMatch[4])
+    if (step <= 0) {
+      return `${config.label}步长必须大于 0`
+    }
+
+    if (base !== '*') {
+      const [start, end] = base.split('-').map(Number)
+      if (
+        Number.isNaN(start)
+        || Number.isNaN(end)
+        || start > end
+        || start < config.min
+        || end > config.max
+      ) {
+        return `${config.label}范围必须在 ${config.min}-${config.max}`
+      }
+    }
+    return ''
+  }
+
+  if (text.includes('/')) {
+    return `${config.label}步长语法仅支持 */n 或 a-b/n`
+  }
+
+  const rangeMatch = text.match(/^(\d+)-(\d+)$/)
+  if (rangeMatch) {
+    const start = Number(rangeMatch[1])
+    const end = Number(rangeMatch[2])
+    if (start > end || start < config.min || end > config.max) {
+      return `${config.label}范围必须在 ${config.min}-${config.max}`
+    }
+    return ''
+  }
+
+  if (isInRange(text)) {
+    return ''
+  }
+
+  return `${config.label}格式无效，支持 *、a,b,c、a-b、*/n、a-b/n`
+}
+
+const fieldErrors = computed(() => ({
+  second: validateCronField('second', second.value),
+  minute: validateCronField('minute', minute.value),
+  hour: validateCronField('hour', hour.value),
+  day: validateCronField('day', day.value),
+  month: validateCronField('month', month.value),
+  week: validateCronField('week', week.value)
+}))
+
+const isCronInvalid = computed(() => Object.values(fieldErrors.value).some(Boolean))
 
 const description = computed(() => {
   const parts = []
@@ -296,6 +404,9 @@ const applyPreset = (preset: any) => {
 }
 
 const copyCron = async () => {
+  if (isCronInvalid.value) {
+    return
+  }
   try {
     await navigator.clipboard.writeText(cronExpression.value)
   } catch (error) {
