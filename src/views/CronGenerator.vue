@@ -191,27 +191,27 @@
             <div class="space-y-2">
               <div class="flex justify-between p-2 bg-base-200 rounded">
                 <span class="text-sm text-base-content/70">秒</span>
-                <code class="text-sm font-mono">{{ second }}</code>
+                <code class="text-sm font-mono">{{ fieldDescriptions[0] }}</code>
               </div>
               <div class="flex justify-between p-2 bg-base-200 rounded">
                 <span class="text-sm text-base-content/70">分钟</span>
-                <code class="text-sm font-mono">{{ minute }}</code>
+                <code class="text-sm font-mono">{{ fieldDescriptions[1] }}</code>
               </div>
               <div class="flex justify-between p-2 bg-base-200 rounded">
                 <span class="text-sm text-base-content/70">小时</span>
-                <code class="text-sm font-mono">{{ hour }}</code>
+                <code class="text-sm font-mono">{{ fieldDescriptions[2] }}</code>
               </div>
               <div class="flex justify-between p-2 bg-base-200 rounded">
                 <span class="text-sm text-base-content/70">日</span>
-                <code class="text-sm font-mono">{{ day }}</code>
+                <code class="text-sm font-mono">{{ fieldDescriptions[3] }}</code>
               </div>
               <div class="flex justify-between p-2 bg-base-200 rounded">
                 <span class="text-sm text-base-content/70">月</span>
-                <code class="text-sm font-mono">{{ month }}</code>
+                <code class="text-sm font-mono">{{ fieldDescriptions[4] }}</code>
               </div>
               <div class="flex justify-between p-2 bg-base-200 rounded">
                 <span class="text-sm text-base-content/70">星期</span>
-                <code class="text-sm font-mono">{{ week }}</code>
+                <code class="text-sm font-mono">{{ fieldDescriptions[5] }}</code>
               </div>
             </div>
           </div>
@@ -238,6 +238,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useToolNavigation } from '@/composables/useToolNavigation'
+import { parseFieldToken, describeField, describeCronExpression, type CronFieldType } from '@/utils/cronExplain'
 
 const { goBack } = useToolNavigation()
 
@@ -281,6 +282,7 @@ const cronExpression = computed(() => {
   return `${second.value} ${minute.value} ${hour.value} ${day.value} ${month.value} ${week.value}`
 })
 
+<<<<<<< HEAD
 const validateCronField = (fieldName: FieldName, value: string): string => {
   const config = FIELD_RANGES[fieldName]
   const text = value.trim()
@@ -410,57 +412,25 @@ watch(expressionInput, (value) => {
   parseCronExpression(value)
 })
 
+const fieldTypes: CronFieldType[] = ['second', 'minute', 'hour', 'day', 'month', 'week']
+
+const fieldValues = computed(() => [
+  second.value,
+  minute.value,
+  hour.value,
+  day.value,
+  month.value,
+  week.value
+])
+
+const fieldDescriptions = computed(() => {
+  return fieldValues.value.map((value, index) =>
+    describeField(parseFieldToken(value, fieldTypes[index]), fieldTypes[index])
+  )
+})
+
 const description = computed(() => {
-  const parts = []
-  
-  if (second.value === '*') {
-    parts.push('每秒')
-  } else if (second.value.includes('/')) {
-    const step = second.value.split('/')[1]
-    parts.push(`每${step}秒`)
-  } else if (second.value !== '0') {
-    parts.push(`第${second.value}秒`)
-  }
-  
-  if (minute.value === '*') {
-    parts.push('每分钟')
-  } else if (minute.value.includes('/')) {
-    const step = minute.value.split('/')[1]
-    parts.push(`每${step}分钟`)
-  } else {
-    parts.push(`第${minute.value}分钟`)
-  }
-  
-  if (hour.value === '*') {
-    parts.push('每小时')
-  } else if (hour.value.includes('/')) {
-    const step = hour.value.split('/')[1]
-    parts.push(`每${step}小时`)
-  } else {
-    parts.push(`${hour.value}点`)
-  }
-  
-  if (day.value !== '*') {
-    parts.push(`每月${day.value}号`)
-  }
-  
-  if (month.value !== '*') {
-    parts.push(`${month.value}月`)
-  }
-  
-  if (week.value !== '*') {
-    const weekMap: Record<string, string> = {
-      '0': '周日', '1': '周一', '2': '周二', '3': '周三',
-      '4': '周四', '5': '周五', '6': '周六', '7': '周日'
-    }
-    if (week.value.includes('-')) {
-      parts.push('工作日')
-    } else {
-      parts.push(weekMap[week.value] || `星期${week.value}`)
-    }
-  }
-  
-  return parts.length > 0 ? parts.join(' ') + ' 执行' : '请配置执行时间'
+  return describeCronExpression(fieldValues.value)
 })
 
 const applyPreset = (preset: any) => {
