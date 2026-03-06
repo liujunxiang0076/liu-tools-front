@@ -368,41 +368,134 @@ const parseField = (field: string, min: number, max: number) => {
   return allowed
 }
 
-const getNextRuns = (expression: string, count: number) => {
+type CronFields = {
+  secSet: Set<number>
+  minSet: Set<number>
+  hrSet: Set<number>
+  daySet: Set<number>
+  monSet: Set<number>
+  weekSet: Set<number>
+}
+
+const getSortedValues = (values: Set<number>) => Array.from(values).sort((a, b) => a - b)
+
+const findNextOrSame = (values: number[], current: number) => {
+  for (const value of values) {
+    if (value >= current) {
+      return value
+    }
+  }
+  return null
+}
+
+const parseCronFields = (expression: string): CronFields => {
   const [sec, min, hr, dayOfMonth, mon, dayOfWeek] = expression.trim().split(/\s+/)
   if (!dayOfWeek) {
     throw new Error('Cron 表达式必须为 6 段：秒 分 时 日 月 周')
   }
 
-  const secSet = parseField(sec, 0, 59)
-  const minSet = parseField(min, 0, 59)
-  const hrSet = parseField(hr, 0, 23)
-  const daySet = parseField(dayOfMonth, 1, 31)
-  const monSet = parseField(mon, 1, 12)
-  const weekSet = parseField(dayOfWeek, 0, 7)
+  return {
+    secSet: parseField(sec, 0, 59),
+    minSet: parseField(min, 0, 59),
+    hrSet: parseField(hr, 0, 23),
+    daySet: parseField(dayOfMonth, 1, 31),
+    monSet: parseField(mon, 1, 12),
+    weekSet: parseField(dayOfWeek, 0, 7)
+  }
+}
 
-  const weekMatches = (weekDay: number) => weekSet.has(weekDay) || (weekDay === 0 && weekSet.has(7))
-  const result: Date[] = []
-  const cursor = new Date()
+const getNextRunAfter = (start: Date, fields: CronFields, maxYears = 2) => {
+  const secValues = getSortedValues(fields.secSet)
+  const minValues = getSortedValues(fields.minSet)
+  const hrValues = getSortedValues(fields.hrSet)
+  const monValues = getSortedValues(fields.monSet)
+  const minSecond = secValues[0]
+  const minMinute = minValues[0]
+  const minHour = hrValues[0]
+
+  const weekMatches = (weekDay: number) => fields.weekSet.has(weekDay) || (weekDay === 0 && fields.weekSet.has(7))
+
+  const cursor = new Date(start)
   cursor.setMilliseconds(0)
+  cursor.setSeconds(cursor.getSeconds() + 1)
 
-  // 最多向未来搜索 2 年，避免死循环
-  const maxIterations = 2 * 366 * 24 * 60 * 60
+  const limit = new Date(start)
+  limit.setFullYear(limit.getFullYear() + maxYears)
 
-  for (let i = 0; i < maxIterations && result.length < count; i += 1) {
-    cursor.setSeconds(cursor.getSeconds() + 1)
-    const currentWeekDay = cursor.getDay()
-
-    const matched = secSet.has(cursor.getSeconds())
-      && minSet.has(cursor.getMinutes())
-      && hrSet.has(cursor.getHours())
-      && daySet.has(cursor.getDate())
-      && monSet.has(cursor.getMonth() + 1)
-      && weekMatches(currentWeekDay)
-
-    if (matched) {
-      result.push(new Date(cursor))
+  while (cursor <= limit) {
+    const currentMonth = cursor.getMonth() + 1
+    const nextMonth = findNextOrSame(monValues, currentMonth)
+    if (nextMonth === null) {
+      cursor.setFullYear(cursor.getFullYear() + 1, monValues[0] - 1, 1)
+      cursor.setHours(minHour, minMinute, minSecond, 0)
+      continue
     }
+    if (nextMonth !== currentMonth) {
+      cursor.setMonth(nextMonth - 1, 1)
+      cursor.setHours(minHour, minMinute, minSecond, 0)
+      continue
+    }
+
+    const currentDay = cursor.getDate()
+    if (!fields.daySet.has(currentDay) || !weekMatches(cursor.getDay())) {
+      cursor.setDate(currentDay + 1)
+      cursor.setHours(minHour, minMinute, minSecond, 0)
+      continue
+    }
+
+    const currentHour = cursor.getHours()
+    const nextHour = findNextOrSame(hrValues, currentHour)
+    if (nextHour === null) {
+      cursor.setDate(cursor.getDate() + 1)
+      cursor.setHours(minHour, minMinute, minSecond, 0)
+      continue
+    }
+    if (nextHour !== currentHour) {
+      cursor.setHours(nextHour, minMinute, minSecond, 0)
+      continue
+    }
+
+    const currentMinute = cursor.getMinutes()
+    const nextMinute = findNextOrSame(minValues, currentMinute)
+    if (nextMinute === null) {
+      cursor.setHours(currentHour + 1, minMinute, minSecond, 0)
+      continue
+    }
+    if (nextMinute !== currentMinute) {
+      cursor.setMinutes(nextMinute, minSecond, 0)
+      continue
+    }
+
+    const currentSecond = cursor.getSeconds()
+    const nextSecond = findNextOrSame(secValues, currentSecond)
+    if (nextSecond === null) {
+      cursor.setMinutes(currentMinute + 1, minSecond, 0)
+      continue
+    }
+    if (nextSecond !== currentSecond) {
+      cursor.setSeconds(nextSecond, 0)
+      continue
+    }
+
+    return new Date(cursor)
+  }
+
+  return null
+}
+
+const getNextRuns = (expression: string, count: number) => {
+  const fields = parseCronFields(expression)
+
+  const result: Date[] = []
+  let cursor = new Date()
+
+  for (let i = 0; i < count; i += 1) {
+    const nextRun = getNextRunAfter(cursor, fields)
+    if (!nextRun) {
+      break
+    }
+    result.push(nextRun)
+    cursor = nextRun
   }
 
   if (result.length < count) {
@@ -414,22 +507,31 @@ const getNextRuns = (expression: string, count: number) => {
 
 const formattedNextRuns = computed(() => {
   try {
-    return getNextRuns(cronExpression.value, 5).map(run => run.toLocaleString())
+    return getNextRuns(cronExpression.value, 5)
+  } catch (error) {
+    return error instanceof Error ? error : new Error('表达式无效，请检查配置项')
+  }
+})
+
+const nextRuns = computed(() => {
+  if (formattedNextRuns.value instanceof Error) {
+    return []
+  }
+
+  try {
+    return formattedNextRuns.value.map(run => run.toLocaleString())
   } catch {
     return []
   }
 })
 
 const previewError = computed(() => {
-  try {
-    getNextRuns(cronExpression.value, 1)
-    return ''
-  } catch (error) {
-    return error instanceof Error ? error.message : '表达式无效，请检查配置项'
+  if (formattedNextRuns.value instanceof Error) {
+    return formattedNextRuns.value.message
   }
+  return ''
 })
 
-const nextRuns = computed(() => formattedNextRuns.value)
 const nextRunText = computed(() => nextRuns.value[0] ?? '暂无')
 
 const applyPreset = (preset: any) => {
