@@ -83,6 +83,11 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'JsonTreeNode'
+}
+</script>
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { VisualNode } from './jsonTreeTypes'
