@@ -23,6 +23,21 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- 配置区域 -->
         <div class="space-y-6">
+          <!-- 完整表达式输入 -->
+          <div class="bg-base-100 rounded-2xl p-6 shadow-lg">
+            <h3 class="font-semibold text-base-content mb-4">完整 Cron 表达式</h3>
+            <div class="form-control">
+              <textarea
+                v-model="cronInput"
+                placeholder="例如：0 */5 * * * *"
+                class="textarea textarea-bordered h-24 font-mono"
+                :class="{ 'textarea-error': structureError }"
+              />
+              <p class="mt-2 text-xs text-base-content/70">格式：秒 分 时 日 月 周（共 6 段）</p>
+              <p v-if="structureError" class="mt-1 text-xs text-error">{{ structureError }}</p>
+            </div>
+          </div>
+
           <!-- 快捷选择 -->
           <div class="bg-base-100 rounded-2xl p-6 shadow-lg">
             <h3 class="font-semibold text-base-content mb-4">快捷选择</h3>
@@ -50,7 +65,7 @@
                   <span class="label-text font-medium">秒 (0-59)</span>
                 </label>
                 <input
-                  v-model="second"
+                   :value="getPartValue(0, second)" @input="updatePartValue(0, $event)"
                   type="text"
                   placeholder="* 或 0-59"
                   class="input input-bordered input-sm"
@@ -65,7 +80,7 @@
                   <span class="label-text font-medium">分钟 (0-59)</span>
                 </label>
                 <input
-                  v-model="minute"
+                   :value="getPartValue(1, minute)" @input="updatePartValue(1, $event)"
                   type="text"
                   placeholder="* 或 0-59"
                   class="input input-bordered input-sm"
@@ -80,7 +95,7 @@
                   <span class="label-text font-medium">小时 (0-23)</span>
                 </label>
                 <input
-                  v-model="hour"
+                   :value="getPartValue(2, hour)" @input="updatePartValue(2, $event)"
                   type="text"
                   placeholder="* 或 0-23"
                   class="input input-bordered input-sm"
@@ -95,7 +110,7 @@
                   <span class="label-text font-medium">日 (1-31)</span>
                 </label>
                 <input
-                  v-model="day"
+                   :value="getPartValue(3, day)" @input="updatePartValue(3, $event)"
                   type="text"
                   placeholder="* 或 1-31"
                   class="input input-bordered input-sm"
@@ -110,7 +125,7 @@
                   <span class="label-text font-medium">月 (1-12)</span>
                 </label>
                 <input
-                  v-model="month"
+                   :value="getPartValue(4, month)" @input="updatePartValue(4, $event)"
                   type="text"
                   placeholder="* 或 1-12"
                   class="input input-bordered input-sm"
@@ -125,7 +140,7 @@
                   <span class="label-text font-medium">星期 (0-7, 0和7都表示周日)</span>
                 </label>
                 <input
-                  v-model="week"
+                   :value="getPartValue(5, week)" @input="updatePartValue(5, $event)"
                   type="text"
                   placeholder="* 或 0-7"
                   class="input input-bordered input-sm"
@@ -168,7 +183,7 @@
             <div class="p-4 bg-base-200 rounded-lg">
               <code class="text-lg font-mono" :class="isCronInvalid ? 'text-error' : 'text-primary'">{{ cronExpression }}</code>
             </div>
-            <p v-if="isCronInvalid" class="mt-2 text-sm text-error">表达式无效</p>
+            <p v-if="isCronInvalid" class="mt-2 text-sm text-error">{{ invalidReason }}</p>
           </div>
 
           <!-- 表达式解释 -->
@@ -177,27 +192,27 @@
             <div class="space-y-2">
               <div class="flex justify-between p-2 bg-base-200 rounded">
                 <span class="text-sm text-base-content/70">秒</span>
-                <code class="text-sm font-mono">{{ second }}</code>
+                <code class="text-sm font-mono">{{ getPartValue(0, second) }}</code>
               </div>
               <div class="flex justify-between p-2 bg-base-200 rounded">
                 <span class="text-sm text-base-content/70">分钟</span>
-                <code class="text-sm font-mono">{{ minute }}</code>
+                <code class="text-sm font-mono">{{ getPartValue(1, minute) }}</code>
               </div>
               <div class="flex justify-between p-2 bg-base-200 rounded">
                 <span class="text-sm text-base-content/70">小时</span>
-                <code class="text-sm font-mono">{{ hour }}</code>
+                <code class="text-sm font-mono">{{ getPartValue(2, hour) }}</code>
               </div>
               <div class="flex justify-between p-2 bg-base-200 rounded">
                 <span class="text-sm text-base-content/70">日</span>
-                <code class="text-sm font-mono">{{ day }}</code>
+                <code class="text-sm font-mono">{{ getPartValue(3, day) }}</code>
               </div>
               <div class="flex justify-between p-2 bg-base-200 rounded">
                 <span class="text-sm text-base-content/70">月</span>
-                <code class="text-sm font-mono">{{ month }}</code>
+                <code class="text-sm font-mono">{{ getPartValue(4, month) }}</code>
               </div>
               <div class="flex justify-between p-2 bg-base-200 rounded">
                 <span class="text-sm text-base-content/70">星期</span>
-                <code class="text-sm font-mono">{{ week }}</code>
+                <code class="text-sm font-mono">{{ getPartValue(5, week) }}</code>
               </div>
             </div>
           </div>
@@ -233,6 +248,7 @@ const hour = ref('0')
 const day = ref('*')
 const month = ref('*')
 const week = ref('*')
+const cronInput = ref('0 0 0 * * *')
 
 const FIELD_RANGES = {
   second: { label: '秒', min: 0, max: 59 },
@@ -258,10 +274,38 @@ const presets = [
   { name: '工作日上午9点', cron: '0 0 9 * * 1-5', values: ['0', '0', '9', '*', '*', '1-5'] }
 ]
 
+const normalizeExpression = (expression: string): string => expression.trim().split(/\s+/).filter(Boolean).join(' ')
 
-const cronExpression = computed(() => {
-  return `${second.value} ${minute.value} ${hour.value} ${day.value} ${month.value} ${week.value}`
+const cronParts = computed(() => normalizeExpression(cronInput.value).split(' ').filter(Boolean))
+
+const structureError = computed(() => {
+  const expression = normalizeExpression(cronInput.value)
+  if (!expression) {
+    return 'Cron 表达式不能为空'
+  }
+  if (cronParts.value.length !== 6) {
+    return `Cron 表达式需要 6 段，当前为 ${cronParts.value.length} 段`
+  }
+  return ''
 })
+
+const getPartValue = (index: number, fallback: string): string => cronParts.value[index] || fallback
+
+const setPartValue = (index: number, value: string) => {
+  const values = structureError.value
+    ? [second.value, minute.value, hour.value, day.value, month.value, week.value]
+    : [...cronParts.value]
+  values[index] = value
+  ;[second.value, minute.value, hour.value, day.value, month.value, week.value] = values
+  cronInput.value = values.join(' ')
+}
+
+const cronExpression = computed(() => normalizeExpression(cronInput.value))
+
+const updatePartValue = (index: number, event: Event) => {
+  const target = event.target as HTMLInputElement | null
+  setPartValue(index, target?.value || '')
+}
 
 const validateCronField = (fieldName: FieldName, value: string): string => {
   const config = FIELD_RANGES[fieldName]
@@ -336,63 +380,76 @@ const validateCronField = (fieldName: FieldName, value: string): string => {
 }
 
 const fieldErrors = computed(() => ({
-  second: validateCronField('second', second.value),
-  minute: validateCronField('minute', minute.value),
-  hour: validateCronField('hour', hour.value),
-  day: validateCronField('day', day.value),
-  month: validateCronField('month', month.value),
-  week: validateCronField('week', week.value)
+  second: structureError.value ? '' : validateCronField('second', getPartValue(0, second.value)),
+  minute: structureError.value ? '' : validateCronField('minute', getPartValue(1, minute.value)),
+  hour: structureError.value ? '' : validateCronField('hour', getPartValue(2, hour.value)),
+  day: structureError.value ? '' : validateCronField('day', getPartValue(3, day.value)),
+  month: structureError.value ? '' : validateCronField('month', getPartValue(4, month.value)),
+  week: structureError.value ? '' : validateCronField('week', getPartValue(5, week.value))
 }))
 
-const isCronInvalid = computed(() => Object.values(fieldErrors.value).some(Boolean))
+const isCronInvalid = computed(() => Boolean(structureError.value) || Object.values(fieldErrors.value).some(Boolean))
+
+const invalidReason = computed(() => {
+  if (structureError.value) {
+    return structureError.value
+  }
+  return Object.values(fieldErrors.value).find(Boolean) || '表达式无效'
+})
 
 const description = computed(() => {
   const parts = []
   
-  if (second.value === '*') {
+  const [cronSecond, cronMinute, cronHour, cronDay, cronMonth, cronWeek] = cronParts.value
+
+  if (isCronInvalid.value || !cronSecond || !cronMinute || !cronHour || !cronDay || !cronMonth || !cronWeek) {
+    return '请输入合法的 Cron 表达式'
+  }
+
+  if (cronSecond === '*') {
     parts.push('每秒')
-  } else if (second.value.includes('/')) {
-    const step = second.value.split('/')[1]
+  } else if (cronSecond.includes('/')) {
+    const step = cronSecond.split('/')[1]
     parts.push(`每${step}秒`)
-  } else if (second.value !== '0') {
-    parts.push(`第${second.value}秒`)
+  } else if (cronSecond !== '0') {
+    parts.push(`第${cronSecond}秒`)
   }
   
-  if (minute.value === '*') {
+  if (cronMinute === '*') {
     parts.push('每分钟')
-  } else if (minute.value.includes('/')) {
-    const step = minute.value.split('/')[1]
+  } else if (cronMinute.includes('/')) {
+    const step = cronMinute.split('/')[1]
     parts.push(`每${step}分钟`)
   } else {
-    parts.push(`第${minute.value}分钟`)
+    parts.push(`第${cronMinute}分钟`)
   }
   
-  if (hour.value === '*') {
+  if (cronHour === '*') {
     parts.push('每小时')
-  } else if (hour.value.includes('/')) {
-    const step = hour.value.split('/')[1]
+  } else if (cronHour.includes('/')) {
+    const step = cronHour.split('/')[1]
     parts.push(`每${step}小时`)
   } else {
-    parts.push(`${hour.value}点`)
+    parts.push(`${cronHour}点`)
   }
   
-  if (day.value !== '*') {
-    parts.push(`每月${day.value}号`)
+  if (cronDay !== '*') {
+    parts.push(`每月${cronDay}号`)
   }
   
-  if (month.value !== '*') {
-    parts.push(`${month.value}月`)
+  if (cronMonth !== '*') {
+    parts.push(`${cronMonth}月`)
   }
   
-  if (week.value !== '*') {
+  if (cronWeek !== '*') {
     const weekMap: Record<string, string> = {
       '0': '周日', '1': '周一', '2': '周二', '3': '周三',
       '4': '周四', '5': '周五', '6': '周六', '7': '周日'
     }
-    if (week.value.includes('-')) {
+    if (cronWeek.includes('-')) {
       parts.push('工作日')
     } else {
-      parts.push(weekMap[week.value] || `星期${week.value}`)
+      parts.push(weekMap[cronWeek] || `星期${cronWeek}`)
     }
   }
   
@@ -401,6 +458,7 @@ const description = computed(() => {
 
 const applyPreset = (preset: any) => {
   [second.value, minute.value, hour.value, day.value, month.value, week.value] = preset.values
+  cronInput.value = preset.cron
 }
 
 const copyCron = async () => {
