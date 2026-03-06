@@ -215,6 +215,27 @@
             <div class="space-y-2">
               <div class="flex justify-between p-2 bg-base-200 rounded">
                 <span class="text-sm text-base-content/70">秒</span>
+                <code class="text-sm font-mono">{{ fieldDescriptions[0] }}</code>
+              </div>
+              <div class="flex justify-between p-2 bg-base-200 rounded">
+                <span class="text-sm text-base-content/70">分钟</span>
+                <code class="text-sm font-mono">{{ fieldDescriptions[1] }}</code>
+              </div>
+              <div class="flex justify-between p-2 bg-base-200 rounded">
+                <span class="text-sm text-base-content/70">小时</span>
+                <code class="text-sm font-mono">{{ fieldDescriptions[2] }}</code>
+              </div>
+              <div class="flex justify-between p-2 bg-base-200 rounded">
+                <span class="text-sm text-base-content/70">日</span>
+                <code class="text-sm font-mono">{{ fieldDescriptions[3] }}</code>
+              </div>
+              <div class="flex justify-between p-2 bg-base-200 rounded">
+                <span class="text-sm text-base-content/70">月</span>
+                <code class="text-sm font-mono">{{ fieldDescriptions[4] }}</code>
+              </div>
+              <div class="flex justify-between p-2 bg-base-200 rounded">
+                <span class="text-sm text-base-content/70">星期</span>
+                <code class="text-sm font-mono">{{ fieldDescriptions[5] }}</code>
                 <code class="text-sm font-mono">{{ getPartValue(0, second) }}</code>
               </div>
               <div class="flex justify-between p-2 bg-base-200 rounded">
@@ -274,6 +295,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useToolNavigation } from '@/composables/useToolNavigation'
+import { parseFieldToken, describeField, describeCronExpression, type CronFieldType } from '@/utils/cronExplain'
 
 const { goBack } = useToolNavigation()
 
@@ -436,6 +458,21 @@ const invalidReason = computed(() => {
   return Object.values(fieldErrors.value).find(Boolean) || '表达式无效'
 })
 
+const fieldTypes: CronFieldType[] = ['second', 'minute', 'hour', 'day', 'month', 'week']
+
+const fieldValues = computed(() => [
+  second.value,
+  minute.value,
+  hour.value,
+  day.value,
+  month.value,
+  week.value
+])
+
+const fieldDescriptions = computed(() => {
+  return fieldValues.value.map((value, index) =>
+    describeField(parseFieldToken(value, fieldTypes[index]), fieldTypes[index])
+  )
 const parseCronExpression = (expression: string) => {
   const parts = expression.split(/\s+/).filter(Boolean)
 
@@ -483,6 +520,7 @@ watch(expressionInput, (value) => {
 })
 
 const description = computed(() => {
+  return describeCronExpression(fieldValues.value)
   const parts = []
   
   const [cronSecond, cronMinute, cronHour, cronDay, cronMonth, cronWeek] = cronParts.value
