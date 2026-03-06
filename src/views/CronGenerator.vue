@@ -34,6 +34,18 @@
                 class="input input-bordered w-full"
               />
               <p v-if="expressionError" class="text-sm text-error">{{ expressionError }}</p>
+          <!-- 完整表达式输入 -->
+          <div class="bg-base-100 rounded-2xl p-6 shadow-lg">
+            <h3 class="font-semibold text-base-content mb-4">完整 Cron 表达式</h3>
+            <div class="form-control">
+              <textarea
+                v-model="cronInput"
+                placeholder="例如：0 */5 * * * *"
+                class="textarea textarea-bordered h-24 font-mono"
+                :class="{ 'textarea-error': structureError }"
+              />
+              <p class="mt-2 text-xs text-base-content/70">格式：秒 分 时 日 月 周（共 6 段）</p>
+              <p v-if="structureError" class="mt-1 text-xs text-error">{{ structureError }}</p>
             </div>
           </div>
 
@@ -64,7 +76,7 @@
                   <span class="label-text font-medium">秒 (0-59)</span>
                 </label>
                 <input
-                  v-model="second"
+                   :value="getPartValue(0, second)" @input="updatePartValue(0, $event)"
                   type="text"
                   placeholder="* 或 0-59"
                   class="input input-bordered input-sm"
@@ -79,7 +91,7 @@
                   <span class="label-text font-medium">分钟 (0-59)</span>
                 </label>
                 <input
-                  v-model="minute"
+                   :value="getPartValue(1, minute)" @input="updatePartValue(1, $event)"
                   type="text"
                   placeholder="* 或 0-59"
                   class="input input-bordered input-sm"
@@ -94,7 +106,7 @@
                   <span class="label-text font-medium">小时 (0-23)</span>
                 </label>
                 <input
-                  v-model="hour"
+                   :value="getPartValue(2, hour)" @input="updatePartValue(2, $event)"
                   type="text"
                   placeholder="* 或 0-23"
                   class="input input-bordered input-sm"
@@ -109,7 +121,7 @@
                   <span class="label-text font-medium">日 (1-31)</span>
                 </label>
                 <input
-                  v-model="day"
+                   :value="getPartValue(3, day)" @input="updatePartValue(3, $event)"
                   type="text"
                   placeholder="* 或 1-31"
                   class="input input-bordered input-sm"
@@ -124,7 +136,7 @@
                   <span class="label-text font-medium">月 (1-12)</span>
                 </label>
                 <input
-                  v-model="month"
+                   :value="getPartValue(4, month)" @input="updatePartValue(4, $event)"
                   type="text"
                   placeholder="* 或 1-12"
                   class="input input-bordered input-sm"
@@ -139,7 +151,7 @@
                   <span class="label-text font-medium">星期 (0-7, 0和7都表示周日)</span>
                 </label>
                 <input
-                  v-model="week"
+                   :value="getPartValue(5, week)" @input="updatePartValue(5, $event)"
                   type="text"
                   placeholder="* 或 0-7"
                   class="input input-bordered input-sm"
@@ -185,7 +197,7 @@
             <div class="p-4 bg-base-200 rounded-lg">
               <code class="text-lg font-mono" :class="isCronInvalid ? 'text-error' : 'text-primary'">{{ cronExpression }}</code>
             </div>
-            <p v-if="isCronInvalid" class="mt-2 text-sm text-error">表达式无效</p>
+            <p v-if="isCronInvalid" class="mt-2 text-sm text-error">{{ invalidReason }}</p>
           </div>
 
           <!-- 表达式解释 -->
@@ -215,6 +227,27 @@
               <div class="flex justify-between p-2 bg-base-200 rounded">
                 <span class="text-sm text-base-content/70">星期</span>
                 <code class="text-sm font-mono">{{ fieldDescriptions[5] }}</code>
+                <code class="text-sm font-mono">{{ getPartValue(0, second) }}</code>
+              </div>
+              <div class="flex justify-between p-2 bg-base-200 rounded">
+                <span class="text-sm text-base-content/70">分钟</span>
+                <code class="text-sm font-mono">{{ getPartValue(1, minute) }}</code>
+              </div>
+              <div class="flex justify-between p-2 bg-base-200 rounded">
+                <span class="text-sm text-base-content/70">小时</span>
+                <code class="text-sm font-mono">{{ getPartValue(2, hour) }}</code>
+              </div>
+              <div class="flex justify-between p-2 bg-base-200 rounded">
+                <span class="text-sm text-base-content/70">日</span>
+                <code class="text-sm font-mono">{{ getPartValue(3, day) }}</code>
+              </div>
+              <div class="flex justify-between p-2 bg-base-200 rounded">
+                <span class="text-sm text-base-content/70">月</span>
+                <code class="text-sm font-mono">{{ getPartValue(4, month) }}</code>
+              </div>
+              <div class="flex justify-between p-2 bg-base-200 rounded">
+                <span class="text-sm text-base-content/70">星期</span>
+                <code class="text-sm font-mono">{{ getPartValue(5, week) }}</code>
               </div>
             </div>
           </div>
@@ -267,6 +300,7 @@ const expressionInput = ref('')
 const expressionError = ref('')
 const isSyncingFromExpression = ref(false)
 const isSyncingFromFields = ref(false)
+const cronInput = ref('0 0 0 * * *')
 
 const FIELD_RANGES = {
   second: { label: '秒', min: 0, max: 59 },
@@ -292,9 +326,19 @@ const presets = [
   { name: '工作日上午9点', cron: '0 0 9 * * 1-5', values: ['0', '0', '9', '*', '*', '1-5'] }
 ]
 
+const normalizeExpression = (expression: string): string => expression.trim().split(/\s+/).filter(Boolean).join(' ')
 
-const cronExpression = computed(() => {
-  return `${second.value} ${minute.value} ${hour.value} ${day.value} ${month.value} ${week.value}`
+const cronParts = computed(() => normalizeExpression(cronInput.value).split(' ').filter(Boolean))
+
+const structureError = computed(() => {
+  const expression = normalizeExpression(cronInput.value)
+  if (!expression) {
+    return 'Cron 表达式不能为空'
+  }
+  if (cronParts.value.length !== 6) {
+    return `Cron 表达式需要 6 段，当前为 ${cronParts.value.length} 段`
+  }
+  return ''
 })
 
 const validateCronField = (fieldName: FieldName, value: string): string => {
@@ -370,15 +414,15 @@ const validateCronField = (fieldName: FieldName, value: string): string => {
 }
 
 const fieldErrors = computed(() => ({
-  second: validateCronField('second', second.value),
-  minute: validateCronField('minute', minute.value),
-  hour: validateCronField('hour', hour.value),
-  day: validateCronField('day', day.value),
-  month: validateCronField('month', month.value),
-  week: validateCronField('week', week.value)
+  second: structureError.value ? '' : validateCronField('second', getPartValue(0, second.value)),
+  minute: structureError.value ? '' : validateCronField('minute', getPartValue(1, minute.value)),
+  hour: structureError.value ? '' : validateCronField('hour', getPartValue(2, hour.value)),
+  day: structureError.value ? '' : validateCronField('day', getPartValue(3, day.value)),
+  month: structureError.value ? '' : validateCronField('month', getPartValue(4, month.value)),
+  week: structureError.value ? '' : validateCronField('week', getPartValue(5, week.value))
 }))
 
-const isCronInvalid = computed(() => Object.values(fieldErrors.value).some(Boolean))
+const isCronInvalid = computed(() => Boolean(structureError.value) || Object.values(fieldErrors.value).some(Boolean))
 
 const parseCronExpression = (expression: string) => {
   const parts = expression.split(/\s+/).filter(Boolean)
@@ -445,6 +489,62 @@ const fieldDescriptions = computed(() => {
 
 const description = computed(() => {
   return describeCronExpression(fieldValues.value)
+  const parts = []
+  
+  const [cronSecond, cronMinute, cronHour, cronDay, cronMonth, cronWeek] = cronParts.value
+
+  if (isCronInvalid.value || !cronSecond || !cronMinute || !cronHour || !cronDay || !cronMonth || !cronWeek) {
+    return '请输入合法的 Cron 表达式'
+  }
+
+  if (cronSecond === '*') {
+    parts.push('每秒')
+  } else if (cronSecond.includes('/')) {
+    const step = cronSecond.split('/')[1]
+    parts.push(`每${step}秒`)
+  } else if (cronSecond !== '0') {
+    parts.push(`第${cronSecond}秒`)
+  }
+  
+  if (cronMinute === '*') {
+    parts.push('每分钟')
+  } else if (cronMinute.includes('/')) {
+    const step = cronMinute.split('/')[1]
+    parts.push(`每${step}分钟`)
+  } else {
+    parts.push(`第${cronMinute}分钟`)
+  }
+  
+  if (cronHour === '*') {
+    parts.push('每小时')
+  } else if (cronHour.includes('/')) {
+    const step = cronHour.split('/')[1]
+    parts.push(`每${step}小时`)
+  } else {
+    parts.push(`${cronHour}点`)
+  }
+  
+  if (cronDay !== '*') {
+    parts.push(`每月${cronDay}号`)
+  }
+  
+  if (cronMonth !== '*') {
+    parts.push(`${cronMonth}月`)
+  }
+  
+  if (cronWeek !== '*') {
+    const weekMap: Record<string, string> = {
+      '0': '周日', '1': '周一', '2': '周二', '3': '周三',
+      '4': '周四', '5': '周五', '6': '周六', '7': '周日'
+    }
+    if (cronWeek.includes('-')) {
+      parts.push('工作日')
+    } else {
+      parts.push(weekMap[cronWeek] || `星期${cronWeek}`)
+    }
+  }
+  
+  return parts.length > 0 ? parts.join(' ') + ' 执行' : '请配置执行时间'
 })
 
 const parseField = (field: string, min: number, max: number) => {
@@ -509,41 +609,134 @@ const parseField = (field: string, min: number, max: number) => {
   return allowed
 }
 
-const getNextRuns = (expression: string, count: number) => {
+type CronFields = {
+  secSet: Set<number>
+  minSet: Set<number>
+  hrSet: Set<number>
+  daySet: Set<number>
+  monSet: Set<number>
+  weekSet: Set<number>
+}
+
+const getSortedValues = (values: Set<number>) => Array.from(values).sort((a, b) => a - b)
+
+const findNextOrSame = (values: number[], current: number) => {
+  for (const value of values) {
+    if (value >= current) {
+      return value
+    }
+  }
+  return null
+}
+
+const parseCronFields = (expression: string): CronFields => {
   const [sec, min, hr, dayOfMonth, mon, dayOfWeek] = expression.trim().split(/\s+/)
   if (!dayOfWeek) {
     throw new Error('Cron 表达式必须为 6 段：秒 分 时 日 月 周')
   }
 
-  const secSet = parseField(sec, 0, 59)
-  const minSet = parseField(min, 0, 59)
-  const hrSet = parseField(hr, 0, 23)
-  const daySet = parseField(dayOfMonth, 1, 31)
-  const monSet = parseField(mon, 1, 12)
-  const weekSet = parseField(dayOfWeek, 0, 7)
+  return {
+    secSet: parseField(sec, 0, 59),
+    minSet: parseField(min, 0, 59),
+    hrSet: parseField(hr, 0, 23),
+    daySet: parseField(dayOfMonth, 1, 31),
+    monSet: parseField(mon, 1, 12),
+    weekSet: parseField(dayOfWeek, 0, 7)
+  }
+}
 
-  const weekMatches = (weekDay: number) => weekSet.has(weekDay) || (weekDay === 0 && weekSet.has(7))
-  const result: Date[] = []
-  const cursor = new Date()
+const getNextRunAfter = (start: Date, fields: CronFields, maxYears = 2) => {
+  const secValues = getSortedValues(fields.secSet)
+  const minValues = getSortedValues(fields.minSet)
+  const hrValues = getSortedValues(fields.hrSet)
+  const monValues = getSortedValues(fields.monSet)
+  const minSecond = secValues[0]
+  const minMinute = minValues[0]
+  const minHour = hrValues[0]
+
+  const weekMatches = (weekDay: number) => fields.weekSet.has(weekDay) || (weekDay === 0 && fields.weekSet.has(7))
+
+  const cursor = new Date(start)
   cursor.setMilliseconds(0)
+  cursor.setSeconds(cursor.getSeconds() + 1)
 
-  // 最多向未来搜索 2 年，避免死循环
-  const maxIterations = 2 * 366 * 24 * 60 * 60
+  const limit = new Date(start)
+  limit.setFullYear(limit.getFullYear() + maxYears)
 
-  for (let i = 0; i < maxIterations && result.length < count; i += 1) {
-    cursor.setSeconds(cursor.getSeconds() + 1)
-    const currentWeekDay = cursor.getDay()
-
-    const matched = secSet.has(cursor.getSeconds())
-      && minSet.has(cursor.getMinutes())
-      && hrSet.has(cursor.getHours())
-      && daySet.has(cursor.getDate())
-      && monSet.has(cursor.getMonth() + 1)
-      && weekMatches(currentWeekDay)
-
-    if (matched) {
-      result.push(new Date(cursor))
+  while (cursor <= limit) {
+    const currentMonth = cursor.getMonth() + 1
+    const nextMonth = findNextOrSame(monValues, currentMonth)
+    if (nextMonth === null) {
+      cursor.setFullYear(cursor.getFullYear() + 1, monValues[0] - 1, 1)
+      cursor.setHours(minHour, minMinute, minSecond, 0)
+      continue
     }
+    if (nextMonth !== currentMonth) {
+      cursor.setMonth(nextMonth - 1, 1)
+      cursor.setHours(minHour, minMinute, minSecond, 0)
+      continue
+    }
+
+    const currentDay = cursor.getDate()
+    if (!fields.daySet.has(currentDay) || !weekMatches(cursor.getDay())) {
+      cursor.setDate(currentDay + 1)
+      cursor.setHours(minHour, minMinute, minSecond, 0)
+      continue
+    }
+
+    const currentHour = cursor.getHours()
+    const nextHour = findNextOrSame(hrValues, currentHour)
+    if (nextHour === null) {
+      cursor.setDate(cursor.getDate() + 1)
+      cursor.setHours(minHour, minMinute, minSecond, 0)
+      continue
+    }
+    if (nextHour !== currentHour) {
+      cursor.setHours(nextHour, minMinute, minSecond, 0)
+      continue
+    }
+
+    const currentMinute = cursor.getMinutes()
+    const nextMinute = findNextOrSame(minValues, currentMinute)
+    if (nextMinute === null) {
+      cursor.setHours(currentHour + 1, minMinute, minSecond, 0)
+      continue
+    }
+    if (nextMinute !== currentMinute) {
+      cursor.setMinutes(nextMinute, minSecond, 0)
+      continue
+    }
+
+    const currentSecond = cursor.getSeconds()
+    const nextSecond = findNextOrSame(secValues, currentSecond)
+    if (nextSecond === null) {
+      cursor.setMinutes(currentMinute + 1, minSecond, 0)
+      continue
+    }
+    if (nextSecond !== currentSecond) {
+      cursor.setSeconds(nextSecond, 0)
+      continue
+    }
+
+    return new Date(cursor)
+  }
+
+  return null
+}
+
+const getNextRuns = (expression: string, count: number) => {
+  const fields = parseCronFields(expression)
+
+  const result: Date[] = []
+  let cursor = new Date()
+
+  for (let i = 0; i < count; i += 1) {
+    const nextRun = getNextRunAfter(cursor, fields)
+    if (!nextRun) {
+      break
+    }
+    result.push(nextRun)
+    cursor = nextRun
   }
 
   if (result.length < count) {
@@ -555,26 +748,36 @@ const getNextRuns = (expression: string, count: number) => {
 
 const formattedNextRuns = computed(() => {
   try {
-    return getNextRuns(cronExpression.value, 5).map(run => run.toLocaleString())
+    return getNextRuns(cronExpression.value, 5)
+  } catch (error) {
+    return error instanceof Error ? error : new Error('表达式无效，请检查配置项')
+  }
+})
+
+const nextRuns = computed(() => {
+  if (formattedNextRuns.value instanceof Error) {
+    return []
+  }
+
+  try {
+    return formattedNextRuns.value.map(run => run.toLocaleString())
   } catch {
     return []
   }
 })
 
 const previewError = computed(() => {
-  try {
-    getNextRuns(cronExpression.value, 1)
-    return ''
-  } catch (error) {
-    return error instanceof Error ? error.message : '表达式无效，请检查配置项'
+  if (formattedNextRuns.value instanceof Error) {
+    return formattedNextRuns.value.message
   }
+  return ''
 })
 
-const nextRuns = computed(() => formattedNextRuns.value)
 const nextRunText = computed(() => nextRuns.value[0] ?? '暂无')
 
 const applyPreset = (preset: any) => {
   [second.value, minute.value, hour.value, day.value, month.value, week.value] = preset.values
+  cronInput.value = preset.cron
 }
 
 const copyCron = async () => {
