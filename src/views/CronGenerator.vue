@@ -23,6 +23,17 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- 配置区域 -->
         <div class="space-y-6">
+          <!-- Cron 表达式输入 -->
+          <div class="bg-base-100 rounded-2xl p-6 shadow-lg">
+            <h3 class="font-semibold text-base-content mb-4">Cron 表达式输入</h3>
+            <div class="space-y-2">
+              <input
+                v-model="expressionInput"
+                type="text"
+                placeholder="例如：0 */5 * * * *"
+                class="input input-bordered w-full"
+              />
+              <p v-if="expressionError" class="text-sm text-error">{{ expressionError }}</p>
           <!-- 完整表达式输入 -->
           <div class="bg-base-100 rounded-2xl p-6 shadow-lg">
             <h3 class="font-semibold text-base-content mb-4">完整 Cron 表达式</h3>
@@ -261,7 +272,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useToolNavigation } from '@/composables/useToolNavigation'
 
 const { goBack } = useToolNavigation()
@@ -272,6 +283,10 @@ const hour = ref('0')
 const day = ref('*')
 const month = ref('*')
 const week = ref('*')
+const expressionInput = ref('')
+const expressionError = ref('')
+const isSyncingFromExpression = ref(false)
+const isSyncingFromFields = ref(false)
 const cronInput = ref('0 0 0 * * *')
 
 const FIELD_RANGES = {
@@ -419,6 +434,52 @@ const invalidReason = computed(() => {
     return structureError.value
   }
   return Object.values(fieldErrors.value).find(Boolean) || '表达式无效'
+})
+
+const parseCronExpression = (expression: string) => {
+  const parts = expression.split(/\s+/).filter(Boolean)
+
+  if (parts.length !== 6) {
+    expressionError.value = 'Cron 表达式必须严格包含 6 段：秒 分 时 日 月 周'
+    return false
+  }
+
+  isSyncingFromExpression.value = true
+  try {
+    ;[second.value, minute.value, hour.value, day.value, month.value, week.value] = parts
+    expressionError.value = ''
+    return true
+  } finally {
+    isSyncingFromExpression.value = false
+  }
+}
+
+watch(
+  [second, minute, hour, day, month, week],
+  () => {
+    if (isSyncingFromExpression.value) {
+      return
+    }
+
+    isSyncingFromFields.value = true
+    expressionInput.value = cronExpression.value
+    expressionError.value = ''
+    isSyncingFromFields.value = false
+  },
+  { immediate: true }
+)
+
+watch(expressionInput, (value) => {
+  if (isSyncingFromFields.value) {
+    return
+  }
+
+  if (!value.trim()) {
+    expressionError.value = ''
+    return
+  }
+
+  parseCronExpression(value)
 })
 
 const description = computed(() => {
