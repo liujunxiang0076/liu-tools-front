@@ -1930,6 +1930,47 @@ body {
   user-select: none;
 }
 
+/* 文章编译内容图片样式 - 去除暖色阴影并适配主题 */
+:where(
+  article,
+  .article-content,
+  .markdown-body,
+  .markdown-preview,
+  .md-preview,
+  .md-editor-preview,
+  .v-md-editor-preview,
+  .bytemd-preview
+) img {
+  border-radius: 0.875rem;
+  border: 1px solid hsl(var(--b3) / 0.6);
+  background-color: hsl(var(--b1));
+  box-shadow: 0 8px 20px hsl(var(--p) / 0.12) !important;
+  filter: none !important;
+}
+
+:where(
+  article,
+  .article-content,
+  .markdown-body,
+  .markdown-preview,
+  .md-preview,
+  .md-editor-preview,
+  .v-md-editor-preview,
+  .bytemd-preview
+) figure::before,
+:where(
+  article,
+  .article-content,
+  .markdown-body,
+  .markdown-preview,
+  .md-preview,
+  .md-editor-preview,
+  .v-md-editor-preview,
+  .bytemd-preview
+) figure::after {
+  content: none !important;
+}
+
 /* 全局滚动条优化 */
 * {
   scrollbar-width: thin;
