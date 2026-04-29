@@ -334,6 +334,15 @@ export const tools: Tool[] = [
     icon: '🔢',
     tags: ['数字', '中文', '大写', '金额', '财务', '转换'],
     path: '/tool/number-to-chinese'
+  },
+  {
+    id: 29,
+    name: '时间格式展示',
+    description: '查看时间的各种标准格式表示，支持 ISO 8601、RFC 2822、时间戳、本地化等格式',
+    category: 'development',
+    icon: '🕐',
+    tags: ['时间', '格式', 'ISO', 'RFC', '时间戳', '时区', 'DateTime'],
+    path: '/tool/time-format'
   }
 ]
 

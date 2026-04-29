@@ -26,6 +26,7 @@ import HashCalculator from '@/views/HashCalculator.vue'
 import UserAgentParser from '@/views/UserAgentParser.vue'
 import CssShadowGenerator from '@/views/CssShadowGenerator.vue'
 import CronGenerator from '@/views/CronGenerator.vue'
+import TimeFormatTool from '@/views/TimeFormatTool.vue'
 
 // 定义路由
 const routes: RouteRecordRaw[] = [
@@ -163,6 +164,11 @@ const routes: RouteRecordRaw[] = [
         path: 'cron-generator',
         name: 'ToolCronGenerator',
         component: CronGenerator
+      },
+      {
+        path: 'time-format',
+        name: 'ToolTimeFormat',
+        component: TimeFormatTool
       }
     ]
   },
